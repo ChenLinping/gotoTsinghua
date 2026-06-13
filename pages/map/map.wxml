@@ -7,42 +7,46 @@
 
     <!-- 地面网格 -->
     <view class="world-grid">
-      <view wx:for="{{gridRows}}" wx:key="index" wx:for-index="gi" class="grid-row">
+      <view wx:for="{{gridRows}}" wx:key="index" class="grid-row">
         <view wx:for="{{item}}" wx:key="index" class="grid-cell gc-{{item}}"></view>
       </view>
     </view>
 
     <!-- 装饰物 -->
-    <view class="deco deco-cloud" style="left:200px;top:80px;">☁️</view>
-    <view class="deco deco-cloud" style="left:1200px;top:60px;">⛅</view>
-    <view class="deco deco-cloud" style="left:2200px;top:100px;">☁️</view>
-    <view class="deco deco-tree" style="left:100px;top:400px;">🌳</view>
-    <view class="deco deco-tree" style="left:2800px;top:800px;">🌲</view>
-    <view class="deco deco-tree" style="left:150px;top:1500px;">🌿</view>
-    <view class="deco deco-tree" style="left:2700px;top:2000px;">🌳</view>
-    <view class="deco deco-tree" style="left:500px;top:2800px;">🪨</view>
-    <view class="deco deco-tree" style="left:2500px;top:2700px;">🪨</view>
+    <view class="deco deco-cloud" style="left:200px;top:80px;">☁</view>
+    <view class="deco deco-cloud" style="left:1200px;top:60px;">☁</view>
+    <view class="deco deco-cloud" style="left:2200px;top:100px;">☁</view>
+    <view class="deco deco-tree" style="left:100px;top:400px;">♣</view>
+    <view class="deco deco-tree" style="left:2800px;top:800px;">♣</view>
+    <view class="deco deco-tree" style="left:150px;top:1500px;">♠</view>
+    <view class="deco deco-tree" style="left:2700px;top:2000px;">♣</view>
+    <view class="deco deco-tree" style="left:500px;top:2800px;">◆</view>
+    <view class="deco deco-tree" style="left:2500px;top:2700px;">◆</view>
+
+    <!-- 伤害飘字 -->
+    <view wx:for="{{dmgNumbers}}" wx:key="id"
+      class="dmg-float {{item.isPlayer ? 'dmg-player' : 'dmg-monster'}}"
+      style="left:{{item.x}}px;top:{{item.y}}px;">
+      <text>-{{item.value}}</text>
+    </view>
 
     <!-- 怪物 -->
-    <view
-      wx:for="{{monsters}}"
-      wx:key="id"
-      class="mob {{item.alive ? 'mob-alive' : 'mob-dead'}} {{!item.unlocked ? 'mob-locked' : ''}} {{item.isBoss ? 'mob-boss' : ''}} {{item.isElite ? 'mob-elite' : ''}}"
-      style="left:{{item.px}}px;top:{{item.py}}px;"
-    >
+    <view wx:for="{{monsters}}" wx:key="id"
+      class="mob {{item.alive ? 'mob-alive' : 'mob-dead'}} {{!item.unlocked ? 'mob-locked' : ''}} {{item.isBoss ? 'mob-boss' : ''}} {{item.isElite ? 'mob-elite' : ''}} {{item.aiState === 'chase' ? 'mob-chase' : ''}}"
+      style="left:{{item.px}}px;top:{{item.py}}px;">
       <view class="mob-body">
         <view class="mob-head">
-          <text wx:if="{{!item.alive}}" class="mob-face">✓</text>
-          <text wx:elif="{{item.isBoss}}" class="mob-face">👹</text>
-          <text wx:elif="{{item.isElite}}" class="mob-face">💀</text>
-          <text wx:elif="{{!item.unlocked}}" class="mob-face">🔒</text>
+          <text wx:if="{{!item.alive}}" class="mob-face">+</text>
+          <text wx:elif="{{item.isBoss}}" class="mob-face">B</text>
+          <text wx:elif="{{item.isElite}}" class="mob-face">E</text>
+          <text wx:elif="{{!item.unlocked}}" class="mob-face">?</text>
           <text wx:else class="mob-face">{{item.emoji}}</text>
         </view>
         <view class="mob-legs">
           <view class="mob-leg"></view>
           <view class="mob-leg"></view>
         </view>
-        <!-- 怪物名字和HP -->
+        <!-- HP条 -->
         <view class="mob-info" wx:if="{{item.alive && item.unlocked}}">
           <text class="mob-name">{{item.name}}</text>
           <view class="mob-hp-bar">
@@ -54,14 +58,14 @@
 
     <!-- 玩家角色 + 法宝环绕 -->
     <view class="player" style="left:{{playerX}}px;top:{{playerY}}px;">
+      <!-- 护盾光环 -->
+      <view class="shield-aura" wx:if="{{forgeShieldFrames > 0}}"></view>
+
       <!-- 法宝环绕圈 -->
       <view class="treasure-orbit" wx:if="{{treasures.length > 0}}">
-        <view
-          wx:for="{{treasures}}"
-          wx:key="index"
+        <view wx:for="{{treasures}}" wx:key="index"
           class="treasure-item"
-          style="transform:rotate({{treasureAngle + (index * (360 / treasures.length))}}deg) translateX(55px) rotate({{-(treasureAngle + (index * (360 / treasures.length)))}}deg);"
-        >
+          style="transform:rotate({{treasureAngle + (index * (360 / treasures.length))}}deg) translateX(55px) rotate({{-(treasureAngle + (index * (360 / treasures.length)))}}deg);">
           <text class="treasure-emoji">{{item.emoji}}</text>
         </view>
       </view>
@@ -69,7 +73,7 @@
       <!-- 玩家身体 -->
       <view class="steve {{playerMoving ? 'steve-walk' : ''}}">
         <view class="steve-head-box">
-          <text class="steve-face">😀</text>
+          <text class="steve-face">A</text>
         </view>
         <view class="steve-body-box">
           <view class="steve-arm-l"></view>
@@ -85,176 +89,98 @@
     </view>
   </view>
 
+  <!-- ===== 红屏闪烁 ===== -->
+  <view class="hit-flash" wx:if="{{hitFlash}}"></view>
+
   <!-- ===== HUD（屏幕固定） ===== -->
   <view class="hud-bar">
     <text class="hud-lv">Lv.{{char.level}}</text>
     <text class="hud-rank">{{rank.current.emoji}}</text>
     <view class="hud-hp-wrap">
-      <view class="hud-hp-fill" style="width:{{(char.hp/char.maxHP)*100}}%"></view>
+      <view class="hud-hp-fill {{char.hp < char.maxHP * 0.3 ? 'hp-low' : ''}}" style="width:{{(char.hp/char.maxHP)*100}}%"></view>
     </view>
-    <text class="hud-coin">🪙{{char.coins}}</text>
-    <text class="hud-treasure-count">🗡×{{treasures.length}}</text>
+    <text class="hud-hp-text">{{char.hp}}/{{char.maxHP}}</text>
+    <text class="hud-coin">$ {{char.coins}}</text>
+    <text class="hud-knife">x{{treasures.length}}</text>
   </view>
 
   <!-- 区域选择 -->
   <view class="region-pill" bindtap="toggleRegionMenu" wx:if="{{selectedRegion}}">
     <text>{{selectedRegion.icon}} {{selectedRegion.name}}</text>
-    <text class="pill-arrow">{{showRegionMenu ? '▲' : '▼'}}</text>
+    <text class="pill-arrow">{{showRegionMenu ? '^' : 'v'}}</text>
   </view>
   <view class="region-dropdown" wx:if="{{showRegionMenu}}">
     <view wx:for="{{regions}}" wx:key="id"
       class="dd-item {{selectedRegionId === item.id ? 'dd-active' : ''}} {{!item.unlocked ? 'dd-locked' : ''}}"
       data-id="{{item.id}}" bindtap="selectRegion">
       <text>{{item.icon}} {{item.name}}</text>
-      <text wx:if="{{!item.unlocked}}" class="dd-lock">🔒Lv.{{item.unlockLevel}}</text>
+      <text wx:if="{{!item.unlocked}}" class="dd-lock">Lv.{{item.unlockLevel}}</text>
     </view>
   </view>
 
   <!-- 每日宝箱 -->
   <view class="chest-float" bindtap="openChest" wx:if="{{showChest}}">
-    <text class="chest-emoji">🎁</text>
+    <text class="chest-emoji">+</text>
   </view>
 
   <!-- 虚拟摇杆 -->
   <view class="joystick-zone"
     catchtouchstart="onJoyTouchStart"
     catchtouchmove="onJoyTouchMove"
-    catchtouchend="onJoyTouchEnd"
-  >
+    catchtouchend="onJoyTouchEnd">
     <view class="joystick-base">
       <view class="joystick-knob" style="transform:translate({{joyKnobX}}px,{{joyKnobY}}px);"></view>
     </view>
   </view>
 
   <!-- 提示文字 -->
-  <view class="hint-bar" wx:if="{{state === 'exploring' && treasures.length === 0}}">
-    <text>走向怪物开始冒险！打不过就炼宝变强 💪</text>
+  <view class="hint-bar" wx:if="{{showHint && state === 'exploring'}}">
+    <text>靠近怪物开始战斗！血量低了自动炼宝变强</text>
   </view>
 
-  <!-- ===== 炼宝界面 ===== -->
+  <!-- ===== 炼宝面板 (5道题) ===== -->
   <view class="forge-overlay" wx:if="{{state === 'forging'}}">
     <view class="forge-bg"></view>
     <view class="forge-panel">
+      <!-- 标题 -->
       <view class="forge-header">
-        <text class="forge-title">🔮 炼宝炉</text>
-        <text class="forge-sub">注入知识之力，锻造新法宝！</text>
+        <text class="forge-title">* 炼宝炉 *</text>
+        <text class="forge-sub">答对获得法宝，增强战斗力！</text>
       </view>
 
-      <view class="forge-furnace">
-        <view class="furnace-glow"></view>
-        <text class="furnace-emoji">🔮</text>
+      <!-- 进度 -->
+      <view class="forge-progress">
+        <text class="forge-counter">第 {{forgeIdx + 1}} / {{forgeQuestions.length}} 题</text>
+        <view class="forge-dots">
+          <view wx:for="{{forgeResults}}" wx:key="index"
+            class="forge-dot {{item === 'correct' ? 'dot-ok' : item === 'wrong' ? 'dot-no' : forgeIdx === index ? 'dot-cur' : ''}}"></view>
+        </view>
       </view>
 
-      <view class="forge-question" wx:if="{{currentQuestion}}">
-        <text class="forge-q-text">{{currentQuestion.q}}</text>
+      <!-- 当前题目 -->
+      <view class="forge-question" wx:if="{{forgeQuestions[forgeIdx]}}">
+        <text class="forge-q-text">{{forgeQuestions[forgeIdx].q}}</text>
       </view>
 
+      <!-- 选项 -->
       <view class="forge-options">
-        <view wx:for="{{currentQuestion.options}}" wx:key="index"
-          class="forge-opt {{forgeResult === 'correct' && index === currentQuestion.answer ? 'opt-correct' : ''}} {{forgeResult === 'wrong' && selectedOption === index ? 'opt-wrong' : ''}}"
+        <view wx:for="{{forgeQuestions[forgeIdx].options}}" wx:key="index"
+          class="forge-opt {{forgeShowResult && forgeResults[forgeIdx] === 'correct' && index === forgeQuestions[forgeIdx].answer ? 'opt-correct' : ''}} {{forgeShowResult && forgeSelectedOption === index && forgeResults[forgeIdx] === 'wrong' ? 'opt-wrong' : ''}}"
           data-index="{{index}}" bindtap="selectForgeOption">
           <text class="opt-label">{{index === 0 ? 'A' : index === 1 ? 'B' : index === 2 ? 'C' : 'D'}}</text>
           <text class="opt-text">{{item}}</text>
         </view>
       </view>
 
-      <view class="forge-explain" wx:if="{{forgeResult}}">
-        <text class="{{forgeResult === 'correct' ? 'explain-ok' : 'explain-fail'}}">{{forgeResult === 'correct' ? '✅ 炼制成功！' : '❌ 炼制失败，再来！'}}</text>
-        <text class="explain-detail">{{forgeExplain}}</text>
-      </view>
-    </view>
-  </view>
-
-  <!-- ===== 获得法宝动画 ===== -->
-  <view class="got-overlay" wx:if="{{state === 'treasure_got'}}">
-    <view class="got-bg"></view>
-    <view class="got-content">
-      <view class="got-burst"></view>
-      <text class="got-emoji" wx:if="{{treasures.length > 0}}">{{treasures[treasures.length-1].emoji}}</text>
-      <text class="got-name" wx:if="{{treasures.length > 0}}">获得 {{treasures[treasures.length-1].name}}!</text>
-      <text class="got-count">法宝 ×{{treasures.length}}</text>
-    </view>
-  </view>
-
-  <!-- ===== 地图战斗动画 ===== -->
-  <view class="combat-overlay" wx:if="{{state === 'combat' || state === 'combat_end' || state === 'victory'}}">
-    <view class="combat-bg"></view>
-    <view class="combat-arena">
-      <!-- 玩家侧 -->
-      <view class="combat-player-side">
-        <view class="combat-steve">
-          <view class="steve-head-box"><text class="steve-face">😤</text></view>
-          <view class="steve-body-box">
-            <view class="steve-arm-l"></view>
-            <view class="steve-torso"></view>
-            <view class="steve-arm-r"></view>
-          </view>
-          <view class="steve-legs-box">
-            <view class="steve-leg-l"></view>
-            <view class="steve-leg-r"></view>
-          </view>
-        </view>
-        <!-- 剩余法宝 -->
-        <view class="combat-remaining">
-          <text wx:for="{{treasures}}" wx:key="index" wx:if="{{index > combatTreasureIdx}}" class="combat-treasure-mini">{{item.emoji}}</text>
-        </view>
+      <!-- 解析 -->
+      <view class="forge-explain" wx:if="{{forgeShowResult}}">
+        <text class="{{forgeResults[forgeIdx] === 'correct' ? 'explain-ok' : 'explain-fail'}}">{{forgeResults[forgeIdx] === 'correct' ? '正确！获得法宝！' : '错误，换题继续！'}}</text>
+        <text class="explain-detail">{{forgeQuestions[forgeIdx].explain}}</text>
       </view>
 
-      <!-- 飞行中的法宝 -->
-      <view class="combat-flying {{combatPhase === 'launch' ? 'fly-go' : ''}} {{combatPhase === 'hit' ? 'fly-hit' : ''}}"
-        wx:if="{{combatPhase === 'launch' || combatPhase === 'hit' && combatTreasureIdx >= 0}}">
-        <text class="fly-emoji" wx:if="{{combatTreasureIdx >= 0 && treasures[combatTreasureIdx]}}">{{treasures[combatTreasureIdx].emoji}}</text>
-      </view>
-
-      <!-- 伤害数字 -->
-      <view class="combat-dmg {{combatPhase === 'hit' ? 'dmg-show' : ''}}" wx:if="{{combatPhase === 'hit'}}">
-        <text>-{{combatDamage}}</text>
-      </view>
-
-      <!-- 怪物侧 -->
-      <view class="combat-monster-side {{combatPhase === 'hit' ? 'monster-shake' : ''}} {{combatPhase === 'counter' ? 'monster-attack' : ''}}">
-        <view class="combat-mob-body">
-          <view class="combat-mob-head">
-            <text class="combat-mob-face" wx:if="{{combatMonsterHp > 0}}">{{combatMonster.emoji}}</text>
-            <text class="combat-mob-face" wx:else>💥</text>
-          </view>
-          <view class="combat-mob-legs">
-            <view class="mob-leg"></view>
-            <view class="mob-leg"></view>
-          </view>
-        </view>
-        <text class="combat-mob-name">{{combatMonster.name}}</text>
-        <view class="combat-mob-hp">
-          <view class="combat-mob-hp-fill" style="width:{{(combatMonsterHp/combatMonsterMaxHp)*100}}%"></view>
-          <text class="combat-mob-hp-text">{{combatMonsterHp}}/{{combatMonsterMaxHp}}</text>
-        </view>
-      </view>
-
-      <!-- 战斗日志 -->
-      <view class="combat-log">
-        <text>{{combatLog}}</text>
-      </view>
-    </view>
-
-    <!-- 胜利/失败按钮 -->
-    <view class="combat-result" wx:if="{{state === 'victory'}}">
-      <text class="result-emoji">🎉</text>
-      <text class="result-title">击败 {{combatMonster.name}}！</text>
-      <view class="result-rewards">
-        <text>✨ +{{victoryXp}} 经验</text>
-        <text>🪙 +{{victoryCoins}} 金币</text>
-      </view>
-      <view class="result-btn" bindtap="backToExplore">
-        <text>继续探索</text>
-      </view>
-    </view>
-
-    <view class="combat-result" wx:if="{{state === 'combat_end'}}">
-      <text class="result-emoji">😵</text>
-      <text class="result-title">{{combatMonster.name}} 还没倒！</text>
-      <text class="result-hint">需要更多法宝，继续炼宝吧！</text>
-      <view class="result-btn" bindtap="forgeAfterCombat">
-        <text>继续炼宝</text>
+      <!-- 护盾倒计时 -->
+      <view class="forge-shield-bar">
+        <view class="forge-shield-fill" style="width:{{(forgeShieldFrames / 300) * 100}}%"></view>
       </view>
     </view>
   </view>
@@ -263,7 +189,7 @@
   <view class="drop-overlay" wx:if="{{showWeaponDrop}}">
     <view class="drop-bg"></view>
     <view class="drop-panel">
-      <text class="drop-title">🎉 区域通关！</text>
+      <text class="drop-title">* 区域通关! *</text>
       <text class="drop-weapon-emoji">{{dropWeapon.emoji}}</text>
       <text class="drop-weapon-name">{{dropWeapon.name}}</text>
       <text class="drop-weapon-desc">{{dropWeapon.desc}}</text>
