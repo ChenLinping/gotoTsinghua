@@ -427,12 +427,29 @@ function getRegionNodes(regionId, completedNodes) {
   if (!region) return [];
   completedNodes = completedNodes || [];
 
-  var prevCompleted = false;
-  return region.nodes.map(function(node, idx) {
+  // 先统计非Boss怪物完成情况
+  var nonBossTotal = 0;
+  var nonBossDone = 0;
+  for (var k = 0; k < region.nodes.length; k++) {
+    if (region.nodes[k].type !== 'boss') {
+      nonBossTotal++;
+      if (completedNodes.indexOf(region.nodes[k].id) >= 0) {
+        nonBossDone++;
+      }
+    }
+  }
+
+  return region.nodes.map(function(node) {
     var isCompleted = completedNodes.indexOf(node.id) >= 0;
-    // 第一个节点始终解锁，后续节点需要前一个已完成
-    var isUnlocked = (idx === 0) || prevCompleted;
-    prevCompleted = isCompleted;
+    var isBoss = node.type === 'boss';
+
+    // 普通/精英怪始终解锁(自由探索)，Boss需要清完其他怪
+    var isUnlocked;
+    if (isBoss) {
+      isUnlocked = (nonBossDone >= nonBossTotal);
+    } else {
+      isUnlocked = true;
+    }
 
     return {
       id: node.id,
@@ -443,7 +460,7 @@ function getRegionNodes(regionId, completedNodes) {
       label: node.label,
       completed: isCompleted,
       unlocked: isUnlocked,
-      isBoss: node.type === 'boss',
+      isBoss: isBoss,
       isElite: node.type === 'elite',
       monsterType: MONSTER_TYPES[node.type] || MONSTER_TYPES.normal
     };

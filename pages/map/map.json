@@ -1,4 +1,5 @@
 {
   "usingComponents": {},
-  "navigationBarTitleText": "冒险地图"
+  "navigationStyle": "custom",
+  "pageOrientation": "landscape"
 }

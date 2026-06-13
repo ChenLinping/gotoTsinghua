@@ -366,20 +366,20 @@
   line-height: 1;
 }
 
-/* ===== HUD Bar ===== */
+/* ===== HUD Bar (横屏适配) ===== */
 .hud-bar {
   position: fixed;
-  top: 12px;
-  left: 12px;
-  right: 12px;
+  top: 8px;
+  left: 8px;
+  right: 8px;
   z-index: 100;
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: rgba(0,0,0,0.6);
-  padding: 8px 14px;
-  border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.12);
+  gap: 8px;
+  background: rgba(0,0,0,0.55);
+  padding: 6px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.1);
   backdrop-filter: blur(8px);
 }
 
@@ -424,18 +424,17 @@
   white-space: nowrap;
 }
 
-/* ===== Region Pill ===== */
+/* ===== Region Pill (横屏: 右上角) ===== */
 .region-pill {
   position: fixed;
-  top: 52px;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 8px;
+  right: 200px;
   z-index: 101;
   display: flex;
   align-items: center;
   gap: 6px;
   background: rgba(0,0,0,0.55);
-  padding: 6px 16px;
+  padding: 6px 14px;
   border-radius: 16px;
   border: 1px solid rgba(255,255,255,0.12);
   backdrop-filter: blur(6px);
@@ -453,9 +452,8 @@
 /* Region Dropdown */
 .region-dropdown {
   position: fixed;
-  top: 82px;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 38px;
+  right: 200px;
   z-index: 102;
   background: rgba(0,0,0,0.85);
   border-radius: 12px;
@@ -467,8 +465,8 @@
 }
 
 @keyframes ddSlideIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
-  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .dd-item {
@@ -492,20 +490,20 @@
   color: #999;
 }
 
-/* ===== Chest Float ===== */
+/* ===== Chest Float (横屏: 右上角区域) ===== */
 .chest-float {
   position: fixed;
-  right: 16px;
-  top: 50%;
+  right: 140px;
+  top: 8px;
   z-index: 100;
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   background: linear-gradient(180deg, #c6a03e, #8b6914);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+  box-shadow: 0 3px 0 rgba(0,0,0,0.3);
   border: 2px solid #d4a017;
   animation: chestBounce 2s ease-in-out infinite;
 }
@@ -519,13 +517,13 @@
   font-size: 28px;
 }
 
-/* ===== Virtual Joystick ===== */
+/* ===== Virtual Joystick (横屏: 左下角) ===== */
 .joystick-zone {
   position: fixed;
   left: 20px;
-  bottom: 80px;
-  width: 120px;
-  height: 120px;
+  bottom: 60px;
+  width: 110px;
+  height: 110px;
   z-index: 200;
   display: flex;
   align-items: center;
@@ -557,15 +555,15 @@
 /* ===== Hint Bar ===== */
 .hint-bar {
   position: fixed;
-  bottom: 40px;
+  bottom: 56px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 90;
   background: rgba(0,0,0,0.55);
   color: rgba(255,255,255,0.8);
   font-size: 12px;
-  padding: 8px 20px;
-  border-radius: 20px;
+  padding: 6px 16px;
+  border-radius: 16px;
   border: 1px solid rgba(255,255,255,0.1);
   white-space: nowrap;
   animation: hintFade 3s ease-in-out infinite;
@@ -599,11 +597,13 @@
 .forge-panel {
   position: relative;
   z-index: 2;
-  width: 88%;
-  max-width: 380px;
+  width: 70%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
   background: linear-gradient(180deg, #2a1f4e 0%, #1a1340 100%);
-  border-radius: 20px;
-  padding: 28px 24px;
+  border-radius: 16px;
+  padding: 20px 20px;
   border: 2px solid rgba(167,139,250,0.3);
   box-shadow: 0 0 40px rgba(139,92,246,0.2);
   animation: panelSlideUp 0.35s ease;
@@ -891,12 +891,15 @@
   position: relative;
   z-index: 2;
   width: 92%;
-  max-width: 400px;
+  max-width: 600px;
+  max-height: 85vh;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 16px;
-  padding: 24px 20px;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 20px;
   animation: arenaSlide 0.4s ease;
 }
 
@@ -909,8 +912,9 @@
 .combat-player-side {
   display: flex;
   align-items: center;
-  gap: 16px;
-  align-self: flex-start;
+  gap: 12px;
+  flex: 1;
+  min-width: 120px;
 }
 
 .combat-steve {
@@ -946,8 +950,8 @@
 /* Flying Treasure */
 .combat-flying {
   position: absolute;
-  left: 80px;
-  top: 50%;
+  left: 25%;
+  top: 40%;
   transform: translateY(-50%);
   z-index: 10;
   transition: none;
@@ -962,9 +966,9 @@
 }
 
 @keyframes flyToMonster {
-  0% { left: 80px; opacity: 1; transform: translateY(-50%) scale(1); }
-  70% { left: 280px; opacity: 1; transform: translateY(-50%) scale(1.3); }
-  100% { left: 300px; opacity: 0.8; transform: translateY(-50%) scale(0.8); }
+  0% { left: 25%; opacity: 1; transform: translateY(-50%) scale(1); }
+  70% { left: 65%; opacity: 1; transform: translateY(-50%) scale(1.3); }
+  100% { left: 70%; opacity: 0.8; transform: translateY(-50%) scale(0.8); }
 }
 
 @keyframes flyHitFlash {
@@ -981,8 +985,8 @@
 /* Damage Number */
 .combat-dmg {
   position: absolute;
-  right: 60px;
-  top: 30%;
+  right: 20%;
+  top: 20%;
   z-index: 15;
   opacity: 0;
 }
@@ -1009,7 +1013,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  align-self: flex-end;
+  flex: 1;
+  min-width: 120px;
   animation: monsterAppear 0.5s ease;
 }
 
@@ -1108,7 +1113,7 @@
 .combat-log {
   width: 100%;
   text-align: center;
-  padding: 10px;
+  padding: 8px;
   background: rgba(0,0,0,0.3);
   border-radius: 10px;
   border: 1px solid rgba(255,255,255,0.06);
@@ -1124,15 +1129,15 @@
 .combat-result {
   position: relative;
   z-index: 5;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   background: rgba(0,0,0,0.6);
-  border-radius: 20px;
-  padding: 28px 32px;
+  border-radius: 16px;
+  padding: 20px 28px;
   border: 1px solid rgba(255,255,255,0.1);
   animation: resultPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  margin-top: 12px;
 }
 
 @keyframes resultPop {

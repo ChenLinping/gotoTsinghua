@@ -102,6 +102,11 @@ Page({
     this._loopTimer = null;
     this._combatQueue = [];
 
+    // 获取屏幕尺寸(横屏)
+    var sysInfo = wx.getSystemInfoSync();
+    this._vpW = sysInfo.windowWidth || 667;
+    this._vpH = sysInfo.windowHeight || 375;
+
     // 生成地面网格 (20行25列 = 500个cell，避免14400个)
     var gridRows = [];
     for (var i = 0; i < 20; i++) {
@@ -227,8 +232,8 @@ Page({
     px = Math.max(60, Math.min(MAP_W - 60, px));
     py = Math.max(60, Math.min(MAP_H - 60, py));
 
-    var vpW = 375;
-    var vpH = 667;
+    var vpW = this._vpW || 667;
+    var vpH = this._vpH || 375;
     var cx = px - vpW / 2;
     var cy = py - vpH / 2;
     cx = Math.max(0, Math.min(MAP_W - vpW, cx));

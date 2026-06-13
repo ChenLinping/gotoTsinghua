@@ -11,7 +11,8 @@
     "navigationBarTitleText": "走向清华",
     "navigationBarTextStyle": "white",
     "backgroundColor": "#0f0c29",
-    "backgroundTextStyle": "light"
+    "backgroundTextStyle": "light",
+    "pageOrientation": "landscape"
   },
   "tabBar": {
     "color": "#94a3b8",
