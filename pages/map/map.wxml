@@ -1,9 +1,13 @@
 <view class="page">
 
-  <!-- Top Hero Bar -->
-  <view class="hero-bar">
+  <!-- Top Hero Bar (可折叠) -->
+  <view class="hero-bar {{heroCollapsed ? 'hero-collapsed' : ''}}">
     <view class="hero-bg"></view>
-    <view class="hero-content">
+    <view class="hero-toggle" bindtap="toggleHeroBar">
+      <text class="hero-toggle-icon">{{heroCollapsed ? '▼' : '▲'}}</text>
+    </view>
+
+    <view class="hero-content" wx:if="{{!heroCollapsed}}">
       <!-- Left: Level & Rank -->
       <view class="hero-left">
         <view class="level-badge" style="background: {{rank.current.color}}">
@@ -43,6 +47,14 @@
         </view>
       </view>
     </view>
+
+    <!-- 折叠状态只显示简要信息 -->
+    <view class="hero-mini" wx:if="{{heroCollapsed}}">
+      <text class="hero-mini-lv">Lv.{{char.level}}</text>
+      <text class="hero-mini-rank">{{rank.current.emoji}}</text>
+      <text class="hero-mini-hp">❤{{char.hp}}</text>
+      <text class="hero-mini-coin">🪙{{char.coins}}</text>
+    </view>
   </view>
 
   <!-- Daily Chest -->
@@ -75,54 +87,78 @@
 
   <!-- Map Area -->
   <view class="map-area" wx:if="{{selectedRegionId}}">
-    <view
-      class="map-bg-layer"
-      style="background: linear-gradient(180deg, {{selectedRegion.bg || '#e8f5e9'}} 0%, rgba(245,245,245,0.8) 100%);"
-    ></view>
+    <!-- Minecraft 像素风背景层 -->
+    <view class="map-bg-layer mc-bg-{{selectedRegionId}}">
+      <!-- 像素草地/装饰块 -->
+      <view class="mc-block mc-tree" style="left:5%;top:20%;">🌳</view>
+      <view class="mc-block mc-tree" style="left:88%;top:35%;">🌲</view>
+      <view class="mc-block mc-tree" style="left:3%;top:60%;">🌿</view>
+      <view class="mc-block mc-tree" style="left:92%;top:70%;">🌳</view>
+      <view class="mc-block mc-tree" style="left:50%;top:3%;">⛅</view>
+      <view class="mc-block mc-tree" style="left:15%;top:5%;">☁️</view>
+      <view class="mc-block mc-tree" style="left:75%;top:2%;">☁️</view>
+    </view>
 
     <view class="map-header">
-      <text class="map-title">{{selectedRegion.icon}} {{selectedRegion.name}}</text>
+      <text class="map-title mc-font">{{selectedRegion.icon}} {{selectedRegion.name}}</text>
       <text class="map-desc">{{selectedRegion.desc}}</text>
+      <!-- 区域进度条 -->
+      <view class="region-progress-bar">
+        <view class="region-progress-fill" style="width: {{regionTotal > 0 ? (regionProgress/regionTotal)*100 : 0}}%"></view>
+        <text class="region-progress-text">{{regionProgress}}/{{regionTotal}}</text>
+      </view>
     </view>
 
     <!-- Node Map Canvas -->
-    <view class="map-canvas">
-      <!-- Connecting Lines -->
+    <scroll-view class="map-canvas" scroll-y="true" enhanced="true" show-scrollbar="false">
+      <!-- 像素风地面网格 -->
+      <view class="mc-ground">
+        <view wx:for="{{20}}" wx:key="*this" wx:for-index="gi" class="mc-grass-row">
+          <view wx:for="{{8}}" wx:key="*this" wx:for-index="gj" class="mc-grass-cell mc-grass-{{(gi+gj) % 3}}"></view>
+        </view>
+      </view>
+
+      <!-- Connecting Lines (像素风路径) -->
       <view
         wx:for="{{selectedNodes}}"
         wx:key="id"
         wx:if="{{index > 0}}"
-        class="path-line"
+        class="path-line mc-path"
         style="left: {{selectedNodes[index-1].x}}%; top: {{selectedNodes[index-1].y}}%; width: {{selectedNodes[index].x - selectedNodes[index-1].x}}%; height: {{selectedNodes[index].y - selectedNodes[index-1].y}}%;"
       >
-        <view class="path-line-inner {{selectedNodes[index-1].completed && selectedNodes[index].unlocked ? 'path-active' : ''}}"></view>
+        <view class="path-line-inner {{selectedNodes[index-1].completed && selectedNodes[index].unlocked ? 'path-active mc-path-active' : ''}}"></view>
       </view>
 
-      <!-- Nodes -->
+      <!-- Nodes (像素方块风格) -->
       <view
         wx:for="{{selectedNodes}}"
         wx:key="id"
-        class="map-node node-{{item.type}} {{item.completed ? 'node-completed' : ''}} {{item.unlocked && !item.completed ? 'node-available' : ''}} {{!item.unlocked ? 'node-locked' : ''}} {{item.isBoss ? 'node-boss' : ''}} {{item.isElite ? 'node-elite' : ''}}"
+        class="map-node mc-node node-{{item.type}} {{item.completed ? 'node-completed mc-done' : ''}} {{item.unlocked && !item.completed ? 'node-available mc-available' : ''}} {{!item.unlocked ? 'node-locked' : ''}} {{item.isBoss ? 'node-boss mc-boss' : ''}} {{item.isElite ? 'node-elite mc-elite' : ''}}"
         style="left: {{item.x}}%; top: {{item.y}}%;"
         data-id="{{item.id}}"
         bindtap="tapNode"
       >
-        <!-- Boss outer ring -->
-        <view class="node-boss-ring" wx:if="{{item.isBoss}}"></view>
-        <!-- Elite double ring -->
-        <view class="node-elite-ring" wx:if="{{item.isElite && !item.isBoss}}"></view>
+        <!-- Boss 外框像素风 -->
+        <view class="mc-boss-ring" wx:if="{{item.isBoss}}"></view>
+        <!-- Elite 外框 -->
+        <view class="mc-elite-ring" wx:if="{{item.isElite && !item.isBoss}}"></view>
 
-        <!-- Inner circle -->
-        <view class="node-inner">
-          <text wx:if="{{item.completed}}" class="node-icon">✓</text>
-          <text wx:elif="{{item.isBoss}}" class="node-icon">👹</text>
-          <text wx:elif="{{item.isElite}}" class="node-icon">⚔️</text>
-          <text wx:elif="{{!item.unlocked}}" class="node-icon">🔒</text>
-          <text wx:else class="node-icon">{{item.subject === 'math' ? '📐' : item.subject === 'chinese' ? '📖' : item.subject === 'english' ? '🔤' : item.subject === 'physics' ? '⚡' : item.subject === 'chemistry' ? '🧪' : item.subject === 'biology' ? '🧬' : '📚'}}</text>
+        <!-- 像素方块节点 -->
+        <view class="mc-block-node">
+          <view class="mc-block-face mc-block-top"></view>
+          <view class="mc-block-face mc-block-left"></view>
+          <view class="mc-block-face mc-block-right"></view>
+          <view class="mc-block-icon">
+            <text wx:if="{{item.completed}}" class="node-icon">✓</text>
+            <text wx:elif="{{item.isBoss}}" class="node-icon">👹</text>
+            <text wx:elif="{{item.isElite}}" class="node-icon">⚔️</text>
+            <text wx:elif="{{!item.unlocked}}" class="node-icon">🔒</text>
+            <text wx:else class="node-icon">{{item.subject === 'math' ? '📐' : item.subject === 'chinese' ? '📖' : item.subject === 'english' ? '🔤' : item.subject === 'physics' ? '⚡' : item.subject === 'chemistry' ? '🧪' : item.subject === 'biology' ? '🧬' : '📚'}}</text>
+          </view>
         </view>
 
         <!-- Label -->
-        <view class="node-label-wrap">
+        <view class="node-label-wrap mc-label">
           <text class="node-label">{{item.label}}</text>
           <text class="node-type-label" wx:if="{{item.isBoss}}">BOSS</text>
           <text class="node-type-label node-type-elite" wx:elif="{{item.isElite}}">精英</text>
@@ -130,6 +166,27 @@
 
         <!-- Available glow -->
         <view class="node-glow" wx:if="{{item.unlocked && !item.completed}}"></view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- ===== 武器掉落动画覆盖层 ===== -->
+  <view class="weapon-drop-overlay" wx:if="{{showWeaponDrop}}">
+    <view class="weapon-drop-bg"></view>
+    <view class="weapon-drop-content">
+      <text class="weapon-drop-title mc-font">🎉 区域通关！</text>
+      <text class="weapon-drop-region">{{dropRegionName}}</text>
+      <view class="weapon-drop-box">
+        <view class="weapon-drop-glow"></view>
+        <view class="weapon-drop-item">
+          <text class="weapon-drop-emoji">{{dropWeapon.emoji}}</text>
+          <text class="weapon-drop-name mc-font">{{dropWeapon.name}}</text>
+          <text class="weapon-drop-desc">{{dropWeapon.desc}}</text>
+          <text class="weapon-drop-stat">ATK +{{dropWeapon.atk}}</text>
+        </view>
+      </view>
+      <view class="weapon-drop-btn mc-btn" bindtap="confirmWeaponDrop">
+        <text class="weapon-drop-btn-text">装备并挑战Boss!</text>
       </view>
     </view>
   </view>

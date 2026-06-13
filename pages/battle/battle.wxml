@@ -1,208 +1,242 @@
 <!-- ========================================== -->
-<!-- 走向清华 V2 - 战斗页面 -->
+<!-- 走向清华 V2 - 战斗页面 (Minecraft风格) -->
 <!-- ========================================== -->
-<view class="battle-page">
+<view class="battle-page mc-battle">
 
   <!-- ====== Battle Field (Top Half) ====== -->
-  <view class="battle-field">
+  <view class="battle-field mc-field">
+
+    <!-- 天空/背景装饰 -->
+    <view class="mc-sky">
+      <view class="mc-cloud mc-cloud-1">☁️</view>
+      <view class="mc-cloud mc-cloud-2">☁️</view>
+    </view>
 
     <!-- Monster Section -->
-    <view class="monster-section">
+    <view class="monster-section mc-monster-section">
       <view class="monster-info-row">
-        <view class="monster-name">{{monster.name}}</view>
-        <view class="type-badge" style="background:{{monster.color}}">{{monster.typeName}}</view>
+        <view class="monster-name mc-text">{{monster.name}}</view>
+        <view class="type-badge mc-badge" style="background:{{monster.color}}">{{monster.typeName}}</view>
       </view>
-      <view class="monster-display {{isAttacking ? 'monster-hit' : ''}} {{isMonsterDamaged ? 'monster-shake' : ''}}">
-        <text class="monster-emoji">{{monster.emoji}}</text>
-      </view>
-      <!-- Floating damage on monster -->
-      <view wx:if="{{showPlayerDamage}}" class="damage-float {{showCrit ? 'damage-crit' : 'damage-normal'}}">
-        <text wx:if="{{showCrit}}" class="crit-tag">暴击</text>
-        <text>-{{playerDamageAmount}}</text>
-      </view>
-      <view class="hp-bar-container">
-        <view class="hp-bar monster-hp-bar">
-          <view class="hp-fill" style="width:{{monsterHpPercent}}%"></view>
+
+      <!-- 怪物像素方块 -->
+      <view class="mc-mob-display {{isAttacking ? 'monster-hit' : ''}} {{isMonsterDamaged ? 'monster-shake' : ''}}">
+        <view class="mc-mob-block">
+          <view class="mc-mob-top"></view>
+          <view class="mc-mob-front">
+            <text class="monster-emoji">{{monster.emoji}}</text>
+          </view>
+          <view class="mc-mob-left"></view>
+          <view class="mc-mob-right"></view>
         </view>
-        <text class="hp-text">{{monster.hp}}/{{monster.maxHP}}</text>
+      </view>
+
+      <!-- Floating damage on monster -->
+      <view wx:if="{{showPlayerDamage}}" class="mc-damage-float {{showCrit ? 'mc-damage-crit' : ''}}">
+        <text wx:if="{{showCrit}}" class="mc-crit-tag">暴击!</text>
+        <text class="mc-damage-num">-{{playerDamageAmount}}</text>
+      </view>
+
+      <!-- 怪物HP条 -->
+      <view class="mc-hp-bar-wrap">
+        <view class="mc-hp-bar mc-hp-enemy">
+          <view class="mc-hp-fill" style="width:{{monsterHpPercent}}%"></view>
+        </view>
+        <text class="mc-hp-text">{{monster.hp}}/{{monster.maxHP}}</text>
       </view>
     </view>
 
     <!-- VS Indicator -->
-    <view class="vs-section">
-      <text class="vs-text">VS</text>
-      <text class="node-label">{{nodeLabel}}</text>
+    <view class="mc-vs-section">
+      <view class="mc-vs-block">
+        <text class="mc-vs-text">VS</text>
+      </view>
+      <text class="mc-node-label">{{nodeLabel}}</text>
     </view>
 
     <!-- Player Section -->
-    <view class="player-section {{isPlayerDamaged ? 'player-shake' : ''}}">
+    <view class="mc-player-section {{isPlayerDamaged ? 'player-shake' : ''}}">
       <!-- Floating damage on player -->
-      <view wx:if="{{showMonsterDamage}}" class="damage-float damage-from-monster">
-        <text>-{{monsterDamageAmount}}</text>
+      <view wx:if="{{showMonsterDamage}}" class="mc-damage-float mc-damage-player">
+        <text class="mc-damage-num mc-damage-red">-{{monsterDamageAmount}}</text>
       </view>
-      <view class="player-info-row">
-        <view class="player-avatar">🧑‍🎓</view>
-        <view class="player-info-text">
-          <view class="player-level">Lv.{{char.level}}</view>
-          <view class="stat-inline">
-            <text class="stat-atk">ATK {{charStats.atk}}</text>
-            <text class="stat-def">DEF {{charStats.def}}</text>
+
+      <view class="mc-player-row">
+        <!-- 玩家像素角色 -->
+        <view class="mc-player-block">
+          <view class="mc-steve-head">
+            <text class="mc-steve-face">🧑‍🎓</text>
+          </view>
+          <view class="mc-steve-body">
+            <view class="mc-steve-arm mc-steve-arm-l"></view>
+            <view class="mc-steve-torso"></view>
+            <view class="mc-steve-arm mc-steve-arm-r"></view>
+          </view>
+          <view class="mc-steve-legs">
+            <view class="mc-steve-leg mc-steve-leg-l"></view>
+            <view class="mc-steve-leg mc-steve-leg-r"></view>
+          </view>
+        </view>
+
+        <view class="mc-player-info">
+          <view class="mc-player-lv">Lv.{{char.level}}</view>
+          <view class="mc-stats-inline">
+            <text class="mc-stat-atk">⚔{{charStats.atk}}</text>
+            <text class="mc-stat-def">🛡{{charStats.def}}</text>
           </view>
         </view>
       </view>
-      <view class="hp-bar-container">
-        <view class="hp-bar player-hp-bar">
-          <view class="hp-fill player-hp-fill" style="width:{{playerHpPercent}}%"></view>
+
+      <!-- 玩家HP条 -->
+      <view class="mc-hp-bar-wrap">
+        <view class="mc-hp-bar mc-hp-player">
+          <view class="mc-hp-fill mc-hp-fill-green" style="width:{{playerHpPercent}}%"></view>
         </view>
-        <text class="hp-text">{{playerHp}}/{{playerMaxHp}}</text>
+        <text class="mc-hp-text">{{playerHp}}/{{playerMaxHp}}</text>
       </view>
     </view>
 
   </view>
 
   <!-- ====== Question Area (Bottom Half) ====== -->
-  <view class="question-area" wx:if="{{!battleOver}}">
+  <view class="mc-question-area" wx:if="{{!battleOver}}">
 
     <!-- Question Progress -->
-    <view class="question-progress">
-      <text class="question-counter">第 {{questionIndex + 1}} 题</text>
-      <view class="progress-dots">
-        <view wx:for="{{progressDots}}" wx:key="index" class="dot dot-{{item}}"></view>
+    <view class="mc-progress">
+      <text class="mc-counter">第 {{questionIndex + 1}} 题</text>
+      <view class="mc-progress-dots">
+        <view wx:for="{{progressDots}}" wx:key="index" class="mc-dot mc-dot-{{item}}"></view>
       </view>
     </view>
 
     <!-- Question Card -->
-    <view class="question-card" wx:if="{{currentQuestion}}">
-      <text class="question-text">{{currentQuestion.q}}</text>
+    <view class="mc-question-card" wx:if="{{currentQuestion}}">
+      <text class="mc-question-text">{{currentQuestion.q}}</text>
     </view>
 
     <!-- Options -->
-    <view class="options-list">
+    <view class="mc-options">
       <view
         wx:for="{{currentQuestion.options}}"
         wx:key="index"
-        class="option-btn option-{{answeredOptions[index] || 'default'}} {{selectedOption === index ? 'option-selected' : ''}}"
+        class="mc-option mc-option-{{answeredOptions[index] || 'default'}} {{selectedOption === index ? 'mc-option-selected' : ''}}"
         data-index="{{index}}"
         bindtap="selectAnswer"
       >
-        <text class="option-label">{{index === 0 ? 'A' : index === 1 ? 'B' : index === 2 ? 'C' : 'D'}}</text>
-        <text class="option-text">{{item}}</text>
-        <text wx:if="{{showResult && index === currentQuestion.answer}}" class="option-icon-result">✓</text>
-        <text wx:if="{{showResult && selectedOption === index && index !== currentQuestion.answer}}" class="option-icon-result">✗</text>
+        <view class="mc-option-label">
+          <text>{{index === 0 ? 'A' : index === 1 ? 'B' : index === 2 ? 'C' : 'D'}}</text>
+        </view>
+        <text class="mc-option-text">{{item}}</text>
+        <text wx:if="{{showResult && index === currentQuestion.answer}}" class="mc-result-icon mc-result-correct">✓</text>
+        <text wx:if="{{showResult && selectedOption === index && index !== currentQuestion.answer}}" class="mc-result-icon mc-result-wrong">✗</text>
       </view>
     </view>
 
-    <!-- Explanation (shown after answering) -->
-    <view class="explanation-card" wx:if="{{showResult}}">
-      <view class="explanation-header {{isCorrect ? 'explanation-correct' : 'explanation-wrong'}}">
-        <text>{{isCorrect ? '✅ 回答正确！' : '❌ 回答错误'}}</text>
+    <!-- Explanation -->
+    <view class="mc-explanation" wx:if="{{showResult}}">
+      <view class="mc-exp-header {{isCorrect ? 'mc-exp-ok' : 'mc-exp-fail'}}">
+        <text>{{isCorrect ? '✅ 回答正确！攻击成功！' : '❌ 回答错误！怪物反击！'}}</text>
       </view>
-      <text class="explanation-text">{{explanation}}</text>
+      <text class="mc-exp-text">{{explanation}}</text>
     </view>
 
   </view>
 
   <!-- ====== Battle Log ====== -->
-  <view class="battle-log-section">
+  <view class="mc-log-section">
     <scroll-view
       scroll-y
-      class="battle-log-scroll"
+      class="mc-log-scroll"
       scroll-into-view="log-{{battleLog.length - 1}}"
       scroll-with-animation
     >
-      <view wx:for="{{battleLog}}" wx:key="index" id="log-{{index}}" class="log-entry">
+      <view wx:for="{{battleLog}}" wx:key="index" id="log-{{index}}" class="mc-log-entry">
         <text>{{item}}</text>
       </view>
     </scroll-view>
   </view>
 
   <!-- ====== Victory Overlay ====== -->
-  <view class="result-overlay" wx:if="{{victory}}">
-    <view class="result-overlay-bg"></view>
-    <view class="result-card victory-card">
-      <text class="result-emoji">🎉</text>
-      <text class="result-title victory-title">战斗胜利！</text>
+  <view class="mc-result-overlay" wx:if="{{victory}}">
+    <view class="mc-result-bg"></view>
+    <view class="mc-result-card mc-victory-card">
+      <text class="mc-result-emoji">🎉</text>
+      <text class="mc-result-title mc-victory-title mc-text">战斗胜利！</text>
 
-      <!-- Rewards -->
-      <view class="rewards-section">
-        <view class="reward-row">
-          <text class="reward-icon">✨</text>
-          <text class="reward-label">经验值</text>
-          <text class="reward-value">+{{rewards.xp}}</text>
+      <view class="mc-rewards">
+        <view class="mc-reward-row">
+          <text class="mc-reward-icon">✨</text>
+          <text class="mc-reward-label">经验值</text>
+          <text class="mc-reward-value">+{{rewards.xp}}</text>
         </view>
-        <view class="reward-row">
-          <text class="reward-icon">🪙</text>
-          <text class="reward-label">金币</text>
-          <text class="reward-value">+{{rewards.coins}}</text>
+        <view class="mc-reward-row">
+          <text class="mc-reward-icon">🪙</text>
+          <text class="mc-reward-label">金币</text>
+          <text class="mc-reward-value">+{{rewards.coins}}</text>
         </view>
       </view>
 
-      <!-- Battle Stats -->
-      <view class="battle-stats">
-        <view class="stat-item">
-          <text class="stat-num correct-color">{{monster.correctCount}}</text>
-          <text class="stat-label">答对</text>
+      <view class="mc-battle-stats">
+        <view class="mc-stat-col">
+          <text class="mc-stat-num mc-green">{{monster.correctCount}}</text>
+          <text class="mc-stat-lbl">答对</text>
         </view>
-        <view class="stat-item">
-          <text class="stat-num wrong-color">{{monster.wrongCount}}</text>
-          <text class="stat-label">答错</text>
+        <view class="mc-stat-col">
+          <text class="mc-stat-num mc-red">{{monster.wrongCount}}</text>
+          <text class="mc-stat-lbl">答错</text>
         </view>
-        <view class="stat-item">
-          <text class="stat-num">{{monster.questionsAnswered}}</text>
-          <text class="stat-label">总题数</text>
-        </view>
-      </view>
-
-      <!-- Level Up -->
-      <view class="level-up-banner" wx:if="{{leveledUp}}">
-        <text>⬆️ 升级！当前等级 Lv.{{char.level}}</text>
-      </view>
-
-      <!-- New Achievements -->
-      <view class="achievement-section" wx:if="{{newAchievements.length > 0}}">
-        <text class="achievement-title">成就解锁！</text>
-        <view wx:for="{{newAchievements}}" wx:key="id" class="achievement-item">
-          <text class="achievement-emoji">{{item.emoji}}</text>
-          <text class="achievement-name">{{item.name}}</text>
+        <view class="mc-stat-col">
+          <text class="mc-stat-num">{{monster.questionsAnswered}}</text>
+          <text class="mc-stat-lbl">总题数</text>
         </view>
       </view>
 
-      <!-- Bonus drop -->
-      <view class="bonus-drop" wx:if="{{rewards.bonus}}">
+      <view class="mc-levelup" wx:if="{{leveledUp}}">
+        <text>⬆️ 升级！Lv.{{char.level}}</text>
+      </view>
+
+      <view class="mc-achievements" wx:if="{{newAchievements.length > 0}}">
+        <text class="mc-ach-title">成就解锁！</text>
+        <view wx:for="{{newAchievements}}" wx:key="id" class="mc-ach-item">
+          <text class="mc-ach-emoji">{{item.emoji}}</text>
+          <text class="mc-ach-name">{{item.name}}</text>
+        </view>
+      </view>
+
+      <view class="mc-bonus" wx:if="{{rewards.bonus}}">
         <text>🎁 额外掉落：{{rewards.bonus}}</text>
       </view>
 
-      <view class="result-btn victory-btn" bindtap="goBack">
-        <text>返回地图</text>
+      <view class="mc-btn mc-btn-green" bindtap="goBack">
+        <text class="mc-btn-text">返回地图</text>
       </view>
     </view>
   </view>
 
   <!-- ====== Defeat Overlay ====== -->
-  <view class="result-overlay" wx:if="{{defeat}}">
-    <view class="result-overlay-bg"></view>
-    <view class="result-card defeat-card">
-      <text class="result-emoji">💀</text>
-      <text class="result-title defeat-title">战斗失败</text>
-      <text class="defeat-desc">你的HP归零了...回去休息一下吧！</text>
+  <view class="mc-result-overlay" wx:if="{{defeat}}">
+    <view class="mc-result-bg"></view>
+    <view class="mc-result-card mc-defeat-card">
+      <text class="mc-result-emoji">💀</text>
+      <text class="mc-result-title mc-defeat-title mc-text">战斗失败</text>
+      <text class="mc-defeat-desc">HP归零了...回去恢复吧！</text>
 
-      <!-- Battle Stats -->
-      <view class="battle-stats">
-        <view class="stat-item">
-          <text class="stat-num correct-color">{{monster.correctCount}}</text>
-          <text class="stat-label">答对</text>
+      <view class="mc-battle-stats">
+        <view class="mc-stat-col">
+          <text class="mc-stat-num mc-green">{{monster.correctCount}}</text>
+          <text class="mc-stat-lbl">答对</text>
         </view>
-        <view class="stat-item">
-          <text class="stat-num wrong-color">{{monster.wrongCount}}</text>
-          <text class="stat-label">答错</text>
+        <view class="mc-stat-col">
+          <text class="mc-stat-num mc-red">{{monster.wrongCount}}</text>
+          <text class="mc-stat-lbl">答错</text>
         </view>
       </view>
 
-      <view class="result-btn retry-btn" bindtap="retry">
-        <text>重新挑战</text>
+      <view class="mc-btn mc-btn-red" bindtap="retry">
+        <text class="mc-btn-text">重新挑战</text>
       </view>
-      <view class="result-btn back-btn" bindtap="goBack">
-        <text>返回地图</text>
+      <view class="mc-btn mc-btn-gray" bindtap="goBack">
+        <text class="mc-btn-text">返回地图</text>
       </view>
     </view>
   </view>

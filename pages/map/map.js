@@ -11,7 +11,19 @@ Page({
     daysUntilExam: 0,
     showChest: false,
     xpProgress: 0,
-    xpForLevel: 0
+    xpForLevel: 0,
+
+    // 可折叠英雄栏
+    heroCollapsed: false,
+
+    // 区域通关武器掉落动画
+    showWeaponDrop: false,
+    dropWeapon: null,
+    dropRegionName: '',
+
+    // 区域进度
+    regionProgress: 0,
+    regionTotal: 0
   },
 
   onLoad: function() {
@@ -63,6 +75,18 @@ Page({
       }
     }
 
+    // 计算当前区域进度
+    var regionProgress = 0;
+    var regionTotal = 0;
+    if (selectedRegion) {
+      for (var j = 0; j < selectedNodes.length; j++) {
+        regionTotal++;
+        if (selectedNodes[j].completed) {
+          regionProgress++;
+        }
+      }
+    }
+
     this.setData({
       char: char,
       regions: regions,
@@ -73,10 +97,103 @@ Page({
       daysUntilExam: daysUntilExam,
       showChest: showChest,
       xpProgress: xpProgress,
-      xpForLevel: xpForLevel
+      xpForLevel: xpForLevel,
+      regionProgress: regionProgress,
+      regionTotal: regionTotal
+    });
+
+    // 检查区域是否刚刚通关（所有非Boss节点完成）
+    this._checkRegionComplete(char, selectedRegionId, selectedNodes);
+  },
+
+  // ===== 检查区域通关 & 武器掉落 =====
+  _checkRegionComplete: function(char, regionId, nodes) {
+    if (!regionId || !nodes || nodes.length === 0) return;
+
+    // 检查是否所有非Boss节点都已完成
+    var allNormalDone = true;
+    var bossNode = null;
+    for (var i = 0; i < nodes.length; i++) {
+      if (nodes[i].type === 'boss') {
+        bossNode = nodes[i];
+      } else if (!nodes[i].completed) {
+        allNormalDone = false;
+      }
+    }
+
+    // 所有普通节点完成，Boss节点未打且存在 → 触发武器掉落
+    if (allNormalDone && bossNode && !bossNode.completed) {
+      // 检查是否已经触发过（用 storage 记录）
+      var dropKey = 'weaponDropped_' + regionId;
+      var alreadyDropped = wx.getStorageSync(dropKey);
+      if (!alreadyDropped) {
+        wx.setStorageSync(dropKey, true);
+        this._triggerWeaponDrop(char, regionId, bossNode);
+      }
+    }
+  },
+
+  _triggerWeaponDrop: function(char, regionId, bossNode) {
+    var weapon = game.getRegionDropWeapon(regionId);
+    if (!weapon) return;
+
+    var selectedRegion = this.data.selectedRegion;
+    this.setData({
+      showWeaponDrop: true,
+      dropWeapon: weapon,
+      dropRegionName: selectedRegion ? selectedRegion.name : ''
     });
   },
 
+  // ===== 武器掉落确认 → 进入Boss战 =====
+  confirmWeaponDrop: function() {
+    var weapon = this.data.dropWeapon;
+    var char = this.data.char;
+
+    this.setData({ showWeaponDrop: false });
+
+    if (weapon && char) {
+      // 自动装备武器
+      char.equipment = char.equipment || {};
+      char.equipment.weapon = weapon.id;
+      game.saveGame(char);
+      this.setData({ char: char });
+
+      wx.showToast({
+        title: '获得 ' + weapon.name + '!',
+        icon: 'success',
+        duration: 1500
+      });
+    }
+
+    // 延迟一下然后进入Boss战
+    var self = this;
+    setTimeout(function() {
+      // 找到Boss节点
+      var nodes = self.data.selectedNodes;
+      var bossNode = null;
+      for (var i = 0; i < nodes.length; i++) {
+        if (nodes[i].type === 'boss') {
+          bossNode = nodes[i];
+          break;
+        }
+      }
+      if (bossNode && !bossNode.completed) {
+        wx.navigateTo({
+          url: '/pages/battle/battle?nodeId=' + bossNode.id + '&regionId=' + self.data.selectedRegionId
+        });
+      }
+    }, 1600);
+  },
+
+  // ===== 折叠/展开英雄栏 =====
+  toggleHeroBar: function() {
+    this.setData({
+      heroCollapsed: !this.data.heroCollapsed
+    });
+  },
+
+  // ===== 区域切换 =====
   selectRegion: function(e) {
     var regionId = e.currentTarget.dataset.id;
     var region = this.data.regions.find(function(r) { return r.id === regionId; });
@@ -89,10 +206,28 @@ Page({
     }
 
     var nodes = game.getRegionNodes(regionId, this.data.char.completedNodes);
+
+    // 持久化当前区域，战斗返回后不会跳回旧区域
+    var char = this.data.char;
+    char.currentRegion = regionId;
+    game.saveGame(char);
+
+    // 计算进度
+    var regionProgress = 0;
+    var regionTotal = nodes.length;
+    for (var i = 0; i < nodes.length; i++) {
+      if (nodes[i].completed) {
+        regionProgress++;
+      }
+    }
+
     this.setData({
+      char: char,
       selectedRegionId: regionId,
       selectedRegion: region,
-      selectedNodes: nodes
+      selectedNodes: nodes,
+      regionProgress: regionProgress,
+      regionTotal: regionTotal
     });
   },
 

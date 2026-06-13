@@ -450,6 +450,19 @@ function getRegionNodes(regionId, completedNodes) {
   });
 }
 
+// 区域通关武器掉落
+var REGION_WEAPONS = {
+  1: { id: 'w1', name: '铅笔剑', emoji: '✏️', atk: 3, desc: '启程之谷的战利品，书写你的传奇', rarity: 'common' },
+  2: { id: 'w2', name: '钢笔长矛', emoji: '🖊️', atk: 6, desc: '知识密林深处锻造的利刃', rarity: 'common' },
+  3: { id: 'w3', name: '圆规双刃', emoji: '📐', atk: 10, desc: '冰雪峡谷中凝结的精准之刃', rarity: 'rare' },
+  4: { id: 'w5', name: '计算器光剑', emoji: '🔢', atk: 22, desc: '烈焰熔炉中千锤百炼的神兵', rarity: 'epic' },
+  5: { id: 'w6', name: '清华之笔', emoji: '🏆', atk: 30, desc: '登顶清华之巅的传说级武器', rarity: 'legendary' }
+};
+
+function getRegionDropWeapon(regionId) {
+  return REGION_WEAPONS[regionId] || null;
+}
+
 // 获取距离高考天数
 function getDaysUntilExam() {
   var now = new Date();
@@ -724,6 +737,7 @@ module.exports = {
   checkNewAchievements: checkNewAchievements,
   updateStreak: updateStreak,
   getQuestion: getQuestion,
+  getRegionDropWeapon: getRegionDropWeapon,
   findById: findById,
   randomInt: randomInt
 };
