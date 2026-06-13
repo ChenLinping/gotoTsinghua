@@ -135,6 +135,26 @@
 .mob-hp-bar { width: 44px; height: 4px; background: rgba(0,0,0,0.4); border-radius: 2px; overflow: hidden; }
 .mob-hp-fill { height: 100%; background: linear-gradient(90deg, #ef4444, #f87171); border-radius: 2px; transition: width 0.3s; }
 
+/* Monster Knife Orbit */
+.mob-knife-orbit { position: absolute; top: 50%; left: 50%; width: 0; height: 0; z-index: 12; pointer-events: none; }
+.mob-knife-item {
+  position: absolute; width: 16px; height: 16px;
+  margin-left: -8px; margin-top: -8px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(139,68,68,0.2); border-radius: 50%;
+  border: 1px solid rgba(239,68,68,0.35);
+}
+.mob-knife-emoji { font-size: 10px; color: #fca5a5; line-height: 1; }
+.mob-boss .mob-knife-item { width: 20px; height: 20px; margin-left: -10px; margin-top: -10px; border-color: rgba(239,68,68,0.5); }
+.mob-boss .mob-knife-emoji { font-size: 12px; }
+.mob-elite .mob-knife-item { width: 18px; height: 18px; margin-left: -9px; margin-top: -9px; border-color: rgba(251,191,36,0.4); background: rgba(168,130,20,0.2); }
+.mob-elite .mob-knife-emoji { font-size: 11px; color: #fbbf24; }
+
+/* Monster Knife Bar (replaces HP bar) */
+.mob-knife-bar { width: 44px; height: 4px; background: rgba(0,0,0,0.4); border-radius: 2px; overflow: hidden; }
+.mob-knife-fill { height: 100%; background: linear-gradient(90deg, #c084fc, #a855f7); border-radius: 2px; transition: width 0.3s; }
+.mob-knife-count { font-size: 9px; font-weight: 700; color: #c4b5fd; }
+
 /* ===== Player ===== */
 .player { position: absolute; z-index: 20; transform: translate(-50%, -50%); }
 

@@ -34,6 +34,15 @@
     <view wx:for="{{monsters}}" wx:key="id"
       class="mob {{item.alive ? 'mob-alive' : 'mob-dead'}} {{!item.unlocked ? 'mob-locked' : ''}} {{item.isBoss ? 'mob-boss' : ''}} {{item.isElite ? 'mob-elite' : ''}} {{item.aiState === 'chase' ? 'mob-chase' : ''}}"
       style="left:{{item.px}}px;top:{{item.py}}px;">
+      <!-- 怪物飞刀环绕 -->
+      <view class="mob-knife-orbit" wx:if="{{item.alive && item.knives > 0}}">
+        <view wx:for="{{8}}" wx:for-item="k" wx:for-index="ki" wx:key="ki"
+          class="mob-knife-item"
+          wx:if="{{ki < (item.knives > 8 ? 8 : item.knives)}}"
+          style="transform:rotate({{item.knifeAngle + (ki * (360 / (item.knives > 8 ? 8 : item.knives)))}}deg) translateX({{item.isBoss ? 50 : item.isElite ? 42 : 35}}px) rotate({{-(item.knifeAngle + (ki * (360 / (item.knives > 8 ? 8 : item.knives))))}}deg);">
+          <text class="mob-knife-emoji">&#9876;</text>
+        </view>
+      </view>
       <view class="mob-body">
         <view class="mob-head">
           <text wx:if="{{!item.alive}}" class="mob-face">+</text>
@@ -46,12 +55,13 @@
           <view class="mob-leg"></view>
           <view class="mob-leg"></view>
         </view>
-        <!-- HP条 -->
+        <!-- 飞刀数量 + HP条 -->
         <view class="mob-info" wx:if="{{item.alive && item.unlocked}}">
           <text class="mob-name">{{item.name}}</text>
-          <view class="mob-hp-bar">
-            <view class="mob-hp-fill" style="width:{{(item.hp/item.maxHp)*100}}%"></view>
+          <view class="mob-knife-bar">
+            <view class="mob-knife-fill" style="width:{{(item.knives/item.maxKnives)*100}}%"></view>
           </view>
+          <text class="mob-knife-count">&#9876;{{item.knives}}</text>
         </view>
       </view>
     </view>

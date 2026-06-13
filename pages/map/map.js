@@ -5,13 +5,15 @@ var MAP_W = 3000;
 var MAP_H = 3000;
 var PLAYER_SPEED = 5;
 var DETECT_RANGE = 300;   // 怪物感知半径
-var COMBAT_RANGE = 100;   // 飞刀攻击范围
 var KNIFE_CONSUME_TICKS = 60;  // 每消耗1把飞刀的帧数(~1秒)
 var KNIFE_BASE_DMG = 3;       // 每把飞刀基础伤害
 var MONSTER_DPS = 3;      // 怪物每秒对主角伤害
+var COLLISION_RANGE = 60;   // 碰撞半径(互斥距离)
+var COMBAT_RANGE = 120;     // 飞刀交锋范围
 var TICK_MS = 16;
 
 var MONSTER_HP = { normal: 30, elite: 60, boss: 150 };
+var MONSTER_KNIVES = { normal: 8, elite: 32, boss: 64 };
 var MONSTER_SPEED = { normal: 1.5, elite: 2.2, boss: 2.8 };
 
 var FORGE_SHIELD = 300;     // 炼宝护盾帧数(~5秒)
@@ -216,6 +218,7 @@ Page({
     for (var j = 0; j < nodes.length; j++) {
       var n = nodes[j];
       var hp = MONSTER_HP[n.type] || 30;
+      var knives = MONSTER_KNIVES[n.type] || 8;
       var emoji = this._subjectEmoji(n.subject);
       monsters.push({
         id: n.id,
@@ -227,6 +230,9 @@ Page({
         py: (n.y / 100) * MAP_H,
         hp: n.completed ? 0 : hp,
         maxHp: hp,
+        knives: n.completed ? 0 : knives,
+        maxKnives: knives,
+        knifeAngle: Math.floor(Math.random() * 360),
         alive: !n.completed,
         unlocked: n.unlocked,
         isBoss: n.type === 'boss',
@@ -271,6 +277,17 @@ Page({
     if (this.data.treasures.length > 0) {
       update.treasureAngle = (this.data.treasureAngle + 2) % 360;
     }
+
+    // 怪物飞刀旋转(方向相反，视觉上区分)
+    var monsters = this.data.monsters;
+    var mDirty = false;
+    for (var i = 0; i < monsters.length; i++) {
+      if (monsters[i].alive && monsters[i].knives > 0) {
+        monsters[i].knifeAngle = (monsters[i].knifeAngle - 3 + 360) % 360;
+        mDirty = true;
+      }
+    }
+    if (mDirty) update.monsters = monsters;
 
     // 护盾倒计时
     if (this.data.forgeShieldFrames > 0) {
@@ -377,7 +394,7 @@ Page({
     }
   },
 
-  // ===== 实时战斗 (消耗飞刀机制) =====
+  // ===== 实时战斗 (碰撞互斥 + 双方飞刀对耗) =====
   _updateCombat: function() {
     var monsters = this.data.monsters;
     var px = this.data.playerX;
@@ -390,10 +407,10 @@ Page({
     var dmgList = [];
     var dirty = false;
 
-    // 护盾期间怪物不攻击主角
+    // 护盾期间怪物不消耗玩家飞刀
     var shielded = this.data.forgeShieldFrames > 0;
 
-    // 检测附近是否有怪物
+    // === 飞刀消耗计时器 ===
     var hasNearby = false;
     for (var i = 0; i < monsters.length; i++) {
       var m = monsters[i];
@@ -401,116 +418,154 @@ Page({
       var dx = px - m.px;
       var dy = py - m.py;
       var dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < COMBAT_RANGE) {
+      if (dist < COMBAT_RANGE && m.knives > 0) {
         hasNearby = true;
         break;
       }
     }
 
-    // 飞刀消耗计时器 - 有怪物在附近时消耗飞刀
-    if (hasNearby && knifeCount > 0) {
+    if (hasNearby && (knifeCount > 0 || !shielded)) {
       this._knifeConsumeTimer++;
     } else {
       this._knifeConsumeTimer = 0;
     }
 
-    // 消耗飞刀并造成伤害
-    if (this._knifeConsumeTimer >= KNIFE_CONSUME_TICKS && knifeCount > 0) {
-      this._knifeConsumeTimer = 0;
+    // === 碰撞互斥 + 双方飞刀对耗 ===
+    for (var i = 0; i < monsters.length; i++) {
+      var m = monsters[i];
+      if (!m.alive || !m.unlocked) continue;
 
-      // 消耗一把飞刀
-      var consumed = treasures.pop();
-      knifeCount = treasures.length;
+      var dx = px - m.px;
+      var dy = py - m.py;
+      var dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 1) dist = 1;
 
-      // 计算伤害(含buff加成)
-      var dmg = KNIFE_BASE_DMG;
-      // 火焰附魔: +2额外伤害
-      if (buffs.indexOf('fire') >= 0) dmg += 2;
-      // 暴击之心: 第一把刀伤害翻倍
-      if (buffs.indexOf('crit') >= 0 && knifeCount === 0) dmg *= 2;
+      // --- 碰撞互斥 (像陀螺一样互相磕碰) ---
+      if (dist < COLLISION_RANGE) {
+        var overlap = COLLISION_RANGE - dist;
+        var nx = dx / dist;
+        var ny = dy / dist;
+        // 主角被推开(70%)，怪物也被推开(30%)
+        var pushPlayer = overlap * 0.7;
+        var pushMonster = overlap * 0.3;
 
-      // 对最近的怪物造成伤害
-      var nearest = null;
-      var minDist = Infinity;
-      for (var i = 0; i < monsters.length; i++) {
-        var m = monsters[i];
-        if (!m.alive || !m.unlocked) continue;
-        var dx2 = px - m.px;
-        var dy2 = py - m.py;
-        var d = Math.sqrt(dx2 * dx2 + dy2 * dy2);
-        if (d < COMBAT_RANGE && d < minDist) {
-          minDist = d;
-          nearest = m;
-        }
-      }
+        var newPx = px + nx * pushPlayer;
+        var newPy = py + ny * pushPlayer;
+        newPx = Math.max(60, Math.min(MAP_W - 60, newPx));
+        newPy = Math.max(60, Math.min(MAP_H - 60, newPy));
+        this.data.playerX = newPx;
+        px = newPx;
 
-      if (nearest) {
-        nearest.hp = Math.max(0, nearest.hp - dmg);
-        dmgList.push({
-          id: ++this._dmgId,
-          x: nearest.px + (Math.random() - 0.5) * 30,
-          y: nearest.py - 50,
-          value: dmg,
-          isPlayer: false
-        });
-
-        if (nearest.hp <= 0) {
-          this._onMonsterKilled(nearest, char);
-        }
+        m.px -= nx * pushMonster;
+        m.py -= ny * pushMonster;
+        m.px = Math.max(80, Math.min(MAP_W - 80, m.px));
+        m.py = Math.max(80, Math.min(MAP_H - 80, m.py));
         dirty = true;
       }
-    }
 
-    // 怪物攻击主角 (每秒)
-    if (!shielded && tick % 60 === 0) {
-      for (var i = 0; i < monsters.length; i++) {
-        var m = monsters[i];
-        if (!m.alive || !m.unlocked) continue;
-        var dx3 = px - m.px;
-        var dy3 = py - m.py;
-        var dist3 = Math.sqrt(dx3 * dx3 + dy3 * dy3);
+      // --- 飞刀交锋 (在COMBAT_RANGE内双方飞刀互相消耗) ---
+      if (dist < COMBAT_RANGE && this._knifeConsumeTimer >= KNIFE_CONSUME_TICKS) {
+        // 玩家飞刀攻击怪物
+        if (knifeCount > 0 && m.knives > 0) {
+          // 消耗玩家一把飞刀
+          treasures.pop();
+          knifeCount = treasures.length;
 
-        if (dist3 < COMBAT_RANGE) {
-          var mDmg = MONSTER_DPS;
-          // 护体金甲: 减伤30%
-          if (buffs.indexOf('armor') >= 0) {
-            mDmg = Math.max(1, Math.floor(mDmg * 0.7));
+          // 计算对怪物伤害
+          var pDmg = KNIFE_BASE_DMG;
+          if (buffs.indexOf('fire') >= 0) pDmg += 2;
+          if (buffs.indexOf('crit') >= 0 && knifeCount === 0) pDmg *= 2;
+
+          m.knives = Math.max(0, m.knives - 1);
+          m.hp = Math.max(0, m.hp - pDmg);
+
+          dmgList.push({
+            id: ++this._dmgId,
+            x: m.px + (Math.random() - 0.5) * 30,
+            y: m.py - 50,
+            value: pDmg,
+            isPlayer: false
+          });
+
+          // 怪物飞刀用尽 -> 击杀
+          if (m.knives <= 0) {
+            this._onMonsterKilled(m, char);
           }
-          char.hp = Math.max(0, char.hp - mDmg);
+          dirty = true;
+
+          // 怪物飞刀反击玩家
+          if (!shielded && m.knives >= 0) {
+            m.knives = Math.max(0, m.knives - 1);
+            var mDmg = MONSTER_DPS;
+            if (buffs.indexOf('armor') >= 0) {
+              mDmg = Math.max(1, Math.floor(mDmg * 0.7));
+            }
+            char.hp = Math.max(0, char.hp - mDmg);
+
+            dmgList.push({
+              id: ++this._dmgId,
+              x: px + (Math.random() - 0.5) * 20,
+              y: py - 55,
+              value: mDmg,
+              isPlayer: true
+            });
+
+            // 荆棘之盾: 反射
+            if (buffs.indexOf('thorns') >= 0 && m.alive) {
+              var reflectDmg = Math.floor(mDmg * 0.5);
+              if (reflectDmg > 0) {
+                m.hp = Math.max(0, m.hp - reflectDmg);
+                m.knives = Math.max(0, m.knives - 1);
+                dmgList.push({
+                  id: ++this._dmgId,
+                  x: m.px + (Math.random() - 0.5) * 20,
+                  y: m.py - 40,
+                  value: reflectDmg,
+                  isPlayer: false
+                });
+                if (m.knives <= 0) {
+                  this._onMonsterKilled(m, char);
+                }
+              }
+            }
+            dirty = true;
+          }
+        } else if (knifeCount <= 0 && m.knives > 0 && !shielded) {
+          // 玩家没有飞刀了，怪物直接攻击HP
+          m.knives = Math.max(0, m.knives - 1);
+          var mDmg2 = MONSTER_DPS;
+          if (buffs.indexOf('armor') >= 0) {
+            mDmg2 = Math.max(1, Math.floor(mDmg2 * 0.7));
+          }
+          char.hp = Math.max(0, char.hp - mDmg2);
 
           dmgList.push({
             id: ++this._dmgId,
             x: px + (Math.random() - 0.5) * 20,
             y: py - 55,
-            value: mDmg,
+            value: mDmg2,
             isPlayer: true
           });
-
-          // 荆棘之盾: 反射50%伤害
-          if (buffs.indexOf('thorns') >= 0 && m.alive) {
-            var reflectDmg = Math.floor(mDmg * 0.5);
-            if (reflectDmg > 0) {
-              m.hp = Math.max(0, m.hp - reflectDmg);
-              dmgList.push({
-                id: ++this._dmgId,
-                x: m.px + (Math.random() - 0.5) * 20,
-                y: m.py - 40,
-                value: reflectDmg,
-                isPlayer: false
-              });
-              if (m.hp <= 0) {
-                this._onMonsterKilled(m, char);
-              }
-            }
-          }
-
           dirty = true;
-          break; // 每秒只受一次怪物攻击
         }
+
+        // 重置计时器
+        this._knifeConsumeTimer = 0;
       }
     }
 
-    // 飞刀用尽 -> 慢动作过渡 -> 炼宝
+    // === 更新相机(碰撞推开后) ===
+    if (px !== this.data.playerX || py !== this.data.playerY) {
+      var vpW = this._vpW || 667;
+      var vpH = this._vpH || 375;
+      var cx = px - vpW / 2;
+      var cy = py - vpH / 2;
+      cx = Math.max(0, Math.min(MAP_W - vpW, cx));
+      cy = Math.max(0, Math.min(MAP_H - vpH, cy));
+      this.setData({ playerX: px, playerY: py, camX: cx, camY: cy });
+    }
+
+    // === 飞刀用尽 -> 慢动作过渡 -> 炼宝 ===
     if (treasures.length === 0 && this.data.state === 'exploring' && !this._forgeTriggered) {
       this._forgeTriggered = true;
       game.saveGame(char);
@@ -555,6 +610,7 @@ Page({
   _onMonsterKilled: function(monster, char) {
     monster.alive = false;
     monster.hp = 0;
+    monster.knives = 0;
     monster.aiState = 'dead';
     monster.respawnTimer = RESPAWN_TICKS;
 
@@ -603,6 +659,7 @@ Page({
           m.px = newPx;
           m.py = newPy;
           m.hp = m.maxHp;
+          m.knives = m.maxKnives;
           m.alive = true;
           m.aiState = 'patrol';
           m.patrolTimer = 0;
