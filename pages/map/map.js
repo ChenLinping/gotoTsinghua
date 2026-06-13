@@ -126,13 +126,5 @@ Page({
       title: '获得 ' + reward + ' 金币!',
       icon: 'success'
     });
-  },
-
-  goToCharacter: function() {
-    wx.switchTab({ url: '/pages/character/character' });
-  },
-
-  goToShop: function() {
-    wx.switchTab({ url: '/pages/shop/shop' });
   }
 });

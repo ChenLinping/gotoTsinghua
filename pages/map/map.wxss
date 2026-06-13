@@ -592,46 +592,4 @@
   color: #ef6c00;
 }
 
-/* ===== Bottom Bar ===== */
-.bottom-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 130rpx;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  box-shadow: 0 -4rpx 20rpx rgba(0,0,0,0.08);
-  border-radius: 32rpx 32rpx 0 0;
-  z-index: 200;
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-.bottom-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 10rpx 40rpx;
-  border-radius: 20rpx;
-  transition: all 0.2s ease;
-}
-
-.bottom-btn:active {
-  background: rgba(102,126,234,0.08);
-  transform: scale(0.92);
-}
-
-.bottom-btn-icon {
-  font-size: 44rpx;
-}
-
-.bottom-btn-label {
-  font-size: 22rpx;
-  color: #555;
-  font-weight: 600;
-  margin-top: 4rpx;
-}
 

@@ -23,16 +23,16 @@ var REGIONS = [
     phase: '暑假自主预习', color: '#10b981', bg: '#ecfdf5',
     unlockLevel: 1,
     nodes: [
-      { id: '1-1', x: 50, y: 60, type: 'normal', subject: 'math', label: '函数入门' },
-      { id: '1-2', x: 150, y: 120, type: 'normal', subject: 'english', label: '词汇积累' },
-      { id: '1-3', x: 80, y: 200, type: 'normal', subject: 'physics', label: '力学基础' },
-      { id: '1-4', x: 200, y: 260, type: 'elite', subject: 'math', label: '导数初探' },
-      { id: '1-5', x: 120, y: 340, type: 'normal', subject: 'chemistry', label: '化学平衡' },
-      { id: '1-6', x: 60, y: 420, type: 'normal', subject: 'biology', label: '细胞结构' },
-      { id: '1-7', x: 180, y: 480, type: 'normal', subject: 'chinese', label: '文言基础' },
-      { id: '1-8', x: 100, y: 560, type: 'elite', subject: 'english', label: '语法挑战' },
-      { id: '1-9', x: 160, y: 640, type: 'normal', subject: 'math', label: '数列练习' },
-      { id: '1-B', x: 120, y: 740, type: 'boss', subject: 'mixed', label: '暑假守卫战' }
+      { id: '1-1', x: 20, y: 8, type: 'normal', subject: 'math', label: '函数入门' },
+      { id: '1-2', x: 60, y: 16, type: 'normal', subject: 'english', label: '词汇积累' },
+      { id: '1-3', x: 32, y: 24, type: 'normal', subject: 'physics', label: '力学基础' },
+      { id: '1-4', x: 75, y: 32, type: 'elite', subject: 'math', label: '导数初探' },
+      { id: '1-5', x: 45, y: 40, type: 'normal', subject: 'chemistry', label: '化学平衡' },
+      { id: '1-6', x: 22, y: 48, type: 'normal', subject: 'biology', label: '细胞结构' },
+      { id: '1-7', x: 70, y: 56, type: 'normal', subject: 'chinese', label: '文言基础' },
+      { id: '1-8', x: 38, y: 64, type: 'elite', subject: 'english', label: '语法挑战' },
+      { id: '1-9', x: 62, y: 74, type: 'normal', subject: 'math', label: '数列练习' },
+      { id: '1-B', x: 46, y: 86, type: 'boss', subject: 'mixed', label: '暑假守卫战' }
     ]
   },
   {
@@ -40,17 +40,17 @@ var REGIONS = [
     phase: '一轮复习（上）', color: '#6366f1', bg: '#eef2ff',
     unlockLevel: 5,
     nodes: [
-      { id: '2-1', x: 80, y: 60, type: 'normal', subject: 'math', label: '函数与导数' },
-      { id: '2-2', x: 180, y: 120, type: 'normal', subject: 'physics', label: '牛顿定律' },
-      { id: '2-3', x: 60, y: 190, type: 'elite', subject: 'english', label: '阅读突破' },
-      { id: '2-4', x: 160, y: 260, type: 'normal', subject: 'chemistry', label: '电化学' },
-      { id: '2-5', x: 100, y: 330, type: 'normal', subject: 'math', label: '数列综合' },
-      { id: '2-6', x: 200, y: 390, type: 'normal', subject: 'biology', label: '遗传定律' },
-      { id: '2-7', x: 80, y: 460, type: 'elite', subject: 'chinese', label: '古诗鉴赏' },
-      { id: '2-8', x: 170, y: 530, type: 'normal', subject: 'physics', label: '能量守恒' },
-      { id: '2-9', x: 60, y: 600, type: 'normal', subject: 'english', label: '写作训练' },
-      { id: '2-10', x: 150, y: 670, type: 'elite', subject: 'math', label: '解析几何' },
-      { id: '2-B', x: 110, y: 760, type: 'boss', subject: 'mixed', label: '密林Boss战' }
+      { id: '2-1', x: 32, y: 7, type: 'normal', subject: 'math', label: '函数与导数' },
+      { id: '2-2', x: 72, y: 14, type: 'normal', subject: 'physics', label: '牛顿定律' },
+      { id: '2-3', x: 24, y: 22, type: 'elite', subject: 'english', label: '阅读突破' },
+      { id: '2-4', x: 64, y: 30, type: 'normal', subject: 'chemistry', label: '电化学' },
+      { id: '2-5', x: 40, y: 38, type: 'normal', subject: 'math', label: '数列综合' },
+      { id: '2-6', x: 78, y: 46, type: 'normal', subject: 'biology', label: '遗传定律' },
+      { id: '2-7', x: 30, y: 54, type: 'elite', subject: 'chinese', label: '古诗鉴赏' },
+      { id: '2-8', x: 68, y: 62, type: 'normal', subject: 'physics', label: '能量守恒' },
+      { id: '2-9', x: 24, y: 70, type: 'normal', subject: 'english', label: '写作训练' },
+      { id: '2-10', x: 60, y: 78, type: 'elite', subject: 'math', label: '解析几何' },
+      { id: '2-B', x: 44, y: 88, type: 'boss', subject: 'mixed', label: '密林Boss战' }
     ]
   },
   {
@@ -58,15 +58,15 @@ var REGIONS = [
     phase: '寒假强化', color: '#0891b2', bg: '#ecfeff',
     unlockLevel: 10,
     nodes: [
-      { id: '3-1', x: 120, y: 60, type: 'elite', subject: 'math', label: '极限挑战' },
-      { id: '3-2', x: 60, y: 140, type: 'normal', subject: 'english', label: '听力特训' },
-      { id: '3-3', x: 180, y: 210, type: 'normal', subject: 'chinese', label: '作文突破' },
-      { id: '3-4', x: 100, y: 290, type: 'elite', subject: 'physics', label: '电磁感应' },
-      { id: '3-5', x: 200, y: 360, type: 'normal', subject: 'chemistry', label: '有机推断' },
-      { id: '3-6', x: 70, y: 430, type: 'normal', subject: 'biology', label: '实验设计' },
-      { id: '3-7', x: 160, y: 510, type: 'elite', subject: 'math', label: '概率统计' },
-      { id: '3-8', x: 90, y: 590, type: 'normal', subject: 'english', label: '完形填空' },
-      { id: '3-B', x: 130, y: 690, type: 'boss', subject: 'mixed', label: '冰雪决战' }
+      { id: '3-1', x: 48, y: 8, type: 'elite', subject: 'math', label: '极限挑战' },
+      { id: '3-2', x: 22, y: 18, type: 'normal', subject: 'english', label: '听力特训' },
+      { id: '3-3', x: 72, y: 28, type: 'normal', subject: 'chinese', label: '作文突破' },
+      { id: '3-4', x: 40, y: 38, type: 'elite', subject: 'physics', label: '电磁感应' },
+      { id: '3-5', x: 78, y: 48, type: 'normal', subject: 'chemistry', label: '有机推断' },
+      { id: '3-6', x: 28, y: 58, type: 'normal', subject: 'biology', label: '实验设计' },
+      { id: '3-7', x: 64, y: 68, type: 'elite', subject: 'math', label: '概率统计' },
+      { id: '3-8', x: 36, y: 78, type: 'normal', subject: 'english', label: '完形填空' },
+      { id: '3-B', x: 52, y: 90, type: 'boss', subject: 'mixed', label: '冰雪决战' }
     ]
   },
   {
@@ -74,14 +74,14 @@ var REGIONS = [
     phase: '二轮专题复习', color: '#ef4444', bg: '#fef2f2',
     unlockLevel: 16,
     nodes: [
-      { id: '4-1', x: 100, y: 60, type: 'elite', subject: 'math', label: '综合建模' },
-      { id: '4-2', x: 180, y: 140, type: 'normal', subject: 'physics', label: '实验探究' },
-      { id: '4-3', x: 60, y: 220, type: 'elite', subject: 'english', label: '读写综合' },
-      { id: '4-4', x: 160, y: 300, type: 'normal', subject: 'chemistry', label: '实验方案' },
-      { id: '4-5', x: 80, y: 380, type: 'normal', subject: 'chinese', label: '辩证思维' },
-      { id: '4-6', x: 190, y: 450, type: 'elite', subject: 'biology', label: '综合分析' },
-      { id: '4-7', x: 110, y: 530, type: 'normal', subject: 'math', label: '创新题型' },
-      { id: '4-B', x: 140, y: 640, type: 'boss', subject: 'mixed', label: '熔炉决战' }
+      { id: '4-1', x: 40, y: 9, type: 'elite', subject: 'math', label: '综合建模' },
+      { id: '4-2', x: 72, y: 20, type: 'normal', subject: 'physics', label: '实验探究' },
+      { id: '4-3', x: 24, y: 32, type: 'elite', subject: 'english', label: '读写综合' },
+      { id: '4-4', x: 64, y: 44, type: 'normal', subject: 'chemistry', label: '实验方案' },
+      { id: '4-5', x: 32, y: 56, type: 'normal', subject: 'chinese', label: '辩证思维' },
+      { id: '4-6', x: 76, y: 66, type: 'elite', subject: 'biology', label: '综合分析' },
+      { id: '4-7', x: 44, y: 78, type: 'normal', subject: 'math', label: '创新题型' },
+      { id: '4-B', x: 56, y: 90, type: 'boss', subject: 'mixed', label: '熔炉决战' }
     ]
   },
   {
@@ -89,14 +89,14 @@ var REGIONS = [
     phase: '三轮冲刺', color: '#7c3aed', bg: '#f5f3ff',
     unlockLevel: 22,
     nodes: [
-      { id: '5-1', x: 120, y: 60, type: 'elite', subject: 'math', label: '限时冲刺' },
-      { id: '5-2', x: 60, y: 150, type: 'elite', subject: 'english', label: '全真模拟' },
-      { id: '5-3', x: 180, y: 230, type: 'normal', subject: 'chinese', label: '名篇冲刺' },
-      { id: '5-4', x: 100, y: 320, type: 'elite', subject: 'physics', label: '压轴突破' },
-      { id: '5-5', x: 200, y: 400, type: 'normal', subject: 'chemistry', label: '综合演练' },
-      { id: '5-6', x: 70, y: 480, type: 'normal', subject: 'biology', label: '回归教材' },
-      { id: '5-7', x: 160, y: 560, type: 'elite', subject: 'math', label: '新概念题' },
-      { id: '5-B', x: 120, y: 670, type: 'boss', subject: 'mixed', label: '终极决战' }
+      { id: '5-1', x: 48, y: 9, type: 'elite', subject: 'math', label: '限时冲刺' },
+      { id: '5-2', x: 22, y: 20, type: 'elite', subject: 'english', label: '全真模拟' },
+      { id: '5-3', x: 72, y: 32, type: 'normal', subject: 'chinese', label: '名篇冲刺' },
+      { id: '5-4', x: 40, y: 44, type: 'elite', subject: 'physics', label: '压轴突破' },
+      { id: '5-5', x: 78, y: 56, type: 'normal', subject: 'chemistry', label: '综合演练' },
+      { id: '5-6', x: 28, y: 66, type: 'normal', subject: 'biology', label: '回归教材' },
+      { id: '5-7', x: 64, y: 78, type: 'elite', subject: 'math', label: '新概念题' },
+      { id: '5-B', x: 48, y: 90, type: 'boss', subject: 'mixed', label: '终极决战' }
     ]
   }
 ];
