@@ -29,6 +29,8 @@ var TREASURE_POOL = [
   { name: '圣剑', emoji: '\u2694\uFE0F' }
 ];
 
+var MAX_KNIVES = TREASURE_POOL.length; // 初始满飞刀(8把)
+
 var BUFF_POOL = game.BUFF_POOL;
 
 // ========== Page ==========
@@ -77,6 +79,8 @@ Page({
     forgeShieldFrames: 0,
     forgeRewardKnives: 0,
     forgeRewardBuff: null,
+    forgeTransition: false,
+    showForgeText: false,
 
     // HUD
     showChest: false,
@@ -152,8 +156,8 @@ Page({
 
     // 确保buffs数组存在
     if (!char.buffs) char.buffs = [];
-    // 确保至少有1把飞刀
-    if (!char.treasureCount || char.treasureCount < 1) char.treasureCount = 1;
+    // 确保有飞刀(默认满刀)
+    if (!char.treasureCount || char.treasureCount < 1) char.treasureCount = MAX_KNIVES;
 
     var regions = game.getMapRegions(char.level);
     var selId = char.currentRegion || (regions[0] && regions[0].id);
@@ -277,6 +281,9 @@ Page({
       this._updatePlayerMovement(update);
       this._updateMonsterAI();
       this._updateCombat();
+    } else if (this.data.forgeTransition) {
+      // 慢动作过渡: 怪物极慢移动
+      this._updateMonsterAI(true);
     } else if (this.data.state === 'forging') {
       // 炼宝时怪物减速(不攻击)
       this._updateMonsterAI(true);
@@ -503,27 +510,18 @@ Page({
       }
     }
 
-    // 飞刀用尽 -> 触发炼宝
+    // 飞刀用尽 -> 慢动作过渡 -> 炼宝
     if (treasures.length === 0 && this.data.state === 'exploring' && !this._forgeTriggered) {
       this._forgeTriggered = true;
       game.saveGame(char);
-      var self = this;
-      // 短暂延迟让玩家看到飞刀耗尽
-      setTimeout(function() {
-        self._forgeTriggered = false;
-        self._triggerForge();
-      }, 500);
+      this._startForgeTransition();
     }
 
     // HP过低也能触发炼宝(兜底)
     if (char.hp > 0 && char.hp < char.maxHP * 0.15 && this.data.state === 'exploring' && !this._forgeTriggered) {
       this._forgeTriggered = true;
       game.saveGame(char);
-      var self2 = this;
-      setTimeout(function() {
-        self2._forgeTriggered = false;
-        self2._triggerForge();
-      }, 300);
+      this._startForgeTransition();
     }
 
     if (dmgList.length > 0) {
@@ -616,6 +614,29 @@ Page({
     if (dirty) {
       this.setData({ monsters: monsters });
     }
+  },
+
+  // ===== 慢动作过渡 -> 炼宝 =====
+  _startForgeTransition: function() {
+    var self = this;
+
+    // 1. 进入慢动作状态(怪物极慢移动)
+    this.setData({ forgeTransition: true });
+
+    // 2. 0.6秒后显示"飞刀耗尽!"文字
+    setTimeout(function() {
+      self.setData({ showForgeText: true });
+    }, 600);
+
+    // 3. 1.8秒后淡入炼宝面板
+    setTimeout(function() {
+      self.setData({
+        forgeTransition: false,
+        showForgeText: false
+      });
+      self._forgeTriggered = false;
+      self._triggerForge();
+    }, 1800);
   },
 
   // ===== 炼宝系统 =====
@@ -919,8 +940,8 @@ Page({
 
     var monsters = this._buildMonsters(regionId, char.completedNodes);
 
-    // 确保至少1把飞刀
-    if (!char.treasureCount || char.treasureCount < 1) char.treasureCount = 1;
+    // 确保有飞刀
+    if (!char.treasureCount || char.treasureCount < 1) char.treasureCount = MAX_KNIVES;
     var treasures = [];
     for (var t = 0; t < char.treasureCount; t++) {
       treasures.push(TREASURE_POOL[t % TREASURE_POOL.length]);

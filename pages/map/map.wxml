@@ -1,7 +1,7 @@
 <view class="page">
 
   <!-- ===== 游戏世界（相机跟随） ===== -->
-  <view class="world" style="transform:translate({{-camX}}px,{{-camY}}px);">
+  <view class="world {{forgeTransition ? 'world-slowmo' : ''}}" style="transform:translate({{-camX}}px,{{-camY}}px);">
     <!-- 地图背景 -->
     <view class="world-bg mc-bg-{{selectedRegionId}}"></view>
 
@@ -91,6 +91,14 @@
         </view>
       </view>
       <view class="player-shadow"></view>
+    </view>
+  </view>
+
+  <!-- ===== 慢动作过渡层 ===== -->
+  <view class="slowmo-overlay" wx:if="{{forgeTransition}}">
+    <view class="slowmo-vignette"></view>
+    <view class="slowmo-text {{showForgeText ? 'slowmo-text-show' : ''}}">
+      <text>飞刀耗尽!</text>
     </view>
   </view>
 
