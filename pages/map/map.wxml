@@ -1,194 +1,191 @@
 <view class="page">
 
-  <!-- Top Hero Bar (可折叠) -->
-  <view class="hero-bar {{heroCollapsed ? 'hero-collapsed' : ''}}">
-    <view class="hero-bg"></view>
-    <view class="hero-toggle" bindtap="toggleHeroBar">
-      <text class="hero-toggle-icon">{{heroCollapsed ? '▼' : '▲'}}</text>
+  <!-- ===== 全屏大地图（底层） ===== -->
+  <scroll-view class="world-map" scroll-y="true" enhanced="true" show-scrollbar="false">
+    <!-- 区域背景 -->
+    <view class="world-bg mc-bg-{{selectedRegionId}}">
+      <!-- 装饰 -->
+      <view class="world-deco deco-cloud" style="left:8%;top:3%;">☁️</view>
+      <view class="world-deco deco-cloud" style="left:55%;top:1%;">⛅</view>
+      <view class="world-deco deco-cloud" style="left:82%;top:5%;">☁️</view>
+      <view class="world-deco deco-tree" style="left:2%;top:25%;">🌳</view>
+      <view class="world-deco deco-tree" style="left:93%;top:40%;">🌲</view>
+      <view class="world-deco deco-tree" style="left:5%;top:65%;">🌿</view>
+      <view class="world-deco deco-tree" style="left:90%;top:75%;">🌳</view>
+      <view class="world-deco deco-tree" style="left:3%;top:92%;">🪨</view>
+      <view class="world-deco deco-tree" style="left:88%;top:88%;">🪨</view>
     </view>
 
-    <view class="hero-content" wx:if="{{!heroCollapsed}}">
-      <!-- Left: Level & Rank -->
-      <view class="hero-left">
-        <view class="level-badge" style="background: {{rank.current.color}}">
-          <text class="level-text">Lv.{{char.level}}</text>
-        </view>
-        <view class="rank-info">
-          <text class="rank-emoji">{{rank.current.emoji}}</text>
-          <text class="rank-name">{{rank.current.name}}</text>
-        </view>
-      </view>
-
-      <!-- Center: XP Bar -->
-      <view class="hero-center">
-        <view class="xp-bar-wrap">
-          <view class="xp-bar-fill" style="width: {{xpProgress}}%"></view>
-          <text class="xp-bar-text">EXP {{char.xp}}/{{xpForLevel}}</text>
-        </view>
-        <view class="hp-bar-wrap">
-          <view class="hp-bar-fill" style="width: {{(char.hp / char.maxHP) * 100}}%"></view>
-          <text class="hp-bar-text">HP {{char.hp}}/{{char.maxHP}}</text>
-        </view>
-      </view>
-
-      <!-- Right: Stats -->
-      <view class="hero-right">
-        <view class="stat-item coin-stat">
-          <text class="stat-icon">🪙</text>
-          <text class="stat-val">{{char.coins}}</text>
-        </view>
-        <view class="stat-item streak-stat">
-          <text class="stat-icon">🔥</text>
-          <text class="stat-val">{{char.streakDays}}</text>
-        </view>
-        <view class="stat-item exam-stat">
-          <text class="stat-icon">📅</text>
-          <text class="stat-val">{{daysUntilExam}}天</text>
-        </view>
+    <!-- 像素地面网格 -->
+    <view class="world-ground">
+      <view wx:for="{{30}}" wx:key="*this" wx:for-index="gi" class="ground-row">
+        <view wx:for="{{10}}" wx:key="*this" wx:for-index="gj" class="ground-cell gc-{{(gi+gj) % 3}}"></view>
       </view>
     </view>
 
-    <!-- 折叠状态只显示简要信息 -->
-    <view class="hero-mini" wx:if="{{heroCollapsed}}">
-      <text class="hero-mini-lv">Lv.{{char.level}}</text>
-      <text class="hero-mini-rank">{{rank.current.emoji}}</text>
-      <text class="hero-mini-hp">❤{{char.hp}}</text>
-      <text class="hero-mini-coin">🪙{{char.coins}}</text>
+    <!-- 路径连线 -->
+    <view
+      wx:for="{{selectedNodes}}"
+      wx:key="id"
+      wx:if="{{index > 0}}"
+      class="path-line"
+      style="left:{{selectedNodes[index-1].x}}%;top:{{selectedNodes[index-1].y}}%;width:{{selectedNodes[index].x - selectedNodes[index-1].x}}%;height:{{selectedNodes[index].y - selectedNodes[index-1].y}}%;"
+    >
+      <view class="path-inner {{selectedNodes[index-1].completed && selectedNodes[index].unlocked ? 'path-on' : ''}}"></view>
     </view>
-  </view>
 
-  <!-- Daily Chest -->
-  <view class="chest-btn {{showChest ? 'chest-visible' : 'chest-hidden'}}" bindtap="openChest" wx:if="{{showChest}}">
-    <text class="chest-icon">🎁</text>
-    <text class="chest-label">每日宝箱</text>
-    <view class="chest-glow"></view>
-  </view>
-
-  <!-- Region Tabs -->
-  <scroll-view class="region-tabs" scroll-x="true" enhanced="true" show-scrollbar="false">
-    <view class="region-tabs-inner">
-      <view
-        wx:for="{{regions}}"
-        wx:key="id"
-        class="region-tab {{selectedRegionId === item.id ? 'region-tab-active' : ''}} {{!item.unlocked ? 'region-tab-locked' : ''}}"
-        data-id="{{item.id}}"
-        bindtap="selectRegion"
-      >
-        <text class="region-tab-icon">{{item.icon}}</text>
-        <text class="region-tab-name">{{item.name}}</text>
-        <view class="region-tab-lock" wx:if="{{!item.unlocked}}">
-          <text class="lock-icon">🔒</text>
-          <text class="lock-level">Lv.{{item.unlockLevel}}</text>
+    <!-- 怪物节点 -->
+    <view
+      wx:for="{{selectedNodes}}"
+      wx:key="id"
+      class="mob {{item.completed ? 'mob-dead' : ''}} {{item.unlocked && !item.completed ? 'mob-alive' : ''}} {{!item.unlocked ? 'mob-locked' : ''}} {{item.isBoss ? 'mob-boss' : ''}} {{item.isElite ? 'mob-elite' : ''}}"
+      style="left:{{item.x}}%;top:{{item.y}}%;"
+      data-id="{{item.id}}"
+      bindtap="tapNode"
+    >
+      <!-- 怪物身体方块 -->
+      <view class="mob-body">
+        <view class="mob-head">
+          <text wx:if="{{item.completed}}" class="mob-face">✓</text>
+          <text wx:elif="{{item.isBoss}}" class="mob-face">👹</text>
+          <text wx:elif="{{item.isElite}}" class="mob-face">💀</text>
+          <text wx:elif="{{!item.unlocked}}" class="mob-face">🔒</text>
+          <text wx:else class="mob-face">{{item.subject === 'math' ? '📐' : item.subject === 'chinese' ? '📖' : item.subject === 'english' ? '🔤' : item.subject === 'physics' ? '⚡' : item.subject === 'chemistry' ? '🧪' : item.subject === 'biology' ? '🧬' : '📚'}}</text>
         </view>
-        <view class="region-tab-indicator" wx:if="{{selectedRegionId === item.id}}"></view>
+        <view class="mob-feet">
+          <view class="mob-foot mob-foot-l"></view>
+          <view class="mob-foot mob-foot-r"></view>
+        </view>
       </view>
+
+      <!-- 标签 -->
+      <view class="mob-tag">
+        <text class="mob-name">{{item.label}}</text>
+        <text wx:if="{{item.isBoss}}" class="mob-type mob-type-boss">BOSS</text>
+        <text wx:elif="{{item.isElite}}" class="mob-type mob-type-elite">精英</text>
+      </view>
+
+      <!-- 光环 -->
+      <view class="mob-glow" wx:if="{{item.unlocked && !item.completed}}"></view>
+    </view>
+
+    <!-- 玩家角色 -->
+    <view class="player" style="left:{{playerX}}%;top:{{playerY}}%;">
+      <view class="steve">
+        <view class="steve-head-wrap">
+          <view class="steve-head">
+            <text class="steve-face">😀</text>
+          </view>
+        </view>
+        <view class="steve-body-wrap">
+          <view class="steve-arm steve-arm-l"></view>
+          <view class="steve-torso"></view>
+          <view class="steve-arm steve-arm-r"></view>
+        </view>
+        <view class="steve-legs-wrap">
+          <view class="steve-leg steve-leg-l"></view>
+          <view class="steve-leg steve-leg-r"></view>
+        </view>
+      </view>
+      <view class="player-indicator"></view>
     </view>
   </scroll-view>
 
-  <!-- Map Area -->
-  <view class="map-area" wx:if="{{selectedRegionId}}">
-    <!-- Minecraft 像素风背景层 -->
-    <view class="map-bg-layer mc-bg-{{selectedRegionId}}">
-      <!-- 像素草地/装饰块 -->
-      <view class="mc-block mc-tree" style="left:5%;top:20%;">🌳</view>
-      <view class="mc-block mc-tree" style="left:88%;top:35%;">🌲</view>
-      <view class="mc-block mc-tree" style="left:3%;top:60%;">🌿</view>
-      <view class="mc-block mc-tree" style="left:92%;top:70%;">🌳</view>
-      <view class="mc-block mc-tree" style="left:50%;top:3%;">⛅</view>
-      <view class="mc-block mc-tree" style="left:15%;top:5%;">☁️</view>
-      <view class="mc-block mc-tree" style="left:75%;top:2%;">☁️</view>
+  <!-- ===== 区域标题浮层（顶部居中） ===== -->
+  <view class="region-pill" bindtap="toggleRegionMenu" wx:if="{{selectedRegion}}">
+    <text class="region-pill-icon">{{selectedRegion.icon}}</text>
+    <text class="region-pill-name">{{selectedRegion.name}}</text>
+    <text class="region-pill-arrow">{{showRegionMenu ? '▲' : '▼'}}</text>
+    <!-- 进度小条 -->
+    <view class="region-pill-progress">
+      <view class="region-pill-fill" style="width:{{regionTotal > 0 ? (regionProgress/regionTotal)*100 : 0}}%"></view>
     </view>
-
-    <view class="map-header">
-      <text class="map-title mc-font">{{selectedRegion.icon}} {{selectedRegion.name}}</text>
-      <text class="map-desc">{{selectedRegion.desc}}</text>
-      <!-- 区域进度条 -->
-      <view class="region-progress-bar">
-        <view class="region-progress-fill" style="width: {{regionTotal > 0 ? (regionProgress/regionTotal)*100 : 0}}%"></view>
-        <text class="region-progress-text">{{regionProgress}}/{{regionTotal}}</text>
-      </view>
-    </view>
-
-    <!-- Node Map Canvas -->
-    <scroll-view class="map-canvas" scroll-y="true" enhanced="true" show-scrollbar="false">
-      <!-- 像素风地面网格 -->
-      <view class="mc-ground">
-        <view wx:for="{{20}}" wx:key="*this" wx:for-index="gi" class="mc-grass-row">
-          <view wx:for="{{8}}" wx:key="*this" wx:for-index="gj" class="mc-grass-cell mc-grass-{{(gi+gj) % 3}}"></view>
-        </view>
-      </view>
-
-      <!-- Connecting Lines (像素风路径) -->
-      <view
-        wx:for="{{selectedNodes}}"
-        wx:key="id"
-        wx:if="{{index > 0}}"
-        class="path-line mc-path"
-        style="left: {{selectedNodes[index-1].x}}%; top: {{selectedNodes[index-1].y}}%; width: {{selectedNodes[index].x - selectedNodes[index-1].x}}%; height: {{selectedNodes[index].y - selectedNodes[index-1].y}}%;"
-      >
-        <view class="path-line-inner {{selectedNodes[index-1].completed && selectedNodes[index].unlocked ? 'path-active mc-path-active' : ''}}"></view>
-      </view>
-
-      <!-- Nodes (像素方块风格) -->
-      <view
-        wx:for="{{selectedNodes}}"
-        wx:key="id"
-        class="map-node mc-node node-{{item.type}} {{item.completed ? 'node-completed mc-done' : ''}} {{item.unlocked && !item.completed ? 'node-available mc-available' : ''}} {{!item.unlocked ? 'node-locked' : ''}} {{item.isBoss ? 'node-boss mc-boss' : ''}} {{item.isElite ? 'node-elite mc-elite' : ''}}"
-        style="left: {{item.x}}%; top: {{item.y}}%;"
-        data-id="{{item.id}}"
-        bindtap="tapNode"
-      >
-        <!-- Boss 外框像素风 -->
-        <view class="mc-boss-ring" wx:if="{{item.isBoss}}"></view>
-        <!-- Elite 外框 -->
-        <view class="mc-elite-ring" wx:if="{{item.isElite && !item.isBoss}}"></view>
-
-        <!-- 像素方块节点 -->
-        <view class="mc-block-node">
-          <view class="mc-block-face mc-block-top"></view>
-          <view class="mc-block-face mc-block-left"></view>
-          <view class="mc-block-face mc-block-right"></view>
-          <view class="mc-block-icon">
-            <text wx:if="{{item.completed}}" class="node-icon">✓</text>
-            <text wx:elif="{{item.isBoss}}" class="node-icon">👹</text>
-            <text wx:elif="{{item.isElite}}" class="node-icon">⚔️</text>
-            <text wx:elif="{{!item.unlocked}}" class="node-icon">🔒</text>
-            <text wx:else class="node-icon">{{item.subject === 'math' ? '📐' : item.subject === 'chinese' ? '📖' : item.subject === 'english' ? '🔤' : item.subject === 'physics' ? '⚡' : item.subject === 'chemistry' ? '🧪' : item.subject === 'biology' ? '🧬' : '📚'}}</text>
-          </view>
-        </view>
-
-        <!-- Label -->
-        <view class="node-label-wrap mc-label">
-          <text class="node-label">{{item.label}}</text>
-          <text class="node-type-label" wx:if="{{item.isBoss}}">BOSS</text>
-          <text class="node-type-label node-type-elite" wx:elif="{{item.isElite}}">精英</text>
-        </view>
-
-        <!-- Available glow -->
-        <view class="node-glow" wx:if="{{item.unlocked && !item.completed}}"></view>
-      </view>
-    </scroll-view>
   </view>
 
-  <!-- ===== 武器掉落动画覆盖层 ===== -->
-  <view class="weapon-drop-overlay" wx:if="{{showWeaponDrop}}">
-    <view class="weapon-drop-bg"></view>
-    <view class="weapon-drop-content">
-      <text class="weapon-drop-title mc-font">🎉 区域通关！</text>
-      <text class="weapon-drop-region">{{dropRegionName}}</text>
-      <view class="weapon-drop-box">
-        <view class="weapon-drop-glow"></view>
-        <view class="weapon-drop-item">
-          <text class="weapon-drop-emoji">{{dropWeapon.emoji}}</text>
-          <text class="weapon-drop-name mc-font">{{dropWeapon.name}}</text>
-          <text class="weapon-drop-desc">{{dropWeapon.desc}}</text>
-          <text class="weapon-drop-stat">ATK +{{dropWeapon.atk}}</text>
-        </view>
-      </view>
-      <view class="weapon-drop-btn mc-btn" bindtap="confirmWeaponDrop">
-        <text class="weapon-drop-btn-text">装备并挑战Boss!</text>
+  <!-- 区域下拉菜单 -->
+  <view class="region-dropdown" wx:if="{{showRegionMenu}}">
+    <view
+      wx:for="{{regions}}"
+      wx:key="id"
+      class="dropdown-item {{selectedRegionId === item.id ? 'dropdown-active' : ''}} {{!item.unlocked ? 'dropdown-locked' : ''}}"
+      data-id="{{item.id}}"
+      bindtap="selectRegion"
+    >
+      <text class="dropdown-icon">{{item.icon}}</text>
+      <text class="dropdown-name">{{item.name}}</text>
+      <text class="dropdown-lv" wx:if="{{!item.unlocked}}">🔒Lv.{{item.unlockLevel}}</text>
+    </view>
+  </view>
+
+  <!-- ===== HUD（左下角小面板） ===== -->
+  <view class="hud {{hudExpanded ? 'hud-open' : ''}}" bindtap="toggleHud">
+    <!-- 收起态：小圆 -->
+    <view class="hud-mini" wx:if="{{!hudExpanded}}">
+      <text class="hud-mini-lv">{{char.level}}</text>
+      <view class="hud-mini-hp">
+        <view class="hud-mini-hp-fill" style="width:{{(char.hp/char.maxHP)*100}}%"></view>
       </view>
     </view>
+
+    <!-- 展开态 -->
+    <view class="hud-full" wx:if="{{hudExpanded}}">
+      <view class="hud-row">
+        <view class="hud-lv-badge" style="background:{{rank.current.color}}">
+          <text class="hud-lv-text">Lv.{{char.level}}</text>
+        </view>
+        <view class="hud-info">
+          <text class="hud-rank">{{rank.current.emoji}} {{rank.current.name}}</text>
+        </view>
+      </view>
+      <view class="hud-bar-wrap">
+        <view class="hud-bar hud-xp-bar">
+          <view class="hud-bar-fill hud-xp-fill" style="width:{{xpProgress}}%"></view>
+        </view>
+        <text class="hud-bar-label">EXP {{char.xp}}/{{xpForLevel}}</text>
+      </view>
+      <view class="hud-bar-wrap">
+        <view class="hud-bar hud-hp-bar">
+          <view class="hud-bar-fill hud-hp-fill" style="width:{{(char.hp/char.maxHP)*100}}%"></view>
+        </view>
+        <text class="hud-bar-label">HP {{char.hp}}/{{char.maxHP}}</text>
+      </view>
+      <view class="hud-stats">
+        <text class="hud-stat">🪙{{char.coins}}</text>
+        <text class="hud-stat">🔥{{char.streakDays}}</text>
+        <text class="hud-stat">📅{{daysUntilExam}}天</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 每日宝箱 -->
+  <view class="chest-btn" bindtap="openChest" wx:if="{{showChest}}">
+    <text class="chest-icon">🎁</text>
+    <view class="chest-glow"></view>
+  </view>
+
+  <!-- ===== 武器掉落动画 ===== -->
+  <view class="drop-overlay" wx:if="{{showWeaponDrop}}">
+    <view class="drop-bg"></view>
+    <view class="drop-content">
+      <text class="drop-title">🎉 区域通关！</text>
+      <text class="drop-region">{{dropRegionName}}</text>
+      <view class="drop-box">
+        <view class="drop-glow"></view>
+        <text class="drop-emoji">{{dropWeapon.emoji}}</text>
+        <text class="drop-name">{{dropWeapon.name}}</text>
+        <text class="drop-desc">{{dropWeapon.desc}}</text>
+        <text class="drop-stat">ATK +{{dropWeapon.atk}}</text>
+      </view>
+      <view class="drop-btn" bindtap="confirmWeaponDrop">
+        <text class="drop-btn-text">装备并挑战Boss!</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 战斗转场 ===== -->
+  <view class="battle-transition {{showTransition ? 'bt-active' : ''}}" wx:if="{{showTransition}}">
+    <view class="bt-flash"></view>
+    <text class="bt-text">{{transitionText}}</text>
   </view>
 
 </view>

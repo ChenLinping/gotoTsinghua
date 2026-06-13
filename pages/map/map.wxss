@@ -1,237 +1,581 @@
-/* ===== Page ===== */
+/* ===== 全屏大地图 ===== */
 .page {
-  min-height: 100vh;
-  background: #2d1b00;
-  background-image:
-    repeating-linear-gradient(0deg, transparent, transparent 39rpx, rgba(0,0,0,0.03) 39rpx, rgba(0,0,0,0.03) 40rpx),
-    repeating-linear-gradient(90deg, transparent, transparent 39rpx, rgba(0,0,0,0.03) 39rpx, rgba(0,0,0,0.03) 40rpx);
-  padding-bottom: 160rpx;
-  position: relative;
-  overflow-x: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
-
-/* ===== Pixel Font (模拟) ===== */
-.mc-font {
-  letter-spacing: 4rpx;
-  text-shadow: 2rpx 2rpx 0 rgba(0,0,0,0.4), -2rpx -2rpx 0 rgba(0,0,0,0.1);
-}
-
-/* ===== Hero Bar ===== */
-.hero-bar {
-  position: relative;
-  padding: 30rpx 24rpx 24rpx;
+  height: 100vh;
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  background: #2d1b00;
 }
 
-.hero-collapsed {
-  padding: 16rpx 24rpx 12rpx;
-}
-
-.hero-bg {
+.world-map {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, #3a7d44 0%, #2d5a27 60%, #1a3a15 100%);
-  border-radius: 0 0 20rpx 20rpx;
-  border-bottom: 6rpx solid #1a3a15;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 1;
 }
 
-.hero-collapsed .hero-bg {
-  border-radius: 0 0 16rpx 16rpx;
-}
-
-/* Toggle button */
-.hero-toggle {
+/* 区域背景 */
+.world-bg {
   position: absolute;
-  right: 24rpx;
-  bottom: 8rpx;
+  top: 0; left: 0; right: 0;
+  height: 100%;
+  min-height: 900rpx;
+}
+
+.mc-bg-1 { background: linear-gradient(180deg, #87ceeb 0%, #87ceeb 12%, #5b8c3e 12%, #5b8c3e 20%, #4a7a30 20%, #4a7a30 100%); }
+.mc-bg-2 { background: linear-gradient(180deg, #6b8e6b 0%, #6b8e6b 12%, #3d6b28 12%, #3d6b28 20%, #2d5a1a 20%, #2d5a1a 100%); }
+.mc-bg-3 { background: linear-gradient(180deg, #b0c4de 0%, #b0c4de 12%, #8fa4b8 12%, #8fa4b8 20%, #7a90a4 20%, #7a90a4 100%); }
+.mc-bg-4 { background: linear-gradient(180deg, #cd853f 0%, #cd853f 12%, #b8732e 12%, #b8732e 20%, #a0621e 20%, #a0621e 100%); }
+.mc-bg-5 { background: linear-gradient(180deg, #9370db 0%, #9370db 12%, #7b5cb8 12%, #7b5cb8 20%, #6a4ca6 20%, #6a4ca6 100%); }
+
+/* 装饰元素 */
+.world-deco {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.deco-cloud {
+  font-size: 52rpx;
+  opacity: 0.7;
+  animation: cloud-float 18s linear infinite;
+}
+
+.deco-tree {
+  font-size: 44rpx;
+  filter: drop-shadow(2rpx 4rpx 0 rgba(0,0,0,0.3));
+}
+
+@keyframes cloud-float {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(120rpx); }
+}
+
+/* 像素地面 */
+.world-ground {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  min-height: 900rpx;
+  display: flex;
+  flex-direction: column;
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ground-row { display: flex; flex: 1; }
+.ground-cell { flex: 1; border: 1rpx solid rgba(0,0,0,0.2); }
+.gc-0 { background: #5b8c3e; }
+.gc-1 { background: #4a7a30; }
+.gc-2 { background: #6b9c4e; }
+
+/* ===== 路径连线 ===== */
+.path-line {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.path-inner {
+  width: 100%;
+  height: 6rpx;
+  background: rgba(255,255,255,0.12);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 2rpx solid rgba(0,0,0,0.1);
+}
+
+.path-on {
+  background: #5b8c3e;
+  border-color: #3d6b28;
+  height: 8rpx;
+  box-shadow: 0 0 10rpx rgba(91,140,62,0.4);
+}
+
+/* ===== 怪物节点 ===== */
+.mob {
+  position: absolute;
   z-index: 10;
-  width: 48rpx;
-  height: 32rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translate(-50%, -50%);
+  transition: transform 0.15s;
+}
+
+.mob:active { transform: translate(-50%, -50%) scale(0.85); }
+
+/* 怪物身体 */
+.mob-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.mob-head {
+  width: 72rpx;
+  height: 72rpx;
+  background: #8b6b4a;
+  border: 4rpx solid #6b4a2a;
+  border-radius: 6rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.3);
-  border-radius: 8rpx;
-  border: 2rpx solid rgba(255,255,255,0.2);
-}
-
-.hero-toggle-icon {
-  font-size: 18rpx;
-  color: rgba(255,255,255,0.8);
-}
-
-.hero-content {
   position: relative;
-  z-index: 2;
+  z-index: 3;
+  box-shadow: 0 4rpx 0 rgba(0,0,0,0.25);
+}
+
+.mob-face { font-size: 36rpx; }
+
+.mob-feet {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  gap: 6rpx;
+  margin-top: -2rpx;
+  z-index: 2;
 }
 
-/* Collapsed mini view */
-.hero-mini {
-  position: relative;
-  z-index: 2;
+.mob-foot {
+  width: 24rpx;
+  height: 16rpx;
+  background: #6b4a2a;
+  border: 3rpx solid #4a2a0a;
+  border-radius: 0 0 4rpx 4rpx;
+}
+
+/* 已完成 - 钻石色 */
+.mob-dead .mob-head {
+  background: #4ad8d8;
+  border-color: #2a9898;
+  box-shadow: 0 4rpx 0 rgba(0,0,0,0.2);
+}
+.mob-dead .mob-face {
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 900;
+  text-shadow: 1rpx 1rpx 0 rgba(0,0,0,0.3);
+}
+.mob-dead .mob-foot { background: #2a9898; border-color: #1a7878; }
+
+/* 锁定 - 灰色石头 */
+.mob-locked .mob-head {
+  background: #999;
+  border-color: #777;
+}
+.mob-locked .mob-face { opacity: 0.5; font-size: 28rpx; }
+.mob-locked .mob-foot { background: #777; border-color: #555; }
+.mob-locked { pointer-events: none; }
+
+/* Boss - TNT红 */
+.mob-boss .mob-head {
+  width: 88rpx;
+  height: 88rpx;
+  background: #ee3333;
+  border-color: #aa1111;
+  border-width: 5rpx;
+}
+.mob-boss .mob-face { font-size: 44rpx; }
+.mob-boss .mob-foot { width: 28rpx; height: 18rpx; background: #aa1111; border-color: #881111; }
+
+/* 精英 - 金色 */
+.mob-elite .mob-head {
+  width: 80rpx;
+  height: 80rpx;
+  background: #e8c200;
+  border-color: #a08600;
+}
+.mob-elite .mob-face { font-size: 38rpx; }
+.mob-elite .mob-foot { background: #a08600; border-color: #806800; }
+
+/* 怪物光环 */
+.mob-glow {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 110rpx; height: 110rpx;
+  margin-left: -55rpx; margin-top: -55rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(239,68,68,0.25) 0%, transparent 70%);
+  animation: glow-pulse 2s ease-in-out infinite;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.mob-boss .mob-glow {
+  width: 140rpx; height: 140rpx;
+  margin-left: -70rpx; margin-top: -70rpx;
+  background: radial-gradient(circle, rgba(239,68,68,0.35) 0%, transparent 70%);
+}
+
+.mob-elite .mob-glow {
+  background: radial-gradient(circle, rgba(255,215,0,0.25) 0%, transparent 70%);
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* 怪物标签 */
+.mob-tag {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 4rpx;
+}
+
+.mob-name {
+  font-size: 18rpx;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(0,0,0,0.55);
+  padding: 2rpx 10rpx;
+  border-radius: 4rpx;
+  white-space: nowrap;
+  max-width: 140rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 1rpx 1rpx 0 rgba(0,0,0,0.5);
+}
+
+.mob-dead .mob-name { color: #4ad8d8; background: rgba(0,0,0,0.4); }
+.mob-locked .mob-name { color: #999; background: rgba(0,0,0,0.3); }
+
+.mob-type {
+  font-size: 14rpx;
+  font-weight: 800;
+  letter-spacing: 2rpx;
+  margin-top: 2rpx;
+  text-shadow: 1rpx 1rpx 0 rgba(0,0,0,0.5);
+}
+
+.mob-type-boss { color: #ff4444; }
+.mob-type-elite { color: #ffd700; }
+
+/* ===== 玩家角色 ===== */
+.player {
+  position: absolute;
+  z-index: 20;
+  transform: translate(-50%, -50%);
+  animation: player-idle 1.5s ease-in-out infinite;
+}
+
+@keyframes player-idle {
+  0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+  50% { transform: translate(-50%, -50%) translateY(-6rpx); }
+}
+
+.steve {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.steve-head-wrap { position: relative; z-index: 3; }
+
+.steve-head {
+  width: 40rpx;
+  height: 40rpx;
+  background: #c8a87a;
+  border: 3rpx solid #8b6b4a;
+  border-radius: 4rpx;
   display: flex;
   align-items: center;
-  gap: 20rpx;
-  padding: 4rpx 0;
+  justify-content: center;
 }
 
-.hero-mini-lv {
+.steve-face { font-size: 24rpx; }
+
+.steve-body-wrap {
+  display: flex;
+  align-items: stretch;
+  height: 32rpx;
+  position: relative;
+  z-index: 2;
+}
+
+.steve-arm {
+  width: 12rpx;
+  background: #5b8c3e;
+  border: 2rpx solid #3d6b28;
+}
+
+.steve-arm-l { border-radius: 3rpx 0 0 3rpx; }
+.steve-arm-r { border-radius: 0 3rpx 3rpx 0; }
+
+.steve-torso {
+  width: 28rpx;
+  background: #3b82f6;
+  border: 2rpx solid #2563eb;
+}
+
+.steve-legs-wrap {
+  display: flex;
+  height: 24rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.steve-leg {
+  width: 18rpx;
+  background: #4a4a8a;
+  border: 2rpx solid #333366;
+  border-radius: 0 0 3rpx 3rpx;
+}
+
+/* 玩家脚下指示器 */
+.player-indicator {
+  width: 40rpx;
+  height: 12rpx;
+  background: rgba(91,140,62,0.4);
+  border-radius: 50%;
+  margin-top: 2rpx;
+  animation: indicator-pulse 2s ease-in-out infinite;
+}
+
+@keyframes indicator-pulse {
+  0%, 100% { opacity: 0.4; transform: scaleX(1); }
+  50% { opacity: 0.8; transform: scaleX(1.3); }
+}
+
+/* ===== 区域标题浮层 ===== */
+.region-pill {
+  position: fixed;
+  top: 20rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  background: rgba(0,0,0,0.6);
+  padding: 10rpx 20rpx;
+  border-radius: 30rpx;
+  border: 3rpx solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(8px);
+}
+
+.region-pill-icon { font-size: 28rpx; }
+
+.region-pill-name {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 1rpx 1rpx 0 rgba(0,0,0,0.5);
+}
+
+.region-pill-arrow {
+  font-size: 16rpx;
+  color: rgba(255,255,255,0.6);
+  margin-left: 4rpx;
+}
+
+.region-pill-progress {
+  position: absolute;
+  bottom: -2rpx;
+  left: 20rpx;
+  right: 20rpx;
+  height: 4rpx;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2rpx;
+  overflow: hidden;
+}
+
+.region-pill-fill {
+  height: 100%;
+  background: #5b8c3e;
+  border-radius: 2rpx;
+  transition: width 0.5s ease;
+}
+
+/* 区域下拉菜单 */
+.region-dropdown {
+  position: fixed;
+  top: 76rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 101;
+  background: rgba(0,0,0,0.8);
+  border-radius: 12rpx;
+  border: 3rpx solid rgba(255,255,255,0.1);
+  padding: 8rpx;
+  backdrop-filter: blur(12px);
+  min-width: 300rpx;
+  animation: dropdown-in 0.2s ease;
+}
+
+@keyframes dropdown-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(-10rpx); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 14rpx 20rpx;
+  border-radius: 8rpx;
+  transition: background 0.15s;
+}
+
+.dropdown-item:active { background: rgba(255,255,255,0.1); }
+.dropdown-active { background: rgba(91,140,62,0.3); }
+.dropdown-locked { opacity: 0.45; }
+
+.dropdown-icon { font-size: 28rpx; }
+.dropdown-name { font-size: 24rpx; color: #fff; font-weight: 600; flex: 1; }
+.dropdown-lv { font-size: 18rpx; color: #999; }
+
+/* ===== HUD 面板 ===== */
+.hud {
+  position: fixed;
+  left: 20rpx;
+  bottom: 40rpx;
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+
+/* 收起态 */
+.hud-mini {
+  width: 80rpx;
+  height: 80rpx;
+  background: rgba(0,0,0,0.6);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 3rpx solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(8px);
+  gap: 4rpx;
+}
+
+.hud-mini-lv {
   font-size: 28rpx;
   font-weight: 900;
   color: #ffd700;
-  text-shadow: 2rpx 2rpx 0 rgba(0,0,0,0.4);
+  text-shadow: 1rpx 1rpx 0 rgba(0,0,0,0.5);
+  line-height: 1;
 }
 
-.hero-mini-rank {
-  font-size: 32rpx;
+.hud-mini-hp {
+  width: 48rpx;
+  height: 8rpx;
+  background: rgba(255,255,255,0.15);
+  border-radius: 4rpx;
+  overflow: hidden;
 }
 
-.hero-mini-hp,
-.hero-mini-coin {
-  font-size: 22rpx;
-  color: #fff;
-  background: rgba(0,0,0,0.3);
-  padding: 4rpx 14rpx;
-  border-radius: 12rpx;
-  border: 2rpx solid rgba(255,255,255,0.15);
+.hud-mini-hp-fill {
+  height: 100%;
+  background: #4ade80;
+  border-radius: 4rpx;
+  transition: width 0.3s;
 }
 
-/* Hero Left: Level & Rank */
-.hero-left {
+/* 展开态 */
+.hud-full {
+  width: 340rpx;
+  background: rgba(0,0,0,0.7);
+  border-radius: 16rpx;
+  padding: 18rpx;
+  border: 3rpx solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(12px);
+  animation: hud-slide-in 0.3s ease;
+}
+
+@keyframes hud-slide-in {
+  from { opacity: 0; transform: translateY(20rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hud-row {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  width: 150rpx;
+  gap: 10rpx;
+  margin-bottom: 12rpx;
 }
 
-.level-badge {
-  width: 90rpx;
-  height: 90rpx;
+.hud-lv-badge {
+  width: 56rpx;
+  height: 56rpx;
   border-radius: 8rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6rpx 0 rgba(0,0,0,0.3), inset 0 -4rpx 0 rgba(0,0,0,0.2);
-  border: 4rpx solid rgba(255,255,255,0.3);
+  border: 3rpx solid rgba(255,255,255,0.3);
 }
 
-.level-text {
-  font-size: 26rpx;
-  font-weight: bold;
-  color: #fff;
-  text-shadow: 2rpx 2rpx 0 rgba(0,0,0,0.4);
-}
-
-.rank-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 8rpx;
-}
-
-.rank-emoji {
-  font-size: 32rpx;
-}
-
-.rank-name {
-  font-size: 18rpx;
-  color: rgba(255,255,255,0.9);
-  font-weight: 600;
-  margin-top: 2rpx;
-}
-
-/* Hero Center: XP & HP Bars */
-.hero-center {
-  flex: 1;
-  margin: 10rpx 16rpx 0;
-}
-
-.xp-bar-wrap,
-.hp-bar-wrap {
-  height: 32rpx;
-  background: rgba(0,0,0,0.35);
-  border-radius: 4rpx;
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 10rpx;
-  border: 3rpx solid rgba(0,0,0,0.4);
-  box-shadow: inset 0 2rpx 4rpx rgba(0,0,0,0.3);
-}
-
-.xp-bar-fill {
-  height: 100%;
-  background: linear-gradient(180deg, #ffd700 0%, #b8860b 100%);
-  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: inset 0 -2rpx 0 rgba(0,0,0,0.2);
-}
-
-.hp-bar-fill {
-  height: 100%;
-  background: linear-gradient(180deg, #ff4444 0%, #cc0000 100%);
-  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: inset 0 -2rpx 0 rgba(0,0,0,0.2);
-}
-
-.xp-bar-text,
-.hp-bar-text {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18rpx;
-  color: #fff;
-  font-weight: 700;
-  text-shadow: 2rpx 2rpx 0 rgba(0,0,0,0.5);
-}
-
-/* Hero Right: Stats */
-.hero-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 6rpx;
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  background: rgba(0,0,0,0.3);
-  border-radius: 6rpx;
-  padding: 4rpx 12rpx;
-  border: 2rpx solid rgba(255,255,255,0.1);
-}
-
-.stat-icon {
-  font-size: 24rpx;
-  margin-right: 4rpx;
-}
-
-.stat-val {
+.hud-lv-text {
   font-size: 22rpx;
+  font-weight: 800;
   color: #fff;
-  font-weight: 700;
   text-shadow: 1rpx 1rpx 0 rgba(0,0,0,0.4);
 }
 
-/* ===== Daily Chest ===== */
+.hud-info { flex: 1; }
+
+.hud-rank {
+  font-size: 22rpx;
+  color: rgba(255,255,255,0.9);
+  font-weight: 600;
+}
+
+.hud-bar-wrap {
+  position: relative;
+  margin-bottom: 8rpx;
+}
+
+.hud-bar {
+  height: 18rpx;
+  background: rgba(255,255,255,0.1);
+  border-radius: 4rpx;
+  overflow: hidden;
+  border: 2rpx solid rgba(0,0,0,0.3);
+}
+
+.hud-bar-fill {
+  height: 100%;
+  border-radius: 2rpx;
+  transition: width 0.5s ease;
+}
+
+.hud-xp-fill { background: linear-gradient(180deg, #ffd700, #b8860b); }
+.hud-hp-fill { background: linear-gradient(180deg, #ff4444, #cc0000); }
+
+.hud-bar-label {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14rpx;
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 1rpx 1rpx 0 rgba(0,0,0,0.6);
+}
+
+.hud-stats {
+  display: flex;
+  gap: 12rpx;
+  margin-top: 8rpx;
+}
+
+.hud-stat {
+  font-size: 18rpx;
+  color: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.08);
+  padding: 4rpx 10rpx;
+  border-radius: 6rpx;
+  font-weight: 600;
+}
+
+/* ===== 每日宝箱 ===== */
 .chest-btn {
   position: fixed;
   right: 24rpx;
-  top: 200rpx;
+  top: 50%;
   z-index: 100;
-  background: linear-gradient(180deg, #c6a03e 0%, #8b6914 100%);
+  background: linear-gradient(180deg, #c6a03e, #8b6914);
   border-radius: 8rpx;
   padding: 14rpx 16rpx;
   display: flex;
@@ -242,37 +586,20 @@
   animation: chest-bounce 2s ease-in-out infinite;
 }
 
-.chest-hidden {
-  display: none;
+@keyframes chest-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8rpx); }
 }
 
-.chest-icon {
-  font-size: 44rpx;
-}
-
-.chest-label {
-  font-size: 16rpx;
-  color: #fff;
-  font-weight: bold;
-  margin-top: 2rpx;
-  text-shadow: 1rpx 1rpx 0 rgba(0,0,0,0.4);
-}
+.chest-icon { font-size: 44rpx; }
 
 .chest-glow {
   position: absolute;
-  top: -10rpx;
-  left: -10rpx;
-  right: -10rpx;
-  bottom: -10rpx;
+  top: -10rpx; left: -10rpx; right: -10rpx; bottom: -10rpx;
   border-radius: 12rpx;
   background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, transparent 70%);
   animation: chest-glow-pulse 1.5s ease-in-out infinite;
   pointer-events: none;
-}
-
-@keyframes chest-bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8rpx); }
 }
 
 @keyframes chest-glow-pulse {
@@ -280,676 +607,188 @@
   50% { opacity: 1; transform: scale(1.15); }
 }
 
-/* ===== Region Tabs ===== */
-.region-tabs {
-  white-space: nowrap;
-  padding: 16rpx 0 8rpx;
-  background: transparent;
-}
-
-.region-tabs-inner {
-  display: inline-flex;
-  padding: 0 16rpx;
-  gap: 12rpx;
-}
-
-.region-tab {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-width: 130rpx;
-  padding: 12rpx 20rpx;
-  background: #4a3728;
-  border-radius: 6rpx;
-  position: relative;
-  box-shadow: 0 4rpx 0 rgba(0,0,0,0.3);
-  border: 3rpx solid #5a4738;
-  transition: all 0.3s ease;
-}
-
-.region-tab-active {
-  background: linear-gradient(180deg, #5b8c3e 0%, #3d6b28 100%);
-  border-color: #7ab356;
-  box-shadow: 0 4rpx 0 rgba(0,0,0,0.3), 0 0 16rpx rgba(91,140,62,0.3);
-  transform: translateY(-2rpx);
-}
-
-.region-tab-locked {
-  opacity: 0.5;
-}
-
-.region-tab-icon {
-  font-size: 36rpx;
-  margin-bottom: 4rpx;
-}
-
-.region-tab-name {
-  font-size: 20rpx;
-  font-weight: 600;
-  color: #d4c4a8;
-}
-
-.region-tab-active .region-tab-name {
-  color: #fff;
-}
-
-.region-tab-lock {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 2rpx;
-}
-
-.lock-icon {
-  font-size: 18rpx;
-}
-
-.lock-level {
-  font-size: 14rpx;
-  color: #888;
-}
-
-.region-tab-indicator {
-  position: absolute;
-  bottom: -8rpx;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 36rpx;
-  height: 6rpx;
-  background: #5b8c3e;
-  border-radius: 3rpx;
-}
-
-/* ===== Map Area (Minecraft 风格) ===== */
-.map-area {
-  margin: 12rpx 16rpx;
-  border-radius: 8rpx;
-  overflow: hidden;
-  position: relative;
-  border: 6rpx solid #5a4738;
-  box-shadow: 0 6rpx 0 rgba(0,0,0,0.3), inset 0 0 0 3rpx #3a2a1a;
-}
-
-/* MC 像素风背景 */
-.map-bg-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 0;
-  overflow: hidden;
-}
-
-.mc-bg-1 {
-  background: linear-gradient(180deg, #87ceeb 0%, #87ceeb 15%, #5b8c3e 15%, #5b8c3e 25%, #4a7a30 25%, #4a7a30 100%);
-}
-
-.mc-bg-2 {
-  background: linear-gradient(180deg, #6b8e6b 0%, #5a7d5a 15%, #3d6b28 15%, #3d6b28 25%, #2d5a1a 25%, #2d5a1a 100%);
-}
-
-.mc-bg-3 {
-  background: linear-gradient(180deg, #b0c4de 0%, #b0c4de 15%, #8fa4b8 15%, #8fa4b8 25%, #7a90a4 25%, #7a90a4 100%);
-}
-
-.mc-bg-4 {
-  background: linear-gradient(180deg, #cd853f 0%, #cd853f 15%, #b8732e 15%, #b8732e 25%, #a0621e 25%, #a0621e 100%);
-}
-
-.mc-bg-5 {
-  background: linear-gradient(180deg, #9370db 0%, #9370db 15%, #7b5cb8 15%, #7b5cb8 25%, #6a4ca6 25%, #6a4ca6 100%);
-}
-
-/* MC 装饰块 */
-.mc-block {
-  position: absolute;
-  font-size: 40rpx;
-  z-index: 1;
-  pointer-events: none;
-  image-rendering: pixelated;
-}
-
-.mc-tree {
-  filter: drop-shadow(2rpx 4rpx 0 rgba(0,0,0,0.3));
-}
-
-/* 像素草地网格 */
-.mc-ground {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 0;
-  display: flex;
-  flex-direction: column;
-  opacity: 0.06;
-  pointer-events: none;
-}
-
-.mc-grass-row {
-  display: flex;
-  height: 60rpx;
-}
-
-.mc-grass-cell {
-  flex: 1;
-  border: 1rpx solid rgba(0,0,0,0.15);
-}
-
-.mc-grass-0 { background: #5b8c3e; }
-.mc-grass-1 { background: #4a7a30; }
-.mc-grass-2 { background: #6b9c4e; }
-
-.map-header {
-  position: relative;
-  z-index: 2;
-  padding: 20rpx 20rpx 8rpx;
-  text-align: center;
-  background: rgba(0,0,0,0.2);
-}
-
-.map-title {
-  font-size: 30rpx;
-  font-weight: 800;
-  color: #fff;
-  display: block;
-  text-shadow: 3rpx 3rpx 0 rgba(0,0,0,0.5);
-}
-
-.map-desc {
-  font-size: 20rpx;
-  color: rgba(255,255,255,0.8);
-  display: block;
-  margin-top: 4rpx;
-  text-shadow: 1rpx 1rpx 0 rgba(0,0,0,0.3);
-}
-
-/* 区域进度条 */
-.region-progress-bar {
-  margin-top: 10rpx;
-  height: 20rpx;
-  background: rgba(0,0,0,0.3);
-  border-radius: 4rpx;
-  position: relative;
-  overflow: hidden;
-  border: 2rpx solid rgba(0,0,0,0.4);
-}
-
-.region-progress-fill {
-  height: 100%;
-  background: linear-gradient(180deg, #5b8c3e 0%, #3d6b28 100%);
-  transition: width 0.5s ease;
-}
-
-.region-progress-text {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14rpx;
-  color: #fff;
-  font-weight: 700;
-  text-shadow: 1rpx 1rpx 0 rgba(0,0,0,0.5);
-}
-
-/* ===== Map Canvas ===== */
-.map-canvas {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  height: 500rpx;
-  overflow: hidden;
-}
-
-/* ===== Path Lines (像素风) ===== */
-.path-line {
-  position: absolute;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.path-line-inner {
-  width: 100%;
-  height: 6rpx;
-  background: rgba(255,255,255,0.15);
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  border: 2rpx solid rgba(0,0,0,0.1);
-}
-
-.path-line-inner.path-active {
-  background: #5b8c3e;
-  height: 8rpx;
-  border-color: #3d6b28;
-  box-shadow: 0 2rpx 0 rgba(0,0,0,0.2);
-}
-
-.mc-path-active {
-  animation: mc-path-glow 2s ease-in-out infinite;
-}
-
-@keyframes mc-path-glow {
-  0%, 100% { box-shadow: 0 2rpx 0 rgba(0,0,0,0.2); }
-  50% { box-shadow: 0 2rpx 8rpx rgba(91,140,62,0.5); }
-}
-
-/* ===== Map Nodes (Minecraft 方块风格) ===== */
-.map-node {
-  position: absolute;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transform: translate(-50%, -50%);
-  transition: transform 0.15s ease;
-}
-
-.map-node:active {
-  transform: translate(-50%, -50%) scale(0.85);
-}
-
-/* 像素方块节点 */
-.mc-block-node {
-  width: 80rpx;
-  height: 80rpx;
-  position: relative;
-  z-index: 3;
-}
-
-.mc-block-face {
-  position: absolute;
-}
-
-/* 方块顶面 */
-.mc-block-top {
-  top: 0;
-  left: 8rpx;
-  right: 8rpx;
-  height: 16rpx;
-  border-radius: 4rpx 4rpx 0 0;
-  z-index: 2;
-}
-
-/* 方块左侧面 */
-.mc-block-left {
-  top: 14rpx;
-  left: 0;
-  width: 14rpx;
-  bottom: 0;
-  border-radius: 4rpx 0 0 4rpx;
-  z-index: 1;
-}
-
-/* 方块右侧面 */
-.mc-block-right {
-  top: 14rpx;
-  right: 0;
-  width: 14rpx;
-  bottom: 0;
-  border-radius: 0 4rpx 4rpx 0;
-  z-index: 1;
-}
-
-/* 方块主体（正面） */
-.mc-block-node::before {
-  content: '';
-  position: absolute;
-  top: 14rpx;
-  left: 8rpx;
-  right: 8rpx;
-  bottom: 0;
-  border-radius: 0 0 4rpx 4rpx;
-  z-index: 2;
-}
-
-.mc-block-icon {
-  position: absolute;
-  top: 16rpx;
-  left: 8rpx;
-  right: 8rpx;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 5;
-}
-
-.node-icon {
-  font-size: 30rpx;
-}
-
-/* 普通节点配色 - 泥土块 */
-.mc-available .mc-block-top { background: #7cba3c; }
-.mc-available .mc-block-left { background: #6b5035; }
-.mc-available .mc-block-right { background: #5a4028; }
-.mc-available .mc-block-node::before { background: #8b6b4a; border: 3rpx solid #6b5035; }
-
-/* 已完成节点 - 钻石块 */
-.mc-done .mc-block-top { background: #5ce8e8; }
-.mc-done .mc-block-left { background: #3ab8b8; }
-.mc-done .mc-block-right { background: #2a9898; }
-.mc-done .mc-block-node::before { background: #4ad8d8; border: 3rpx solid #2a9898; }
-.mc-done .node-icon {
-  color: #fff;
-  font-size: 28rpx;
-  font-weight: 900;
-  text-shadow: 1rpx 1rpx 0 rgba(0,0,0,0.3);
-}
-
-/* 锁定节点 - 石头块 */
-.node-locked .mc-block-top { background: #aaa; }
-.node-locked .mc-block-left { background: #888; }
-.node-locked .mc-block-right { background: #777; }
-.node-locked .mc-block-node::before { background: #999; border: 3rpx solid #777; }
-.node-locked .node-icon {
-  opacity: 0.5;
-  font-size: 24rpx;
-}
-
-.node-locked {
-  pointer-events: none;
-}
-
-/* Boss节点 - TNT/红石块 */
-.mc-boss .mc-block-node {
-  width: 100rpx;
-  height: 100rpx;
-}
-
-.mc-boss .mc-block-top { background: #ff4444; }
-.mc-boss .mc-block-left { background: #cc2222; }
-.mc-boss .mc-block-right { background: #aa1111; }
-.mc-boss .mc-block-node::before { background: #ee3333; border: 4rpx solid #aa1111; }
-.mc-boss .node-icon { font-size: 38rpx; }
-
-.mc-boss-ring {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 130rpx;
-  height: 130rpx;
-  margin-left: -65rpx;
-  margin-top: -65rpx;
-  border: 4rpx solid rgba(255,68,68,0.5);
-  z-index: 1;
-  animation: mc-boss-pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes mc-boss-pulse {
-  0%, 100% { transform: scale(1); opacity: 0.6; }
-  50% { transform: scale(1.15); opacity: 0; }
-}
-
-/* 精英节点 - 金块 */
-.mc-elite .mc-block-node {
-  width: 90rpx;
-  height: 90rpx;
-}
-
-.mc-elite .mc-block-top { background: #ffd700; }
-.mc-elite .mc-block-left { background: #c8a800; }
-.mc-elite .mc-block-right { background: #a08600; }
-.mc-elite .mc-block-node::before { background: #e8c200; border: 3rpx solid #a08600; }
-.mc-elite .node-icon { font-size: 32rpx; }
-
-.mc-elite-ring {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 110rpx;
-  height: 110rpx;
-  margin-left: -55rpx;
-  margin-top: -55rpx;
-  border: 3rpx dashed rgba(255,215,0,0.6);
-  z-index: 1;
-}
-
-/* Node Glow */
-.node-glow {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100rpx;
-  height: 100rpx;
-  margin-left: -50rpx;
-  margin-top: -50rpx;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(91,140,62,0.3) 0%, transparent 70%);
-  animation: node-glow-pulse 2s ease-in-out infinite;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.mc-boss .node-glow {
-  width: 140rpx;
-  height: 140rpx;
-  margin-left: -70rpx;
-  margin-top: -70rpx;
-  background: radial-gradient(circle, rgba(255,68,68,0.3) 0%, transparent 70%);
-}
-
-.mc-elite .node-glow {
-  width: 120rpx;
-  height: 120rpx;
-  margin-left: -60rpx;
-  margin-top: -60rpx;
-  background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, transparent 70%);
-}
-
-@keyframes node-glow-pulse {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.2); }
-}
-
-/* Node Label */
-.node-label-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 6rpx;
-}
-
-.mc-label .node-label {
-  font-size: 18rpx;
-  font-weight: 700;
-  color: #fff;
-  background: rgba(0,0,0,0.55);
-  padding: 2rpx 10rpx;
-  border-radius: 4rpx;
-  white-space: nowrap;
-  max-width: 150rpx;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  border: 2rpx solid rgba(255,255,255,0.1);
-  text-shadow: 1rpx 1rpx 0 rgba(0,0,0,0.4);
-}
-
-.node-locked .node-label {
-  color: #999;
-  background: rgba(0,0,0,0.3);
-  border-color: transparent;
-}
-
-.node-type-label {
-  font-size: 14rpx;
-  font-weight: 800;
-  color: #ff4444;
-  margin-top: 2rpx;
-  letter-spacing: 2rpx;
-  text-shadow: 1rpx 1rpx 0 rgba(0,0,0,0.4);
-}
-
-.node-type-elite {
-  color: #ffd700;
-}
-
-/* ===== 武器掉落动画覆盖层 ===== */
-.weapon-drop-overlay {
+/* ===== 武器掉落动画 ===== */
+.drop-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
   z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: fadeIn 0.3s ease;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.weapon-drop-bg {
+.drop-bg {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.85);
-  animation: bgFadeIn 0.5s ease;
+  animation: fade-in 0.3s ease;
 }
 
-@keyframes bgFadeIn {
+@keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-.weapon-drop-content {
+.drop-content {
   position: relative;
   z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40rpx;
-  animation: dropSlideIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: drop-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-@keyframes dropSlideIn {
-  from { transform: translateY(100rpx) scale(0.8); opacity: 0; }
+@keyframes drop-in {
+  from { transform: translateY(80rpx) scale(0.8); opacity: 0; }
   to { transform: translateY(0) scale(1); opacity: 1; }
 }
 
-.weapon-drop-title {
-  font-size: 48rpx;
+.drop-title {
+  font-size: 44rpx;
   font-weight: 900;
   color: #ffd700;
   text-shadow: 4rpx 4rpx 0 rgba(0,0,0,0.5);
-  margin-bottom: 8rpx;
+  letter-spacing: 4rpx;
 }
 
-.weapon-drop-region {
-  font-size: 28rpx;
-  color: rgba(255,255,255,0.7);
-  margin-bottom: 40rpx;
+.drop-region {
+  font-size: 26rpx;
+  color: rgba(255,255,255,0.6);
+  margin: 8rpx 0 36rpx;
 }
 
-.weapon-drop-box {
+.drop-box {
   position: relative;
-  width: 400rpx;
-  padding: 40rpx;
-  background: linear-gradient(180deg, #4a3728 0%, #3a2a1a 100%);
+  width: 360rpx;
+  padding: 36rpx;
+  background: linear-gradient(180deg, #4a3728, #3a2a1a);
   border: 6rpx solid #8b6b4a;
   border-radius: 8rpx;
-  box-shadow: 0 8rpx 0 rgba(0,0,0,0.4), inset 0 0 40rpx rgba(255,215,0,0.05);
+  box-shadow: 0 8rpx 0 rgba(0,0,0,0.4);
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.weapon-drop-glow {
+.drop-glow {
   position: absolute;
-  top: -20rpx;
-  left: -20rpx;
-  right: -20rpx;
-  bottom: -20rpx;
+  top: -20rpx; left: -20rpx; right: -20rpx; bottom: -20rpx;
   border-radius: 12rpx;
   background: radial-gradient(circle, rgba(255,215,0,0.2) 0%, transparent 70%);
-  animation: weaponGlow 2s ease-in-out infinite;
+  animation: weapon-glow 2s ease-in-out infinite;
   pointer-events: none;
 }
 
-@keyframes weaponGlow {
+@keyframes weapon-glow {
   0%, 100% { opacity: 0.5; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.1); }
 }
 
-.weapon-drop-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.weapon-drop-emoji {
-  font-size: 100rpx;
-  animation: weaponBounce 1s ease-in-out infinite;
+.drop-emoji {
+  font-size: 90rpx;
+  animation: weapon-bounce 1s ease-in-out infinite;
   filter: drop-shadow(0 4rpx 8rpx rgba(255,215,0,0.5));
 }
 
-@keyframes weaponBounce {
+@keyframes weapon-bounce {
   0%, 100% { transform: translateY(0) rotate(-5deg); }
-  50% { transform: translateY(-20rpx) rotate(5deg); }
+  50% { transform: translateY(-16rpx) rotate(5deg); }
 }
 
-.weapon-drop-name {
-  font-size: 36rpx;
+.drop-name {
+  font-size: 32rpx;
   font-weight: 900;
   color: #ffd700;
-  margin-top: 16rpx;
+  margin-top: 14rpx;
+  letter-spacing: 4rpx;
   text-shadow: 3rpx 3rpx 0 rgba(0,0,0,0.5);
 }
 
-.weapon-drop-desc {
-  font-size: 22rpx;
-  color: rgba(255,255,255,0.7);
-  margin-top: 8rpx;
+.drop-desc {
+  font-size: 20rpx;
+  color: rgba(255,255,255,0.6);
+  margin-top: 6rpx;
 }
 
-.weapon-drop-stat {
-  font-size: 28rpx;
+.drop-stat {
+  font-size: 26rpx;
   font-weight: 800;
   color: #ff6b6b;
-  margin-top: 12rpx;
+  margin-top: 10rpx;
   background: rgba(255,0,0,0.1);
-  padding: 6rpx 20rpx;
+  padding: 4rpx 18rpx;
   border-radius: 6rpx;
   border: 2rpx solid rgba(255,100,100,0.3);
 }
 
-/* MC 风格按钮 */
-.weapon-drop-btn {
-  margin-top: 40rpx;
-  padding: 20rpx 60rpx;
-  background: linear-gradient(180deg, #5b8c3e 0%, #3d6b28 100%);
-  border: 6rpx solid #7ab356;
+.drop-btn {
+  margin-top: 36rpx;
+  padding: 18rpx 50rpx;
+  background: linear-gradient(180deg, #5b8c3e, #3d6b28);
+  border: 5rpx solid #7ab356;
   border-radius: 6rpx;
   box-shadow: 0 6rpx 0 rgba(0,0,0,0.3);
-  animation: btnPulse 2s ease-in-out infinite;
 }
 
-.mc-btn:active {
+.drop-btn:active {
   transform: translateY(4rpx);
   box-shadow: 0 2rpx 0 rgba(0,0,0,0.3);
 }
 
-@keyframes btnPulse {
-  0%, 100% { box-shadow: 0 6rpx 0 rgba(0,0,0,0.3); }
-  50% { box-shadow: 0 6rpx 16rpx rgba(91,140,62,0.4); }
-}
-
-.weapon-drop-btn-text {
-  font-size: 28rpx;
+.drop-btn-text {
+  font-size: 26rpx;
   font-weight: 800;
   color: #fff;
   text-shadow: 2rpx 2rpx 0 rgba(0,0,0,0.4);
+}
+
+/* ===== 战斗转场 ===== */
+.battle-transition {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.bt-flash {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #fff;
+  opacity: 0;
+}
+
+.bt-active .bt-flash {
+  animation: bt-flash-anim 0.8s ease-out;
+}
+
+@keyframes bt-flash-anim {
+  0% { opacity: 0; }
+  15% { opacity: 0.9; }
+  40% { opacity: 0.3; }
+  100% { opacity: 0; }
+}
+
+.bt-text {
+  position: relative;
+  z-index: 2;
+  font-size: 40rpx;
+  font-weight: 900;
+  color: #ffd700;
+  text-shadow: 4rpx 4rpx 0 rgba(0,0,0,0.6);
+  letter-spacing: 6rpx;
+  opacity: 0;
+}
+
+.bt-active .bt-text {
+  animation: bt-text-anim 0.8s ease-out;
+}
+
+@keyframes bt-text-anim {
+  0% { opacity: 0; transform: scale(0.5); }
+  20% { opacity: 1; transform: scale(1.2); }
+  50% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.5); }
 }
