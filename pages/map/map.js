@@ -603,6 +603,34 @@ Page({
     var treasures = this.data.treasures.slice();
     var pool = TREASURE_POOL;
 
+    // 保存答题记录
+    var history = wx.getStorageSync('answerHistory') || [];
+    var questions = this.data.forgeQuestions;
+    var results = this.data.forgeResults;
+    var subject = this.data.forgeSubject;
+    var now = new Date();
+    var dateStr = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
+
+    for (var h = 0; h < questions.length; h++) {
+      if (results[h]) {
+        history.push({
+          q: questions[h].q,
+          options: questions[h].options,
+          answer: questions[h].answer,
+          correct: results[h] === 'correct',
+          subject: subject,
+          date: dateStr,
+          explain: questions[h].explain || ''
+        });
+      }
+    }
+
+    // 限制最多保存200条
+    if (history.length > 200) {
+      history = history.slice(history.length - 200);
+    }
+    wx.setStorageSync('answerHistory', history);
+
     // 每答对一题多一把法宝
     for (var i = 0; i < correct; i++) {
       var t = pool[treasures.length % pool.length];

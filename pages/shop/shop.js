@@ -1,187 +1,132 @@
-var game = require('../../utils/game');
-
 Page({
   data: {
-    char: null,
-    coins: 0,
-    activeTab: 0,
-    tabs: ['武器', '防具', '饰品'],
-    tabIcons: ['🗡️', '🛡️', '💍'],
-    items: [],
-    equippedId: ''
+    activeTab: 0,  // 0=按日期 1=按科目
+    groups: [],
+    stats: { total: 0, correct: 0, rate: 0 },
+    subjectStats: [],
+    empty: true
   },
 
-  onLoad: function () {
-    this.loadCharacter();
-  },
+  onLoad: function() { this.loadHistory(); },
+  onShow: function() { this.loadHistory(); },
 
-  onShow: function () {
-    this.loadCharacter();
-  },
-
-  loadCharacter: function () {
-    var char = game.loadGame();
-    if (!char) {
-      wx.showToast({ title: '未找到角色数据', icon: 'none' });
+  loadHistory: function() {
+    var history = wx.getStorageSync('answerHistory') || [];
+    if (history.length === 0) {
+      this.setData({ groups: [], stats: { total: 0, correct: 0, rate: 0 }, subjectStats: [], empty: true });
       return;
     }
-    this.setData({ char: char, coins: char.coins || 0 });
-    this.loadItems();
-  },
 
-  loadItems: function () {
-    var char = this.data.char;
-    if (!char) return;
-
-    var tab = this.data.activeTab;
-    var rawList, equippedId, statKey;
-
-    if (tab === 0) {
-      rawList = game.EQUIPMENT.weapons;
-      equippedId = char.equipment.weapon || '';
-      statKey = 'atk';
-    } else if (tab === 1) {
-      rawList = game.EQUIPMENT.armor;
-      equippedId = char.equipment.armor || '';
-      statKey = 'def';
-    } else {
-      rawList = game.EQUIPMENT.accessories;
-      equippedId = char.equipment.accessory || '';
-      statKey = 'bonus';
+    // 统计
+    var total = history.length;
+    var correct = 0;
+    var subjectMap = {};
+    for (var i = 0; i < history.length; i++) {
+      if (history[i].correct) correct++;
+      var s = history[i].subject || 'mixed';
+      if (!subjectMap[s]) subjectMap[s] = { subject: s, total: 0, correct: 0 };
+      subjectMap[s].total++;
+      if (history[i].correct) subjectMap[s].correct++;
     }
 
-    var inventory = char.inventory || [];
-    var coins = char.coins || 0;
-    var level = char.level || 1;
+    var subjectNames = {
+      math: '数学', chinese: '语文', english: '英语',
+      physics: '物理', chemistry: '化学', biology: '生物', mixed: '综合'
+    };
 
-    var items = rawList.map(function (item) {
-      var owned = inventory.indexOf(item.id) >= 0 || equippedId === item.id;
-      var equipped = equippedId === item.id;
-      var locked = level < item.unlockLevel;
-      var canAfford = coins >= item.price;
-      var rarityColor = game.RARITY_COLORS[item.rarity] || '#94a3b8';
-      var rarityName = game.RARITY_NAMES[item.rarity] || '普通';
+    var subjectStats = [];
+    for (var key in subjectMap) {
+      var st = subjectMap[key];
+      subjectStats.push({
+        subject: st.subject,
+        name: subjectNames[st.subject] || st.subject,
+        total: st.total,
+        correct: st.correct,
+        rate: st.total > 0 ? Math.round((st.correct / st.total) * 100) : 0
+      });
+    }
 
-      // Build stat description
-      var statText = '';
-      if (statKey === 'atk') {
-        statText = '+' + item.atk + ' ATK';
-      } else if (statKey === 'def') {
-        statText = '+' + item.def + ' DEF';
-      } else if (item.bonus) {
-        statText = item.desc;
-      }
-
-      return {
-        id: item.id,
-        name: item.name,
-        emoji: item.emoji,
-        desc: item.desc,
-        price: item.price,
-        rarity: item.rarity,
-        rarityColor: rarityColor,
-        rarityName: rarityName,
-        unlockLevel: item.unlockLevel,
-        statText: statText,
-        owned: owned,
-        equipped: equipped,
-        locked: locked,
-        canAfford: canAfford,
-        isFree: item.price === 0
-      };
-    });
+    var stats = {
+      total: total,
+      correct: correct,
+      rate: total > 0 ? Math.round((correct / total) * 100) : 0
+    };
 
     this.setData({
-      items: items,
-      equippedId: equippedId
+      stats: stats,
+      subjectStats: subjectStats,
+      empty: false
     });
+
+    this.buildGroups(history);
   },
 
-  switchTab: function (e) {
-    var idx = e.currentTarget.dataset.idx;
+  buildGroups: function(history) {
+    var tab = this.data.activeTab;
+    var groups = [];
+
+    if (tab === 0) {
+      // 按日期分组
+      var dateMap = {};
+      var dateOrder = [];
+      for (var i = history.length - 1; i >= 0; i--) {
+        var d = history[i].date || '未知';
+        if (!dateMap[d]) {
+          dateMap[d] = [];
+          dateOrder.push(d);
+        }
+        dateMap[d].push(history[i]);
+      }
+      for (var j = 0; j < dateOrder.length; j++) {
+        var dt = dateOrder[j];
+        var items = dateMap[dt];
+        var c = 0;
+        for (var k = 0; k < items.length; k++) {
+          if (items[k].correct) c++;
+        }
+        groups.push({
+          title: dt,
+          subtitle: items.length + ' 题, 对 ' + c + ' 题',
+          items: items
+        });
+      }
+    } else {
+      // 按科目分组
+      var subjectMap = {};
+      var subjectNames = {
+        math: '数学', chinese: '语文', english: '英语',
+        physics: '物理', chemistry: '化学', biology: '生物', mixed: '综合'
+      };
+      for (var m = history.length - 1; m >= 0; m--) {
+        var s = history[m].subject || 'mixed';
+        if (!subjectMap[s]) subjectMap[s] = [];
+        subjectMap[s].push(history[m]);
+      }
+      var order = ['math', 'physics', 'chemistry', 'biology', 'chinese', 'english', 'mixed'];
+      for (var n = 0; n < order.length; n++) {
+        var sub = order[n];
+        if (subjectMap[sub]) {
+          var subItems = subjectMap[sub];
+          var sc = 0;
+          for (var p = 0; p < subItems.length; p++) {
+            if (subItems[p].correct) sc++;
+          }
+          groups.push({
+            title: subjectNames[sub] || sub,
+            subtitle: subItems.length + ' 题, 正确率 ' + (subItems.length > 0 ? Math.round(sc / subItems.length * 100) : 0) + '%',
+            items: subItems
+          });
+        }
+      }
+    }
+
+    this.setData({ groups: groups });
+  },
+
+  switchTab: function(e) {
+    var idx = parseInt(e.currentTarget.dataset.idx);
     this.setData({ activeTab: idx });
-    this.loadItems();
-  },
-
-  buyItem: function (e) {
-    var itemId = e.currentTarget.dataset.id;
-    var char = this.data.char;
-    if (!char) return;
-
-    var tab = this.data.activeTab;
-    var rawList, category;
-    if (tab === 0) {
-      rawList = game.EQUIPMENT.weapons;
-      category = 'weapons';
-    } else if (tab === 1) {
-      rawList = game.EQUIPMENT.armor;
-      category = 'armor';
-    } else {
-      rawList = game.EQUIPMENT.accessories;
-      category = 'accessories';
-    }
-
-    var item = game.findById(rawList, itemId);
-    if (!item) return;
-
-    // Check level
-    if (char.level < item.unlockLevel) {
-      wx.showToast({ title: '需要 ' + item.unlockLevel + ' 级解锁', icon: 'none' });
-      return;
-    }
-
-    // Check coins
-    if ((char.coins || 0) < item.price) {
-      wx.showToast({ title: '金币不足！', icon: 'none' });
-      return;
-    }
-
-    // Check already owned
-    if (!char.inventory) char.inventory = [];
-    if (char.inventory.indexOf(itemId) >= 0) {
-      wx.showToast({ title: '已拥有此物品', icon: 'none' });
-      return;
-    }
-
-    // Deduct coins and add to inventory
-    char.coins -= item.price;
-    char.inventory.push(itemId);
-    game.saveGame(char);
-
-    wx.showToast({ title: '购买成功！', icon: 'success' });
-    this.setData({ char: char, coins: char.coins });
-    this.loadItems();
-  },
-
-  equipItem: function (e) {
-    var itemId = e.currentTarget.dataset.id;
-    var char = this.data.char;
-    if (!char) return;
-
-    var tab = this.data.activeTab;
-    var slotKey;
-    if (tab === 0) {
-      slotKey = 'weapon';
-    } else if (tab === 1) {
-      slotKey = 'armor';
-    } else {
-      slotKey = 'accessory';
-    }
-
-    // Check if already equipped
-    if (char.equipment[slotKey] === itemId) {
-      // Unequip
-      char.equipment[slotKey] = '';
-      game.saveGame(char);
-      wx.showToast({ title: '已卸下装备', icon: 'none' });
-    } else {
-      // Equip
-      char.equipment[slotKey] = itemId;
-      game.saveGame(char);
-      wx.showToast({ title: '装备成功！', icon: 'success' });
-    }
-
-    this.setData({ char: char });
-    this.loadItems();
+    var history = wx.getStorageSync('answerHistory') || [];
+    this.buildGroups(history);
   }
 });

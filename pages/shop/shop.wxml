@@ -1,105 +1,69 @@
 <view class="page-bg">
-  <!-- 顶部金币栏 -->
-  <view class="coin-bar">
-    <view class="coin-info">
-      <text class="coin-icon">💰</text>
-      <text class="coin-label">金币</text>
-    </view>
-    <text class="coin-amount">{{coins}}</text>
-    <view class="shop-title-wrap">
-      <text class="shop-title">冒险商店</text>
+
+  <!-- 顶部统计 -->
+  <view class="stat-bar">
+    <text class="stat-title">宝库</text>
+    <view class="stat-items">
+      <view class="stat-item">
+        <text class="stat-num">{{stats.total}}</text>
+        <text class="stat-label">总题数</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-num stat-ok">{{stats.correct}}</text>
+        <text class="stat-label">答对</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-num">{{stats.rate}}%</text>
+        <text class="stat-label">正确率</text>
+      </view>
     </view>
   </view>
 
-  <!-- Tab 栏 -->
+  <!-- Tab 切换 -->
   <view class="tab-bar">
-    <view
-      class="tab-item {{activeTab === idx ? 'tab-active' : ''}}"
-      wx:for="{{tabs}}"
-      wx:key="idx"
-      data-idx="{{idx}}"
-      bindtap="switchTab"
-    >
-      <text class="tab-icon">{{tabIcons[idx]}}</text>
-      <text class="tab-text">{{item}}</text>
+    <view class="tab-item {{activeTab === 0 ? 'tab-active' : ''}}" data-idx="0" bindtap="switchTab">
+      <text>按日期</text>
+    </view>
+    <view class="tab-item {{activeTab === 1 ? 'tab-active' : ''}}" data-idx="1" bindtap="switchTab">
+      <text>按科目</text>
     </view>
   </view>
 
-  <!-- 商品列表 -->
-  <scroll-view scroll-y class="item-list">
-    <view
-      class="item-card {{item.locked ? 'item-locked' : ''}} {{item.equipped ? 'item-equipped' : ''}}"
-      style="border-left: 6rpx solid {{item.locked ? '#475569' : item.rarityColor}};"
-      wx:for="{{items}}"
-      wx:key="id"
-    >
-      <!-- 锁定遮罩 -->
-      <block wx:if="{{item.locked}}">
-        <view class="item-main">
-          <view class="item-left">
-            <text class="item-emoji locked-emoji">🔒</text>
-          </view>
-          <view class="item-center">
-            <text class="item-name locked-name">{{item.name}}</text>
-            <view class="lock-info">
-              <text class="lock-text">{{item.unlockLevel}}级解锁</text>
-            </view>
-            <text class="item-desc locked-desc">{{item.desc}}</text>
-          </view>
-          <view class="item-right">
-            <text class="lock-badge">未解锁</text>
-          </view>
-        </view>
-      </block>
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{empty}}">
+    <text class="empty-icon">?</text>
+    <text class="empty-text">还没有答题记录</text>
+    <text class="empty-hint">去地图上炼宝答题吧！</text>
+  </view>
 
-      <!-- 正常显示 -->
-      <block wx:else>
-        <view class="item-main">
-          <view class="item-left">
-            <text class="item-emoji">{{item.emoji}}</text>
-            <text class="item-rarity" style="background: {{item.rarityColor}};">{{item.rarityName}}</text>
-          </view>
-          <view class="item-center">
-            <text class="item-name">{{item.name}}</text>
-            <text class="item-stat">{{item.statText}}</text>
-            <text class="item-desc">{{item.desc}}</text>
-          </view>
-          <view class="item-right">
-            <!-- 已装备 -->
-            <block wx:if="{{item.equipped}}">
-              <view class="equipped-badge">
-                <text>已装备</text>
-              </view>
-              <view class="btn-unequip" data-id="{{item.id}}" bindtap="equipItem">
-                <text>卸下</text>
-              </view>
-            </block>
-            <!-- 已拥有未装备 -->
-            <block wx:elif="{{item.owned}}">
-              <view class="btn-equip" data-id="{{item.id}}" bindtap="equipItem">
-                <text>装备</text>
-              </view>
-            </block>
-            <!-- 未拥有 -->
-            <block wx:else>
-              <view class="price-tag {{item.canAfford ? '' : 'no-afford'}}">
-                <text class="price-icon">💰</text>
-                <text class="price-num">{{item.price}}</text>
-              </view>
-              <view
-                class="btn-buy {{item.canAfford ? '' : 'btn-disabled'}}"
-                data-id="{{item.id}}"
-                bindtap="{{item.canAfford ? 'buyItem' : ''}}"
-              >
-                <text>{{item.isFree ? '免费领取' : '购买'}}</text>
-              </view>
-            </block>
+  <!-- 题目列表 -->
+  <scroll-view scroll-y class="history-list" wx:if="{{!empty}}">
+    <view wx:for="{{groups}}" wx:key="title" class="group">
+      <view class="group-header">
+        <text class="group-title">{{item.title}}</text>
+        <text class="group-sub">{{item.subtitle}}</text>
+      </view>
+
+      <view wx:for="{{item.items}}" wx:for-item="q" wx:key="q" class="q-card {{q.correct ? 'q-ok' : 'q-no'}}">
+        <view class="q-top">
+          <text class="q-badge {{q.correct ? 'badge-ok' : 'badge-no'}}">{{q.correct ? '对' : '错'}}</text>
+          <text class="q-subject">{{q.subject === 'math' ? '数学' : q.subject === 'chinese' ? '语文' : q.subject === 'english' ? '英语' : q.subject === 'physics' ? '物理' : q.subject === 'chemistry' ? '化学' : q.subject === 'biology' ? '生物' : '综合'}}</text>
+        </view>
+        <text class="q-text">{{q.q}}</text>
+        <view class="q-options">
+          <view wx:for="{{q.options}}" wx:for-item="opt" wx:for-index="oi" wx:key="oi"
+            class="q-opt {{oi === q.answer ? 'opt-right' : ''}}">
+            <text class="q-opt-label">{{oi === 0 ? 'A' : oi === 1 ? 'B' : oi === 2 ? 'C' : 'D'}}</text>
+            <text class="q-opt-text">{{opt}}</text>
           </view>
         </view>
-      </block>
+        <view class="q-explain" wx:if="{{q.explain}}">
+          <text class="q-explain-text">{{q.explain}}</text>
+        </view>
+      </view>
     </view>
 
-    <!-- 底部留白 -->
-    <view style="height: 60rpx;"></view>
+    <view style="height: 60px;"></view>
   </scroll-view>
+
 </view>
