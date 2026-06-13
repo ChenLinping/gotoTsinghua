@@ -89,6 +89,7 @@ Page({
     showRegionMenu: false,
     showWeaponDrop: false,
     dropWeapon: null,
+    showMenu: false,
 
     // 伤害飘字
     dmgNumbers: [],
@@ -98,6 +99,13 @@ Page({
 
     // 提示
     showHint: true,
+
+    // 装饰emoji
+    emCloud: '\u2601',
+    emTree1: '\u2663',
+    emTree2: '\u2660',
+    emDiamond: '\u25C6',
+    emKnife: '\uD83D\uDDE1\uFE0F',
 
     // 网格
     gridRows: []
@@ -139,12 +147,42 @@ Page({
   },
 
   onUnload: function() { this._stopLoop(); },
-  onHide: function() { this._stopLoop(); },
+  onHide: function() {
+    this._stopLoop();
+    try { wx.showTabBar(); } catch (e) {}
+  },
 
   onShow: function() {
     this.loadData();
     if (!this._loopTimer) this._startLoop();
     try { wx.hideTabBar(); } catch (e) {}
+    this.setData({ showMenu: false });
+  },
+
+  // ===== 菜单切换 =====
+  toggleMenu: function() {
+    var show = !this.data.showMenu;
+    this.setData({ showMenu: show });
+    // 显示菜单时显示TabBar
+    try {
+      if (show) {
+        wx.showTabBar({ animation: true });
+      } else {
+        wx.hideTabBar({ animation: true });
+      }
+    } catch (e) {}
+  },
+
+  goCharacter: function() {
+    this.setData({ showMenu: false });
+    try { wx.showTabBar(); } catch (e) {}
+    wx.switchTab({ url: '/pages/character/character' });
+  },
+
+  goTreasury: function() {
+    this.setData({ showMenu: false });
+    try { wx.showTabBar(); } catch (e) {}
+    wx.switchTab({ url: '/pages/shop/shop' });
   },
 
   // ===== 数据加载 =====

@@ -13,15 +13,15 @@
     </view>
 
     <!-- 装饰物 -->
-    <view class="deco deco-cloud" style="left:200px;top:80px;">&#9729;</view>
-    <view class="deco deco-cloud" style="left:1200px;top:60px;">&#9729;</view>
-    <view class="deco deco-cloud" style="left:2200px;top:100px;">&#9729;</view>
-    <view class="deco deco-tree" style="left:100px;top:400px;">&#9827;</view>
-    <view class="deco deco-tree" style="left:2800px;top:800px;">&#9827;</view>
-    <view class="deco deco-tree" style="left:150px;top:1500px;">&#9824;</view>
-    <view class="deco deco-tree" style="left:2700px;top:2000px;">&#9827;</view>
-    <view class="deco deco-tree" style="left:500px;top:2800px;">&#9670;</view>
-    <view class="deco deco-tree" style="left:2500px;top:2700px;">&#9670;</view>
+    <view class="deco deco-cloud" style="left:200px;top:80px;">{{emCloud}}</view>
+    <view class="deco deco-cloud" style="left:1200px;top:60px;">{{emCloud}}</view>
+    <view class="deco deco-cloud" style="left:2200px;top:100px;">{{emCloud}}</view>
+    <view class="deco deco-tree" style="left:100px;top:400px;">{{emTree1}}</view>
+    <view class="deco deco-tree" style="left:2800px;top:800px;">{{emTree1}}</view>
+    <view class="deco deco-tree" style="left:150px;top:1500px;">{{emTree2}}</view>
+    <view class="deco deco-tree" style="left:2700px;top:2000px;">{{emTree1}}</view>
+    <view class="deco deco-tree" style="left:500px;top:2800px;">{{emDiamond}}</view>
+    <view class="deco deco-tree" style="left:2500px;top:2700px;">{{emDiamond}}</view>
 
     <!-- 伤害飘字 -->
     <view wx:for="{{dmgNumbers}}" wx:key="id"
@@ -40,7 +40,7 @@
           class="mob-knife-item"
           wx:if="{{ki < (item.knives > 8 ? 8 : item.knives)}}"
           style="transform:rotate({{item.knifeAngle + (ki * (360 / (item.knives > 8 ? 8 : item.knives)))}}deg) translateX({{item.isBoss ? 50 : item.isElite ? 42 : 35}}px) rotate({{-(item.knifeAngle + (ki * (360 / (item.knives > 8 ? 8 : item.knives))))}}deg);">
-          <text class="mob-knife-emoji">&#9876;</text>
+          <text class="mob-knife-emoji">{{emKnife}}</text>
         </view>
       </view>
       <view class="mob-body">
@@ -61,7 +61,7 @@
           <view class="mob-knife-bar">
             <view class="mob-knife-fill" style="width:{{(item.knives/item.maxKnives)*100}}%"></view>
           </view>
-          <text class="mob-knife-count">&#9876;{{item.knives}}</text>
+          <text class="mob-knife-count">{{emKnife}}{{item.knives}}</text>
         </view>
       </view>
     </view>
@@ -115,6 +115,19 @@
   <!-- ===== 红屏闪烁 ===== -->
   <view class="hit-flash" wx:if="{{hitFlash}}"></view>
 
+  <!-- ===== 菜单按钮 ===== -->
+  <view class="menu-btn" bindtap="toggleMenu">
+    <text>{{showMenu ? 'X' : '='}}</text>
+  </view>
+  <view class="menu-dropdown" wx:if="{{showMenu}}">
+    <view class="menu-item" bindtap="goCharacter">
+      <text>{{emCloud}} 角色</text>
+    </view>
+    <view class="menu-item" bindtap="goTreasury">
+      <text>{{emDiamond}} 宝库</text>
+    </view>
+  </view>
+
   <!-- ===== HUD（屏幕固定） ===== -->
   <view class="hud-bar">
     <text class="hud-lv">Lv.{{char.level}}</text>
@@ -128,7 +141,7 @@
 
   <!-- 飞刀弹药显示 -->
   <view class="knife-hud">
-    <text class="knife-icon">&#9876;</text>
+    <text class="knife-icon">{{emKnife}}</text>
     <text class="knife-count">{{treasures.length}}</text>
   </view>
 

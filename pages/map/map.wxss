@@ -282,9 +282,30 @@
 }
 .treasure-emoji { font-size: 14px; line-height: 1; }
 
+/* ===== Menu Button ===== */
+.menu-btn {
+  position: fixed; top: 6px; left: 6px; z-index: 150;
+  width: 28px; height: 28px;
+  background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+}
+.menu-btn text { font-size: 16px; font-weight: 900; color: #e2e8f0; }
+.menu-dropdown {
+  position: fixed; top: 38px; left: 6px; z-index: 150;
+  background: rgba(0,0,0,0.85); border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1); padding: 4px;
+  min-width: 100px; animation: ddIn 0.2s ease;
+}
+.menu-item {
+  padding: 8px 14px; border-radius: 6px;
+  font-size: 12px; color: #fff; font-weight: 600;
+}
+.menu-item:active { background: rgba(255,255,255,0.1); }
+
 /* ===== HUD ===== */
 .hud-bar {
-  position: fixed; top: 6px; left: 6px; right: 6px; z-index: 100;
+  position: fixed; top: 6px; left: 40px; right: 6px; z-index: 100;
   display: flex; align-items: center; gap: 8px;
   background: rgba(0,0,0,0.5); padding: 5px 10px;
   border-radius: 14px; border: 1px solid rgba(255,255,255,0.08);
