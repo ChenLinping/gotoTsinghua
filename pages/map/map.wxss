@@ -1,5 +1,5 @@
 /* ========================================== */
-/* 走向清华 V4.0 - 实时战斗 + 怪物AI + 炼宝 */
+/* 走向清华 V4.1 - 双层体系: 消耗飞刀 + 永久Buff */
 /* ========================================== */
 
 /* ===== Page ===== */
@@ -160,6 +160,77 @@
   50% { transform: scale(1.15); opacity: 0.5; }
 }
 
+/* ===== Buff Aura Effects ===== */
+.buff-aura {
+  position: absolute; top: 50%; left: 50%;
+  width: 80px; height: 80px;
+  margin-left: -40px; margin-top: -40px;
+  border-radius: 50%;
+  pointer-events: none; z-index: 19;
+}
+
+/* 火焰附魔 - 橙红脉冲 */
+.buff-aura-fire {
+  background: radial-gradient(circle, rgba(239,68,68,0.15) 0%, rgba(251,146,60,0.1) 50%, transparent 70%);
+  border: 1px solid rgba(239,68,68,0.25);
+  animation: fireAura 1.5s ease-in-out infinite;
+}
+@keyframes fireAura {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 0.4; }
+}
+
+/* 护体金甲 - 金色光盾 */
+.buff-aura-armor {
+  background: radial-gradient(circle, rgba(234,179,8,0.12) 0%, rgba(234,179,8,0.06) 50%, transparent 70%);
+  border: 1px solid rgba(234,179,8,0.3);
+  animation: armorAura 2s ease-in-out infinite;
+}
+@keyframes armorAura {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.1); opacity: 0.3; }
+}
+
+/* 吸血光环 - 绿色脉动 */
+.buff-aura-lifesteal {
+  background: radial-gradient(circle, rgba(34,197,94,0.12) 0%, rgba(34,197,94,0.06) 50%, transparent 70%);
+  border: 1px solid rgba(34,197,94,0.25);
+  animation: lifeAura 1.8s ease-in-out infinite;
+}
+@keyframes lifeAura {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.15); opacity: 0.35; }
+}
+
+/* 暴击之心 - 红色闪烁 */
+.buff-aura-crit {
+  background: radial-gradient(circle, rgba(239,68,68,0.1) 0%, rgba(236,72,153,0.08) 50%, transparent 70%);
+  border: 1px solid rgba(236,72,153,0.2);
+  animation: critAura 1s ease-in-out infinite;
+}
+@keyframes critAura {
+  0%, 100% { transform: scale(0.95); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+/* 荆棘之盾 - 绿色刺 */
+.buff-aura-thorns {
+  background: radial-gradient(circle, rgba(16,185,129,0.12) 0%, rgba(16,185,129,0.06) 50%, transparent 70%);
+  border: 1px dashed rgba(16,185,129,0.35);
+  animation: thornsAura 2s linear infinite;
+}
+@keyframes thornsAura {
+  0% { transform: scale(1) rotate(0deg); opacity: 0.5; }
+  50% { transform: scale(1.1) rotate(180deg); opacity: 0.7; }
+  100% { transform: scale(1) rotate(360deg); opacity: 0.5; }
+}
+
+/* Fire treasure glow */
+.treasure-fire {
+  box-shadow: 0 0 8px rgba(239,68,68,0.6);
+  border-color: rgba(239,68,68,0.5);
+}
+
 /* Steve */
 .steve { display: flex; flex-direction: column; align-items: center; animation: steveIdle 1.5s ease-in-out infinite; }
 .steve-walk { animation: steveWalk 0.4s ease-in-out infinite; }
@@ -187,6 +258,7 @@
   display: flex; align-items: center; justify-content: center;
   background: rgba(255,255,255,0.12); border-radius: 50%;
   border: 1px solid rgba(255,255,255,0.25);
+  transition: opacity 0.3s;
 }
 .treasure-emoji { font-size: 14px; line-height: 1; }
 
@@ -205,7 +277,40 @@
 @keyframes hpBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 .hud-hp-text { font-size: 10px; color: #94a3b8; white-space: nowrap; min-width: 50px; }
 .hud-coin { font-size: 11px; color: #fbbf24; font-weight: 700; white-space: nowrap; }
-.hud-knife { font-size: 11px; color: #c4b5fd; font-weight: 700; white-space: nowrap; }
+
+/* Knife Ammo HUD */
+.knife-hud {
+  position: fixed; top: 36px; right: 10px; z-index: 101;
+  display: flex; align-items: center; gap: 4px;
+  background: rgba(0,0,0,0.55); padding: 4px 10px;
+  border-radius: 10px; border: 1px solid rgba(196,181,253,0.3);
+}
+.knife-icon {
+  font-size: 14px; color: #c4b5fd;
+}
+.knife-count {
+  font-size: 16px; font-weight: 900; color: #e9d5ff;
+  min-width: 16px; text-align: center;
+}
+
+/* Buff HUD Icons */
+.buff-hud {
+  position: fixed; top: 36px; left: 10px; z-index: 101;
+  display: flex; align-items: center; gap: 4px;
+}
+.buff-icon {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.buff-emoji { font-size: 16px; line-height: 1; }
+
+.buff-icon-fire { background: rgba(239,68,68,0.25); border-color: rgba(239,68,68,0.4); }
+.buff-icon-armor { background: rgba(234,179,8,0.25); border-color: rgba(234,179,8,0.4); }
+.buff-icon-lifesteal { background: rgba(34,197,94,0.25); border-color: rgba(34,197,94,0.4); }
+.buff-icon-crit { background: rgba(236,72,153,0.25); border-color: rgba(236,72,153,0.4); }
+.buff-icon-thorns { background: rgba(16,185,129,0.25); border-color: rgba(16,185,129,0.4); }
 
 /* Region Pill */
 .region-pill {

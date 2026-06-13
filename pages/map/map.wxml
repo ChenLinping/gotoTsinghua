@@ -13,15 +13,15 @@
     </view>
 
     <!-- 装饰物 -->
-    <view class="deco deco-cloud" style="left:200px;top:80px;">☁</view>
-    <view class="deco deco-cloud" style="left:1200px;top:60px;">☁</view>
-    <view class="deco deco-cloud" style="left:2200px;top:100px;">☁</view>
-    <view class="deco deco-tree" style="left:100px;top:400px;">♣</view>
-    <view class="deco deco-tree" style="left:2800px;top:800px;">♣</view>
-    <view class="deco deco-tree" style="left:150px;top:1500px;">♠</view>
-    <view class="deco deco-tree" style="left:2700px;top:2000px;">♣</view>
-    <view class="deco deco-tree" style="left:500px;top:2800px;">◆</view>
-    <view class="deco deco-tree" style="left:2500px;top:2700px;">◆</view>
+    <view class="deco deco-cloud" style="left:200px;top:80px;">&#9729;</view>
+    <view class="deco deco-cloud" style="left:1200px;top:60px;">&#9729;</view>
+    <view class="deco deco-cloud" style="left:2200px;top:100px;">&#9729;</view>
+    <view class="deco deco-tree" style="left:100px;top:400px;">&#9827;</view>
+    <view class="deco deco-tree" style="left:2800px;top:800px;">&#9827;</view>
+    <view class="deco deco-tree" style="left:150px;top:1500px;">&#9824;</view>
+    <view class="deco deco-tree" style="left:2700px;top:2000px;">&#9827;</view>
+    <view class="deco deco-tree" style="left:500px;top:2800px;">&#9670;</view>
+    <view class="deco deco-tree" style="left:2500px;top:2700px;">&#9670;</view>
 
     <!-- 伤害飘字 -->
     <view wx:for="{{dmgNumbers}}" wx:key="id"
@@ -56,15 +56,20 @@
       </view>
     </view>
 
-    <!-- 玩家角色 + 法宝环绕 -->
+    <!-- 玩家角色 + 法宝环绕 + Buff光环 -->
     <view class="player" style="left:{{playerX}}px;top:{{playerY}}px;">
       <!-- 护盾光环 -->
       <view class="shield-aura" wx:if="{{forgeShieldFrames > 0}}"></view>
 
+      <!-- Buff光环 (火焰/金甲/吸血等) -->
+      <view wx:for="{{buffList}}" wx:key="id"
+        class="buff-aura buff-aura-{{item.id}}">
+      </view>
+
       <!-- 法宝环绕圈 -->
       <view class="treasure-orbit" wx:if="{{treasures.length > 0}}">
         <view wx:for="{{treasures}}" wx:key="index"
-          class="treasure-item"
+          class="treasure-item {{buffs[0] === 'fire' ? 'treasure-fire' : ''}}"
           style="transform:rotate({{treasureAngle + (index * (360 / treasures.length))}}deg) translateX(55px) rotate({{-(treasureAngle + (index * (360 / treasures.length)))}}deg);">
           <text class="treasure-emoji">{{item.emoji}}</text>
         </view>
@@ -101,7 +106,19 @@
     </view>
     <text class="hud-hp-text">{{char.hp}}/{{char.maxHP}}</text>
     <text class="hud-coin">$ {{char.coins}}</text>
-    <text class="hud-knife">x{{treasures.length}}</text>
+  </view>
+
+  <!-- 飞刀弹药显示 -->
+  <view class="knife-hud">
+    <text class="knife-icon">&#9876;</text>
+    <text class="knife-count">{{treasures.length}}</text>
+  </view>
+
+  <!-- Buff图标栏 -->
+  <view class="buff-hud" wx:if="{{buffList.length > 0}}">
+    <view wx:for="{{buffList}}" wx:key="id" class="buff-icon buff-icon-{{item.id}}">
+      <text class="buff-emoji">{{item.emoji}}</text>
+    </view>
   </view>
 
   <!-- 区域选择 -->
@@ -135,7 +152,7 @@
 
   <!-- 提示文字 -->
   <view class="hint-bar" wx:if="{{showHint && state === 'exploring'}}">
-    <text>靠近怪物开始战斗！血量低了自动炼宝变强</text>
+    <text>靠近怪物战斗！飞刀用完自动炼宝补充</text>
   </view>
 
   <!-- ===== 炼宝面板 (5道题) ===== -->
@@ -145,7 +162,7 @@
       <!-- 标题 -->
       <view class="forge-header">
         <text class="forge-title">* 炼宝炉 *</text>
-        <text class="forge-sub">答对获得法宝，增强战斗力！</text>
+        <text class="forge-sub">飞刀耗尽！答题铸造新飞刀 + 永久强化</text>
       </view>
 
       <!-- 进度 -->
@@ -174,7 +191,7 @@
 
       <!-- 解析 -->
       <view class="forge-explain" wx:if="{{forgeShowResult}}">
-        <text class="{{forgeResults[forgeIdx] === 'correct' ? 'explain-ok' : 'explain-fail'}}">{{forgeResults[forgeIdx] === 'correct' ? '正确！获得法宝！' : '错误，换题继续！'}}</text>
+        <text class="{{forgeResults[forgeIdx] === 'correct' ? 'explain-ok' : 'explain-fail'}}">{{forgeResults[forgeIdx] === 'correct' ? '正确！飞刀+1' : '错误，继续加油！'}}</text>
         <text class="explain-detail">{{forgeQuestions[forgeIdx].explain}}</text>
       </view>
 

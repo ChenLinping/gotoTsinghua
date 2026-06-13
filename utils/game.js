@@ -198,6 +198,15 @@ var MONSTER_SKINS = [
   { emoji: '👹', name: '阶段Boss' }
 ];
 
+// ========== 永久Buff池 ==========
+var BUFF_POOL = [
+  { id: 'fire', name: '\u706B\u7130\u9644\u9B54', desc: '\u98DE\u5200\u5E26\u706B\uFF0C\u6BCF\u6B21\u989D\u5916+2\u4F24\u5BB3', emoji: '\uD83D\uDD25' },
+  { id: 'armor', name: '\u62A4\u4F53\u91D1\u7532', desc: '\u51CF\u53D730%\u4F24\u5BB3', emoji: '\uD83D\uDEE1\uFE0F' },
+  { id: 'lifesteal', name: '\u5438\u8840\u5149\u73AF', desc: '\u51FB\u6740\u602A\u7269\u6062\u590D15HP', emoji: '\uD83D\uDC9A' },
+  { id: 'crit', name: '\u66B4\u51FB\u4E4B\u5FC3', desc: '\u9996\u628A\u98DE\u5200\u4F24\u5BB3\u7FFB\u500D', emoji: '\u2764\uFE0F' },
+  { id: 'thorns', name: '\u8346\u68D8\u4E4B\u76FE', desc: '\u53CD\u5C0450%\u53D7\u5230\u7684\u4F24\u5BB3', emoji: '\uD83C\uDF35' }
+];
+
 // ========== 核心函数 ==========
 
 // 创建新角色
@@ -227,7 +236,8 @@ function createCharacter() {
     lastPlayDate: '',
     perfectBattles: 0,
     subjectKills: { math: 0, english: 0, chinese: 0, physics: 0, chemistry: 0, biology: 0 },
-    treasureCount: 0
+    treasureCount: 1,
+    buffs: []
   };
 }
 
@@ -737,6 +747,7 @@ module.exports = {
   DAILY_CHEST_REWARDS: DAILY_CHEST_REWARDS,
   MONSTER_SKINS: MONSTER_SKINS,
   QUESTION_BANK: QUESTION_BANK,
+  BUFF_POOL: BUFF_POOL,
   createCharacter: createCharacter,
   getCharStats: getCharStats,
   getRankByLevel: getRankByLevel,
