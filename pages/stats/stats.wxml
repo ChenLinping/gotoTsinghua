@@ -1,0 +1,86 @@
+<view class="container">
+
+  <!-- 总览卡片 -->
+  <view class="overview-grid">
+    <view class="stat-card" style="border-left:6rpx solid #4f46e5">
+      <text class="stat-num" style="color:#4f46e5">{{daysLeft}}</text>
+      <text class="stat-label">距高考（天）</text>
+    </view>
+    <view class="stat-card" style="border-left:6rpx solid #10b981">
+      <text class="stat-num" style="color:#10b981">{{totalMastered}}</text>
+      <text class="stat-label">已掌握题目</text>
+    </view>
+    <view class="stat-card" style="border-left:6rpx solid #f59e0b">
+      <text class="stat-num" style="color:#f59e0b">{{totalQ}}</text>
+      <text class="stat-label">题库总题数</text>
+    </view>
+  </view>
+
+  <!-- 各科掌握情况 -->
+  <view class="card">
+    <view class="card-title">
+      <text class="title-icon" style="color:#f59e0b">🏆</text>
+      <text>各科掌握情况</text>
+    </view>
+
+    <view wx:for="{{subjectStats}}" wx:key="name" class="progress-row">
+      <view class="progress-top">
+        <text class="progress-name">{{item.icon}} {{item.name}}</text>
+        <text class="progress-info">{{item.mastered}}/{{item.total}} 题 · {{item.pct}}%</text>
+      </view>
+      <view class="progress-bar">
+        <view class="progress-fill" style="width:{{item.pct}}%;background:linear-gradient(90deg, {{item.color}}, {{item.color}}aa)"></view>
+      </view>
+    </view>
+
+    <view wx:if="{{totalMastered === 0}}" class="empty-tip">
+      还没有标记任何题目为"已掌握"，去做几道题吧！
+    </view>
+  </view>
+
+  <!-- 本周任务完成 -->
+  <view class="card">
+    <view class="card-title">
+      <text class="title-icon" style="color:#10b981">📊</text>
+      <text>本周任务完成</text>
+    </view>
+
+    <view class="weekly-chart">
+      <view wx:for="{{weeklyStats}}" wx:key="name" class="chart-col">
+        <view class="chart-bars">
+          <view class="chart-bar-bg" style="height:{{item.total * 40 + 20}}rpx">
+            <view class="chart-bar-fill" style="height:{{item.total > 0 ? item.completed / item.total * 100 : 0}}%"></view>
+          </view>
+        </view>
+        <view class="chart-count">{{item.completed}}/{{item.total}}</view>
+        <text class="chart-label">{{item.name}}</text>
+      </view>
+    </view>
+
+    <view class="weekly-summary">
+      <text>本周共完成 {{totalCompleted}}/{{totalTasks}} 个任务</text>
+    </view>
+  </view>
+
+  <!-- 弱科提升建议 -->
+  <view class="card weak-card">
+    <view class="card-title" style="color:#991b1b">
+      <text class="title-icon" style="color:#dc2626">⚠️</text>
+      <text>弱科提升建议</text>
+    </view>
+    <view class="weak-content">
+      <view class="weak-item">
+        <text class="weak-sub">英语（重点突破）</text>
+        <text class="weak-text">每天保证40分钟以上英语学习时间。词汇是基础，坚持每天背50个高频词，利用碎片时间反复记忆。语法薄弱建议系统梳理高考常考语法点，做专项练习。</text>
+      </view>
+      <view class="weak-item">
+        <text class="weak-sub">语文（日积月累）</text>
+        <text class="weak-text">语文提分慢但降分快，不能放弃。每天花20分钟背诵默写名篇名句（6分必拿），每周练1篇作文审题立意，文言文每天精读1篇积累实词虚词。</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 重置按钮 -->
+  <view class="reset-btn" bindtap="resetProgress">重置学习进度</view>
+
+</view>

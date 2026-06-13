@@ -1,0 +1,109 @@
+<view class="container">
+
+  <!-- 科目选择 -->
+  <scroll-view scroll-x class="subject-tabs">
+    <view wx:for="{{subjects}}" wx:key="key"
+      class="subject-tab {{activeSubject === item.key ? 'active' : ''}}"
+      style="{{activeSubject === item.key ? 'background:' + item.color + ';color:#fff;box-shadow:0 8rpx 24rpx ' + item.color + '44' : 'color:' + item.text}}"
+      bindtap="switchSubject" data-key="{{item.key}}">
+      <text>{{item.icon}} {{item.name}}</text>
+    </view>
+  </scroll-view>
+
+  <!-- 科目信息 -->
+  <view class="subject-header" style="background:linear-gradient(135deg, {{subjectInfo.color}}, {{subjectInfo.color}}cc)">
+    <view class="subject-header-left">
+      <text class="subject-header-name">{{subjectInfo.icon}} {{subjectInfo.name}}</text>
+      <text class="subject-header-phase">{{content.phase}}</text>
+    </view>
+    <view class="subject-header-right">
+      <text class="mastered-label">已掌握</text>
+      <text class="mastered-num">{{masteredCount}}/{{totalQ}}</text>
+    </view>
+  </view>
+
+  <!-- 知识要点 -->
+  <view class="card">
+    <view class="card-title">
+      <text class="title-icon" style="color:#f59e0b">💡</text>
+      <text>核心知识要点</text>
+    </view>
+
+    <view wx:for="{{content.keyTopics}}" wx:key="title" class="topic-item">
+      <view class="topic-header" bindtap="toggleTopic" data-index="{{index}}"
+        style="{{expandedTopic[index] ? 'background:' + subjectInfo.bg : 'background:#f8fafc'}}">
+        <text class="topic-title">📌 {{item.title}}</text>
+        <text class="topic-arrow" style="transform:{{expandedTopic[index] ? 'rotate(90deg)' : 'none'}}">›</text>
+      </view>
+      <view wx:if="{{expandedTopic[index]}}" class="topic-body">
+        <view wx:for="{{item.points}}" wx:for-item="point" wx:for-index="pi" wx:key="pi" class="point-item">
+          <view class="point-dot" style="background:{{subjectInfo.color}}"></view>
+          <text class="point-text">{{point}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 练习题库 -->
+  <view class="card">
+    <view class="card-title">
+      <text class="title-icon" style="color:{{subjectInfo.color}}">🧠</text>
+      <text>专项练习题</text>
+    </view>
+
+    <view wx:for="{{content.questions}}" wx:key="q" class="question-item">
+      <!-- 题目标题栏 -->
+      <view class="q-header" bindtap="toggleQuestion" data-index="{{index}}">
+        <view class="q-left">
+          <view class="q-num" style="background:{{subjectInfo.bg}};color:{{subjectInfo.text}}">{{index + 1}}</view>
+          <view class="q-info">
+            <text class="q-preview">{{item.q}}</text>
+            <view class="q-tags">
+              <text class="diff-tag" style="{{item.difficulty === 'easy' ? 'background:#10b98122;color:#10b981' : item.difficulty === 'medium' ? 'background:#f59e0b22;color:#f59e0b' : item.difficulty === 'hard' ? 'background:#ef444422;color:#ef4444' : 'background:#7c3aed22;color:#7c3aed'}}">
+                {{item.difficulty === 'easy' ? '基础' : item.difficulty === 'medium' ? '中档' : item.difficulty === 'hard' ? '拔高' : '挑战'}}
+              </text>
+              <text class="diff-tag" style="background:#f0fdf4;color:#166534" wx:if="{{item.topic}}">{{item.topic}}</text>
+              <text class="diff-tag" style="background:#eef2ff;color:#4f46e5">+{{item.difficulty === 'easy' ? 30 : item.difficulty === 'medium' ? 60 : item.difficulty === 'hard' ? 100 : 150}} XP</text>
+            </view>
+          </view>
+        </view>
+        <text class="q-arrow" style="transform:{{expandedQ[index] ? 'rotate(90deg)' : 'none'}}">›</text>
+      </view>
+
+      <!-- 题目展开内容 -->
+      <view wx:if="{{expandedQ[index]}}" class="q-body">
+        <!-- 题目详情 -->
+        <view class="q-content">{{item.q}}</view>
+
+        <!-- 提示按钮 -->
+        <view wx:if="{{!showAnswer[index]}}" class="hint-btn" bindtap="toggleHint" data-index="{{index}}"
+          style="{{showHint[index] ? 'background:#fffbeb' : ''}}">
+          <text>💡 {{showHint[index] ? '隐藏提示' : '需要提示？'}}</text>
+        </view>
+
+        <!-- 提示内容 -->
+        <view wx:if="{{showHint[index] && !showAnswer[index]}}" class="hint-content">
+          <text>{{item.hint}}</text>
+        </view>
+
+        <!-- 显示/隐藏答案 -->
+        <view class="answer-btn" bindtap="toggleAnswer" data-index="{{index}}"
+          style="{{showAnswer[index] ? 'background:#f1f5f9;color:#475569' : 'background:' + subjectInfo.color + ';color:#fff'}}">
+          <text>{{showAnswer[index] ? '🙈 隐藏答案' : '👁 查看答案'}}</text>
+        </view>
+
+        <!-- 答案内容 -->
+        <view wx:if="{{showAnswer[index]}}" class="answer-content" style="border-left-color:{{subjectInfo.color}}">
+          <text>{{item.answer}}</text>
+        </view>
+
+        <!-- 掌握按钮 -->
+        <view wx:if="{{showAnswer[index]}}" class="master-btn" bindtap="toggleMastered" data-index="{{index}}"
+          style="{{mastered[activeSubject + '-' + index] ? 'background:#10b981;color:#fff' : 'background:#f0fdf4;color:#10b981'}}">
+          <text>{{mastered[activeSubject + '-' + index] ? '✓ 已掌握' : '标记为已掌握'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+</view>

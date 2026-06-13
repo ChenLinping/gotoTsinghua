@@ -1,0 +1,142 @@
+<view class="container">
+
+  <!-- 段位主卡片 -->
+  <view class="rank-card" style="background:linear-gradient(135deg, {{rank.color}}, {{rank.color}}99)">
+    <view class="rank-emoji">{{rank.emoji}}</view>
+    <view class="rank-info">
+      <text class="rank-name">{{rank.name}}</text>
+      <text class="rank-desc">{{rank.desc}}</text>
+      <text class="rank-xp">总经验值：{{totalXP}} XP</text>
+    </view>
+    <!-- 升段动画 -->
+    <view wx:if="{{levelUpAnimation}}" class="levelup-banner">
+      <text>🎉 恭喜升段！</text>
+    </view>
+  </view>
+
+  <!-- 经验进度条 -->
+  <view class="card" wx:if="{{nextRank}}">
+    <view class="progress-header">
+      <text class="progress-title">下一段位：{{nextRank.emoji}} {{nextRank.name}}</text>
+      <text class="progress-pct">{{progressPct}}%</text>
+    </view>
+    <view class="xp-bar">
+      <view class="xp-fill" style="width:{{progressPct}}%;background:{{nextRank.color}}"></view>
+    </view>
+    <view class="progress-footer">
+      <text class="xp-remaining">还需 {{xpToNext}} XP</text>
+      <text class="xp-rule">做题得经验，坚持有加成</text>
+    </view>
+  </view>
+
+  <view class="card" wx:else>
+    <view class="max-rank-msg">
+      <text class="max-emoji">🏆</text>
+      <text class="max-text">已达最高段位！走向清华！</text>
+    </view>
+  </view>
+
+  <!-- 每日连胜 -->
+  <view class="streak-card">
+    <view class="streak-flame">{{streak >= 7 ? '🔥' : streak >= 3 ? '💫' : '✨'}}</view>
+    <view class="streak-info">
+      <text class="streak-num">{{streak}} 天</text>
+      <text class="streak-label">连续学习</text>
+    </view>
+    <view class="streak-bonus">
+      <text class="bonus-label">连胜加成</text>
+      <text class="bonus-value">+{{streak >= 30 ? 100 : streak >= 14 ? 60 : streak >= 7 ? 40 : streak >= 3 ? 20 : 0}} XP/天</text>
+    </view>
+  </view>
+
+  <!-- 段位历程 -->
+  <view class="card">
+    <view class="card-title">
+      <text class="title-icon">🏅</text>
+      <text>段位历程</text>
+    </view>
+    <view class="rank-timeline">
+      <view wx:for="{{ranks}}" wx:key="name" class="rank-step {{item.isCurrent ? 'current' : ''}} {{item.isUnlocked ? 'unlocked' : 'locked'}}">
+        <view class="rank-step-icon" style="{{item.isUnlocked ? 'background:' + item.color + '22;border-color:' + item.color : ''}}">
+          <text>{{item.emoji}}</text>
+        </view>
+        <view class="rank-step-info">
+          <text class="rank-step-name" style="{{item.isCurrent ? 'color:' + item.color + ';font-weight:700' : ''}}">{{item.name}}</text>
+          <text class="rank-step-xp">{{item.minXP}} XP</text>
+        </view>
+        <view wx:if="{{item.isCurrent}}" class="current-badge">当前</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 成就徽章 -->
+  <view class="card">
+    <view class="card-title">
+      <text class="title-icon">🎖</text>
+      <text>成就徽章（{{achievementCount}}/{{achievementTotal}}）</text>
+    </view>
+    <view class="achievement-grid">
+      <view wx:for="{{achievements}}" wx:key="name" class="achievement-item {{item.earned ? 'earned' : 'locked'}}">
+        <view class="achievement-icon">{{item.earned ? item.emoji : '🔒'}}</view>
+        <text class="achievement-name">{{item.name}}</text>
+        <text class="achievement-desc">{{item.desc}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 各科进度 -->
+  <view class="card">
+    <view class="card-title">
+      <text class="title-icon">📊</text>
+      <text>掌握进度（{{masteredCount}}/{{totalQuestions}}）</text>
+    </view>
+    <view wx:for="{{subjectProgress}}" wx:key="name" class="subject-row">
+      <view class="subject-header">
+        <text>{{item.icon}} {{item.name}}</text>
+        <text>{{item.mastered}}/{{item.total}} ({{item.pct}}%)</text>
+      </view>
+      <view class="subject-bar">
+        <view class="subject-fill" style="width:{{item.pct}}%;background:{{item.color}}"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- XP获取说明 -->
+  <view class="card xp-guide">
+    <view class="card-title">
+      <text class="title-icon">💡</text>
+      <text>如何获取经验值</text>
+    </view>
+    <view class="xp-rules">
+      <view class="xp-rule-item">
+        <text class="xp-rule-label">基础题</text>
+        <text class="xp-rule-value">+30 XP</text>
+      </view>
+      <view class="xp-rule-item">
+        <text class="xp-rule-label">中档题</text>
+        <text class="xp-rule-value">+60 XP</text>
+      </view>
+      <view class="xp-rule-item">
+        <text class="xp-rule-label">拔高题</text>
+        <text class="xp-rule-value">+100 XP</text>
+      </view>
+      <view class="xp-rule-item">
+        <text class="xp-rule-label">挑战题</text>
+        <text class="xp-rule-value">+150 XP</text>
+      </view>
+      <view class="xp-rule-item highlight">
+        <text class="xp-rule-label">完成每日任务</text>
+        <text class="xp-rule-value">+50 XP</text>
+      </view>
+      <view class="xp-rule-item highlight">
+        <text class="xp-rule-label">连续3天学习</text>
+        <text class="xp-rule-value">+20 XP/天</text>
+      </view>
+      <view class="xp-rule-item highlight">
+        <text class="xp-rule-label">连续7天学习</text>
+        <text class="xp-rule-value">+40 XP/天</text>
+      </view>
+    </view>
+  </view>
+
+</view>

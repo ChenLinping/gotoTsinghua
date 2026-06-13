@@ -1,0 +1,6 @@
+# WeChat DevTools private config (local only)
+project.private.config.json
+
+# OS files
+.DS_Store
+Thumbs.db
