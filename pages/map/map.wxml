@@ -1,0 +1,149 @@
+<view class="page">
+
+  <!-- Top Hero Bar -->
+  <view class="hero-bar">
+    <view class="hero-bg"></view>
+    <view class="hero-content">
+      <!-- Left: Level & Rank -->
+      <view class="hero-left">
+        <view class="level-badge" style="background: {{rank.current.color}}">
+          <text class="level-text">Lv.{{char.level}}</text>
+        </view>
+        <view class="rank-info">
+          <text class="rank-emoji">{{rank.current.emoji}}</text>
+          <text class="rank-name">{{rank.current.name}}</text>
+        </view>
+      </view>
+
+      <!-- Center: XP Bar -->
+      <view class="hero-center">
+        <view class="xp-bar-wrap">
+          <view class="xp-bar-fill" style="width: {{xpProgress}}%"></view>
+          <text class="xp-bar-text">EXP {{char.xp}}/{{xpForLevel}}</text>
+        </view>
+        <view class="hp-bar-wrap">
+          <view class="hp-bar-fill" style="width: {{(char.hp / char.maxHP) * 100}}%"></view>
+          <text class="hp-bar-text">HP {{char.hp}}/{{char.maxHP}}</text>
+        </view>
+      </view>
+
+      <!-- Right: Stats -->
+      <view class="hero-right">
+        <view class="stat-item coin-stat">
+          <text class="stat-icon">🪙</text>
+          <text class="stat-val">{{char.coins}}</text>
+        </view>
+        <view class="stat-item streak-stat">
+          <text class="stat-icon">🔥</text>
+          <text class="stat-val">{{char.streakDays}}</text>
+        </view>
+        <view class="stat-item exam-stat">
+          <text class="stat-icon">📅</text>
+          <text class="stat-val">{{daysUntilExam}}天</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Daily Chest -->
+  <view class="chest-btn {{showChest ? 'chest-visible' : 'chest-hidden'}}" bindtap="openChest" wx:if="{{showChest}}">
+    <text class="chest-icon">🎁</text>
+    <text class="chest-label">每日宝箱</text>
+    <view class="chest-glow"></view>
+  </view>
+
+  <!-- Region Tabs -->
+  <scroll-view class="region-tabs" scroll-x="true" enhanced="true" show-scrollbar="false">
+    <view class="region-tabs-inner">
+      <view
+        wx:for="{{regions}}"
+        wx:key="id"
+        class="region-tab {{selectedRegionId === item.id ? 'region-tab-active' : ''}} {{!item.unlocked ? 'region-tab-locked' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="selectRegion"
+      >
+        <text class="region-tab-icon">{{item.icon}}</text>
+        <text class="region-tab-name">{{item.name}}</text>
+        <view class="region-tab-lock" wx:if="{{!item.unlocked}}">
+          <text class="lock-icon">🔒</text>
+          <text class="lock-level">Lv.{{item.unlockLevel}}</text>
+        </view>
+        <view class="region-tab-indicator" wx:if="{{selectedRegionId === item.id}}"></view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- Map Area -->
+  <view class="map-area" wx:if="{{selectedRegionId}}">
+    <view
+      class="map-bg-layer"
+      style="background: linear-gradient(180deg, {{selectedRegion.bg || '#e8f5e9'}} 0%, rgba(245,245,245,0.8) 100%);"
+    ></view>
+
+    <view class="map-header">
+      <text class="map-title">{{selectedRegion.icon}} {{selectedRegion.name}}</text>
+      <text class="map-desc">{{selectedRegion.desc}}</text>
+    </view>
+
+    <!-- Node Map Canvas -->
+    <view class="map-canvas">
+      <!-- Connecting Lines -->
+      <view
+        wx:for="{{selectedNodes}}"
+        wx:key="id"
+        wx:if="{{index > 0}}"
+        class="path-line"
+        style="left: {{selectedNodes[index-1].x}}%; top: {{selectedNodes[index-1].y}}%; width: {{selectedNodes[index].x - selectedNodes[index-1].x}}%; height: {{selectedNodes[index].y - selectedNodes[index-1].y}}%;"
+      >
+        <view class="path-line-inner {{selectedNodes[index-1].completed && selectedNodes[index].unlocked ? 'path-active' : ''}}"></view>
+      </view>
+
+      <!-- Nodes -->
+      <view
+        wx:for="{{selectedNodes}}"
+        wx:key="id"
+        class="map-node node-{{item.type}} {{item.completed ? 'node-completed' : ''}} {{item.unlocked && !item.completed ? 'node-available' : ''}} {{!item.unlocked ? 'node-locked' : ''}} {{item.isBoss ? 'node-boss' : ''}} {{item.isElite ? 'node-elite' : ''}}"
+        style="left: {{item.x}}%; top: {{item.y}}%;"
+        data-id="{{item.id}}"
+        bindtap="tapNode"
+      >
+        <!-- Boss outer ring -->
+        <view class="node-boss-ring" wx:if="{{item.isBoss}}"></view>
+        <!-- Elite double ring -->
+        <view class="node-elite-ring" wx:if="{{item.isElite && !item.isBoss}}"></view>
+
+        <!-- Inner circle -->
+        <view class="node-inner">
+          <text wx:if="{{item.completed}}" class="node-icon">✓</text>
+          <text wx:elif="{{item.isBoss}}" class="node-icon">👹</text>
+          <text wx:elif="{{item.isElite}}" class="node-icon">⚔️</text>
+          <text wx:elif="{{!item.unlocked}}" class="node-icon">🔒</text>
+          <text wx:else class="node-icon">{{item.subject === 'math' ? '📐' : item.subject === 'chinese' ? '📖' : item.subject === 'english' ? '🔤' : item.subject === 'physics' ? '⚡' : item.subject === 'chemistry' ? '🧪' : item.subject === 'biology' ? '🧬' : '📚'}}</text>
+        </view>
+
+        <!-- Label -->
+        <view class="node-label-wrap">
+          <text class="node-label">{{item.label}}</text>
+          <text class="node-type-label" wx:if="{{item.isBoss}}">BOSS</text>
+          <text class="node-type-label node-type-elite" wx:elif="{{item.isElite}}">精英</text>
+        </view>
+
+        <!-- Available glow -->
+        <view class="node-glow" wx:if="{{item.unlocked && !item.completed}}"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Bottom Bar -->
+  <view class="bottom-bar">
+    <view class="bottom-btn" bindtap="goToCharacter">
+      <text class="bottom-btn-icon">🧙</text>
+      <text class="bottom-btn-label">角色</text>
+    </view>
+    <view class="bottom-btn" bindtap="goToShop">
+      <text class="bottom-btn-icon">🏪</text>
+      <text class="bottom-btn-label">商店</text>
+    </view>
+  </view>
+
+</view>

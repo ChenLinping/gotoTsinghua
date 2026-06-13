@@ -1,233 +1,168 @@
-var data = require('../../utils/data');
+var game = require('../../utils/game');
 
 Page({
   data: {
     step: 0,
     name: '',
+    nameError: '',
+
+    // 6 subjects for score input
     subjects: [
-      { key: 'math', name: '数学', icon: '📐', max: 150, score: '' },
-      { key: 'english', name: '英语', icon: '🌍', max: 150, score: '' },
-      { key: 'chinese', name: '语文', icon: '📖', max: 150, score: '' },
-      { key: 'physics', name: '物理', icon: '⚡', max: 100, score: '' },
-      { key: 'chemistry', name: '化学', icon: '🧪', max: 100, score: '' },
-      { key: 'biology', name: '生物', icon: '🧬', max: 100, score: '' }
+      { key: 'math', name: '数学', icon: '📐', color: '#6366f1', desc: '逻辑之力', score: '', placeholder: '如: 120' },
+      { key: 'english', name: '英语', icon: '🌍', color: '#ec4899', desc: '语言之力', score: '', placeholder: '如: 130' },
+      { key: 'chinese', name: '语文', icon: '📜', color: '#f59e0b', desc: '文字之力', score: '', placeholder: '如: 115' },
+      { key: 'physics', name: '物理', icon: '⚡', color: '#0891b2', desc: '自然之力', score: '', placeholder: '如: 85' },
+      { key: 'chemistry', name: '化学', icon: '🧪', color: '#10b981', desc: '变化之力', score: '', placeholder: '如: 80' },
+      { key: 'biology', name: '生物', icon: '🧬', color: '#8b5cf6', desc: '生命之力', score: '', placeholder: '如: 78' }
     ],
-    analysis: null,
+
     totalScore: 0,
-    totalMax: 750,
-    canNext: false,
+    startLevel: 1,
+    scoreAnalysis: '',
     statusBarHeight: 20
   },
 
   onLoad: function () {
-    var that = this;
     var sysInfo = wx.getSystemInfoSync();
-    that.setData({
+    this.setData({
       statusBarHeight: sysInfo.statusBarHeight || 20
     });
-  },
 
-  nextStep: function () {
-    var that = this;
-    var step = that.data.step;
-
-    if (step === 1) {
-      if (!that.data.name || that.data.name.trim().length === 0) {
-        wx.showToast({ title: '请输入你的名字', icon: 'none' });
-        return;
-      }
-    }
-
-    if (step === 2) {
-      var subjects = that.data.subjects;
-      for (var i = 0; i < subjects.length; i++) {
-        var s = subjects[i];
-        var val = parseFloat(s.score);
-        if (s.score === '' || isNaN(val)) {
-          wx.showToast({ title: '请填写' + s.name + '成绩', icon: 'none' });
-          return;
-        }
-        if (val < 0 || val > s.max) {
-          wx.showToast({ title: s.name + '成绩需在 0-' + s.max + ' 之间', icon: 'none' });
-          return;
-        }
-      }
-      that.generateAnalysis();
-    }
-
-    that.setData({ step: step + 1 });
-  },
-
-  prevStep: function () {
-    var that = this;
-    if (that.data.step > 0) {
-      that.setData({ step: that.data.step - 1 });
+    // Check if already has a character
+    var char = game.loadGame();
+    if (char && char.name) {
+      wx.switchTab({ url: '/pages/map/map' });
     }
   },
 
+  // ========== Step 0: 欢迎 ==========
+  startAdventure: function () {
+    this.setData({ step: 1 });
+  },
+
+  // ========== Step 1: 名字输入 ==========
   onNameInput: function (e) {
-    var that = this;
     var val = e.detail.value;
-    that.setData({
+    this.setData({
       name: val,
-      canNext: val.trim().length > 0
+      nameError: ''
     });
   },
 
+  confirmName: function () {
+    var name = (this.data.name || '').trim();
+    if (!name) {
+      this.setData({ nameError: '请输入你的名字' });
+      return;
+    }
+    if (name.length > 8) {
+      this.setData({ nameError: '名字不能超过8个字' });
+      return;
+    }
+    this.setData({ step: 2 });
+  },
+
+  // ========== Step 2: 成绩输入 ==========
   onScoreInput: function (e) {
-    var that = this;
-    var index = parseInt(e.currentTarget.dataset.index);
-    var key = e.currentTarget.dataset.key;
+    var idx = e.currentTarget.dataset.idx;
     var val = e.detail.value;
+    var subjects = this.data.subjects.slice();
+    subjects[idx].score = val;
 
-    var subjects = that.data.subjects.slice();
-    var maxVal = subjects[index].max;
-
-    // Allow empty while typing
-    if (val === '') {
-      subjects[index].score = '';
-      that.setData({ subjects: subjects });
-      return;
-    }
-
-    var num = parseFloat(val);
-    if (isNaN(num)) {
-      return;
-    }
-
-    // Clamp to max
-    if (num > maxVal) {
-      num = maxVal;
-      subjects[index].score = String(maxVal);
-    } else if (num < 0) {
-      subjects[index].score = '0';
-    } else {
-      subjects[index].score = val;
-    }
-
-    // Check if all scores are filled
-    var allFilled = true;
-    for (var i = 0; i < subjects.length; i++) {
-      var sv = parseFloat(subjects[i].score);
-      if (subjects[i].score === '' || isNaN(sv)) {
-        allFilled = false;
-        break;
-      }
-    }
-
-    that.setData({ subjects: subjects, canNext: allFilled });
-  },
-
-  generateAnalysis: function () {
-    var that = this;
-    var subjects = that.data.subjects;
-
-    var items = [];
+    // Calculate total
     var total = 0;
-    for (var i = 0; i < subjects.length; i++) {
-      var s = subjects[i];
-      var score = parseFloat(s.score) || 0;
-      var pct = Math.round((score / s.max) * 100);
-      total += score;
-      items.push({
-        key: s.key,
-        name: s.name,
-        icon: s.icon,
-        score: score,
-        max: s.max,
-        pct: pct
-      });
-    }
-
-    // Sort by percentage ascending (weakest first)
-    items.sort(function (a, b) { return a.pct - b.pct; });
-
-    var weak = [];
-    var stable = [];
-    var strong = [];
-
-    for (var j = 0; j < items.length; j++) {
-      var item = items[j];
-      if (j < 2) {
-        item.category = 'weak';
-        item.suggestion = that.getSuggestion(item.key, 'weak');
-        weak.push(item);
-      } else if (j >= items.length - 2) {
-        item.category = 'strong';
-        item.suggestion = that.getSuggestion(item.key, 'strong');
-        strong.push(item);
-      } else {
-        item.category = 'stable';
-        item.suggestion = that.getSuggestion(item.key, 'stable');
-        stable.push(item);
+    subjects.forEach(function (s) {
+      var num = parseInt(s.score, 10);
+      if (!isNaN(num) && num > 0) {
+        total += num;
       }
+    });
+
+    // Calculate start level
+    var startLevel = 1;
+    if (total >= 600) startLevel = 8;
+    else if (total >= 550) startLevel = 6;
+    else if (total >= 500) startLevel = 5;
+    else if (total >= 450) startLevel = 4;
+    else if (total >= 400) startLevel = 3;
+    else if (total >= 300) startLevel = 2;
+
+    // Generate analysis text
+    var analysis = '';
+    if (total >= 600) {
+      analysis = '卓越的天赋！你将以高等级开始冒险！';
+    } else if (total >= 500) {
+      analysis = '出色的基础！你拥有不错的起始优势。';
+    } else if (total >= 400) {
+      analysis = '良好的基础。努力提升，前途无量！';
+    } else if (total > 0) {
+      analysis = '冒险才刚刚开始，每一步都是成长！';
     }
 
-    var totalPct = Math.round((total / that.data.totalMax) * 100);
-
-    that.setData({
+    this.setData({
+      subjects: subjects,
       totalScore: total,
-      analysis: {
-        total: total,
-        totalPct: totalPct,
-        weak: weak,
-        strong: strong,
-        stable: stable,
-        weakCount: weak.length,
-        strongCount: strong.length,
-        stableCount: stable.length
-      }
+      startLevel: startLevel,
+      scoreAnalysis: analysis
     });
   },
 
-  getSuggestion: function (key, category) {
-    var weakMap = {
-      math: '建议每天增加30分钟数学专项练习，重点攻克函数与导数、解析几何等高频考点',
-      english: '建议每天坚持背单词30个，并做一套阅读理解真题训练',
-      chinese: '建议加强文言文阅读和作文素材积累，每天阅读一篇范文',
-      physics: '建议系统梳理力学和电学公式，配合典型例题加深理解',
-      chemistry: '建议重点记忆化学方程式和元素周期表规律，多做实验题',
-      biology: '建议回归课本，梳理遗传、细胞代谢等核心知识框架'
-    };
-
-    var strongMap = {
-      math: '数学基础扎实，建议保持每日练习，挑战压轴题',
-      english: '英语表现优秀，建议拓展阅读面和写作深度',
-      chinese: '语文功底不错，建议在诗词鉴赏和作文上继续精进',
-      physics: '物理理解力强，建议接触竞赛题拓展思维',
-      chemistry: '化学掌握良好，建议多做综合推断题',
-      biology: '生物成绩出色，建议关注实验设计与综合分析'
-    };
-
-    var stableMap = {
-      math: '成绩稳定，建议针对薄弱章节做专项提升',
-      english: '基础尚可，建议增加词汇量并强化听力训练',
-      chinese: '水平平稳，建议在阅读理解和作文上多下功夫',
-      physics: '基础一般，建议通过画图辅助理解物理过程',
-      chemistry: '掌握中等，建议多做分类练习巩固知识点',
-      biology: '成绩中等，建议制作思维导图梳理知识体系'
-    };
-
-    if (category === 'weak') return weakMap[key] || '建议针对该科目制定专项提升计划';
-    if (category === 'strong') return strongMap[key] || '保持优势，继续巩固';
-    return stableMap[key] || '稳步提升，查漏补缺';
+  confirmScores: function () {
+    this.setData({ step: 3 });
   },
 
-  finishOnboarding: function () {
-    var that = this;
-    var subjects = that.data.subjects;
-    var scores = {};
+  // ========== Step 3: 完成 ==========
+  enterWorld: function () {
+    var char = game.createCharacter();
+    char.name = (this.data.name || '').trim();
 
-    for (var i = 0; i < subjects.length; i++) {
-      scores[subjects[i].key] = parseFloat(subjects[i].score) || 0;
+    // Set starting level based on scores
+    if (this.data.startLevel > 1) {
+      char.level = this.data.startLevel;
+      char.baseAtk = 10 + (char.level - 1) * 2;
+      char.baseDef = 5 + (char.level - 1) * 1;
+      char.xp = game.getXpForLevel(char.level);
+      var stats = game.getCharStats(char);
+      char.maxHP = stats.maxHP;
+      char.hp = stats.maxHP;
     }
 
-    wx.setStorageSync('userName', that.data.name);
-    wx.setStorageSync('userScores', scores);
-    wx.setStorageSync('onboardingDone', true);
-
-    wx.switchTab({
-      url: '/pages/index/index'
+    // Save initial scores
+    var scores = {};
+    this.data.subjects.forEach(function (s) {
+      var num = parseInt(s.score, 10);
+      scores[s.key] = isNaN(num) ? 0 : num;
     });
+    char.initialScores = scores;
+
+    // Set play date
+    char.lastPlayDate = new Date().toISOString().slice(0, 10);
+    char.streakDays = 1;
+
+    // Give starter equipment
+    char.equipment.weapon = 'w1';
+    char.equipment.armor = 'a1';
+    if (!char.inventory) char.inventory = [];
+    char.inventory.push('w1');
+    char.inventory.push('a1');
+
+    game.saveGame(char);
+
+    wx.showToast({
+      title: '欢迎来到冒险世界！',
+      icon: 'success',
+      duration: 1500
+    });
+
+    setTimeout(function () {
+      wx.switchTab({ url: '/pages/map/map' });
+    }, 1500);
+  },
+
+  // ========== 导航 ==========
+  goBack: function () {
+    if (this.data.step > 0) {
+      this.setData({ step: this.data.step - 1 });
+    }
   }
 });

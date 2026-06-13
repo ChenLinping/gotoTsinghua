@@ -1,0 +1,105 @@
+<view class="page-bg">
+  <!-- 顶部金币栏 -->
+  <view class="coin-bar">
+    <view class="coin-info">
+      <text class="coin-icon">💰</text>
+      <text class="coin-label">金币</text>
+    </view>
+    <text class="coin-amount">{{coins}}</text>
+    <view class="shop-title-wrap">
+      <text class="shop-title">冒险商店</text>
+    </view>
+  </view>
+
+  <!-- Tab 栏 -->
+  <view class="tab-bar">
+    <view
+      class="tab-item {{activeTab === idx ? 'tab-active' : ''}}"
+      wx:for="{{tabs}}"
+      wx:key="idx"
+      data-idx="{{idx}}"
+      bindtap="switchTab"
+    >
+      <text class="tab-icon">{{tabIcons[idx]}}</text>
+      <text class="tab-text">{{item}}</text>
+    </view>
+  </view>
+
+  <!-- 商品列表 -->
+  <scroll-view scroll-y class="item-list">
+    <view
+      class="item-card {{item.locked ? 'item-locked' : ''}} {{item.equipped ? 'item-equipped' : ''}}"
+      style="border-left: 6rpx solid {{item.locked ? '#475569' : item.rarityColor}};"
+      wx:for="{{items}}"
+      wx:key="id"
+    >
+      <!-- 锁定遮罩 -->
+      <block wx:if="{{item.locked}}">
+        <view class="item-main">
+          <view class="item-left">
+            <text class="item-emoji locked-emoji">🔒</text>
+          </view>
+          <view class="item-center">
+            <text class="item-name locked-name">{{item.name}}</text>
+            <view class="lock-info">
+              <text class="lock-text">{{item.unlockLevel}}级解锁</text>
+            </view>
+            <text class="item-desc locked-desc">{{item.desc}}</text>
+          </view>
+          <view class="item-right">
+            <text class="lock-badge">未解锁</text>
+          </view>
+        </view>
+      </block>
+
+      <!-- 正常显示 -->
+      <block wx:else>
+        <view class="item-main">
+          <view class="item-left">
+            <text class="item-emoji">{{item.emoji}}</text>
+            <text class="item-rarity" style="background: {{item.rarityColor}};">{{item.rarityName}}</text>
+          </view>
+          <view class="item-center">
+            <text class="item-name">{{item.name}}</text>
+            <text class="item-stat">{{item.statText}}</text>
+            <text class="item-desc">{{item.desc}}</text>
+          </view>
+          <view class="item-right">
+            <!-- 已装备 -->
+            <block wx:if="{{item.equipped}}">
+              <view class="equipped-badge">
+                <text>已装备</text>
+              </view>
+              <view class="btn-unequip" data-id="{{item.id}}" bindtap="equipItem">
+                <text>卸下</text>
+              </view>
+            </block>
+            <!-- 已拥有未装备 -->
+            <block wx:elif="{{item.owned}}">
+              <view class="btn-equip" data-id="{{item.id}}" bindtap="equipItem">
+                <text>装备</text>
+              </view>
+            </block>
+            <!-- 未拥有 -->
+            <block wx:else>
+              <view class="price-tag {{item.canAfford ? '' : 'no-afford'}}">
+                <text class="price-icon">💰</text>
+                <text class="price-num">{{item.price}}</text>
+              </view>
+              <view
+                class="btn-buy {{item.canAfford ? '' : 'btn-disabled'}}"
+                data-id="{{item.id}}"
+                bindtap="{{item.canAfford ? 'buyItem' : ''}}"
+              >
+                <text>{{item.isFree ? '免费领取' : '购买'}}</text>
+              </view>
+            </block>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <!-- 底部留白 -->
+    <view style="height: 60rpx;"></view>
+  </scroll-view>
+</view>

@@ -1,0 +1,210 @@
+<!-- ========================================== -->
+<!-- 走向清华 V2 - 战斗页面 -->
+<!-- ========================================== -->
+<view class="battle-page">
+
+  <!-- ====== Battle Field (Top Half) ====== -->
+  <view class="battle-field">
+
+    <!-- Monster Section -->
+    <view class="monster-section">
+      <view class="monster-info-row">
+        <view class="monster-name">{{monster.name}}</view>
+        <view class="type-badge" style="background:{{monster.color}}">{{monster.typeName}}</view>
+      </view>
+      <view class="monster-display {{isAttacking ? 'monster-hit' : ''}} {{isMonsterDamaged ? 'monster-shake' : ''}}">
+        <text class="monster-emoji">{{monster.emoji}}</text>
+      </view>
+      <!-- Floating damage on monster -->
+      <view wx:if="{{showPlayerDamage}}" class="damage-float {{showCrit ? 'damage-crit' : 'damage-normal'}}">
+        <text wx:if="{{showCrit}}" class="crit-tag">暴击</text>
+        <text>-{{playerDamageAmount}}</text>
+      </view>
+      <view class="hp-bar-container">
+        <view class="hp-bar monster-hp-bar">
+          <view class="hp-fill" style="width:{{monsterHpPercent}}%"></view>
+        </view>
+        <text class="hp-text">{{monster.hp}}/{{monster.maxHP}}</text>
+      </view>
+    </view>
+
+    <!-- VS Indicator -->
+    <view class="vs-section">
+      <text class="vs-text">VS</text>
+      <text class="node-label">{{nodeLabel}}</text>
+    </view>
+
+    <!-- Player Section -->
+    <view class="player-section {{isPlayerDamaged ? 'player-shake' : ''}}">
+      <!-- Floating damage on player -->
+      <view wx:if="{{showMonsterDamage}}" class="damage-float damage-from-monster">
+        <text>-{{monsterDamageAmount}}</text>
+      </view>
+      <view class="player-info-row">
+        <view class="player-avatar">🧑‍🎓</view>
+        <view class="player-info-text">
+          <view class="player-level">Lv.{{char.level}}</view>
+          <view class="stat-inline">
+            <text class="stat-atk">ATK {{charStats.atk}}</text>
+            <text class="stat-def">DEF {{charStats.def}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="hp-bar-container">
+        <view class="hp-bar player-hp-bar">
+          <view class="hp-fill player-hp-fill" style="width:{{playerHpPercent}}%"></view>
+        </view>
+        <text class="hp-text">{{playerHp}}/{{playerMaxHp}}</text>
+      </view>
+    </view>
+
+  </view>
+
+  <!-- ====== Question Area (Bottom Half) ====== -->
+  <view class="question-area" wx:if="{{!battleOver}}">
+
+    <!-- Question Progress -->
+    <view class="question-progress">
+      <text class="question-counter">第 {{questionIndex + 1}} 题</text>
+      <view class="progress-dots">
+        <view wx:for="{{progressDots}}" wx:key="index" class="dot dot-{{item}}"></view>
+      </view>
+    </view>
+
+    <!-- Question Card -->
+    <view class="question-card" wx:if="{{currentQuestion}}">
+      <text class="question-text">{{currentQuestion.q}}</text>
+    </view>
+
+    <!-- Options -->
+    <view class="options-list">
+      <view
+        wx:for="{{currentQuestion.options}}"
+        wx:key="index"
+        class="option-btn option-{{answeredOptions[index] || 'default'}} {{selectedOption === index ? 'option-selected' : ''}}"
+        data-index="{{index}}"
+        bindtap="selectAnswer"
+      >
+        <text class="option-label">{{index === 0 ? 'A' : index === 1 ? 'B' : index === 2 ? 'C' : 'D'}}</text>
+        <text class="option-text">{{item}}</text>
+        <text wx:if="{{showResult && index === currentQuestion.answer}}" class="option-icon-result">✓</text>
+        <text wx:if="{{showResult && selectedOption === index && index !== currentQuestion.answer}}" class="option-icon-result">✗</text>
+      </view>
+    </view>
+
+    <!-- Explanation (shown after answering) -->
+    <view class="explanation-card" wx:if="{{showResult}}">
+      <view class="explanation-header {{isCorrect ? 'explanation-correct' : 'explanation-wrong'}}">
+        <text>{{isCorrect ? '✅ 回答正确！' : '❌ 回答错误'}}</text>
+      </view>
+      <text class="explanation-text">{{explanation}}</text>
+    </view>
+
+  </view>
+
+  <!-- ====== Battle Log ====== -->
+  <view class="battle-log-section">
+    <scroll-view
+      scroll-y
+      class="battle-log-scroll"
+      scroll-into-view="log-{{battleLog.length - 1}}"
+      scroll-with-animation
+    >
+      <view wx:for="{{battleLog}}" wx:key="index" id="log-{{index}}" class="log-entry">
+        <text>{{item}}</text>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- ====== Victory Overlay ====== -->
+  <view class="result-overlay" wx:if="{{victory}}">
+    <view class="result-overlay-bg"></view>
+    <view class="result-card victory-card">
+      <text class="result-emoji">🎉</text>
+      <text class="result-title victory-title">战斗胜利！</text>
+
+      <!-- Rewards -->
+      <view class="rewards-section">
+        <view class="reward-row">
+          <text class="reward-icon">✨</text>
+          <text class="reward-label">经验值</text>
+          <text class="reward-value">+{{rewards.xp}}</text>
+        </view>
+        <view class="reward-row">
+          <text class="reward-icon">🪙</text>
+          <text class="reward-label">金币</text>
+          <text class="reward-value">+{{rewards.coins}}</text>
+        </view>
+      </view>
+
+      <!-- Battle Stats -->
+      <view class="battle-stats">
+        <view class="stat-item">
+          <text class="stat-num correct-color">{{monster.correctCount}}</text>
+          <text class="stat-label">答对</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-num wrong-color">{{monster.wrongCount}}</text>
+          <text class="stat-label">答错</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-num">{{monster.questionsAnswered}}</text>
+          <text class="stat-label">总题数</text>
+        </view>
+      </view>
+
+      <!-- Level Up -->
+      <view class="level-up-banner" wx:if="{{leveledUp}}">
+        <text>⬆️ 升级！当前等级 Lv.{{char.level}}</text>
+      </view>
+
+      <!-- New Achievements -->
+      <view class="achievement-section" wx:if="{{newAchievements.length > 0}}">
+        <text class="achievement-title">成就解锁！</text>
+        <view wx:for="{{newAchievements}}" wx:key="id" class="achievement-item">
+          <text class="achievement-emoji">{{item.emoji}}</text>
+          <text class="achievement-name">{{item.name}}</text>
+        </view>
+      </view>
+
+      <!-- Bonus drop -->
+      <view class="bonus-drop" wx:if="{{rewards.bonus}}">
+        <text>🎁 额外掉落：{{rewards.bonus}}</text>
+      </view>
+
+      <view class="result-btn victory-btn" bindtap="goBack">
+        <text>返回地图</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ====== Defeat Overlay ====== -->
+  <view class="result-overlay" wx:if="{{defeat}}">
+    <view class="result-overlay-bg"></view>
+    <view class="result-card defeat-card">
+      <text class="result-emoji">💀</text>
+      <text class="result-title defeat-title">战斗失败</text>
+      <text class="defeat-desc">你的HP归零了...回去休息一下吧！</text>
+
+      <!-- Battle Stats -->
+      <view class="battle-stats">
+        <view class="stat-item">
+          <text class="stat-num correct-color">{{monster.correctCount}}</text>
+          <text class="stat-label">答对</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-num wrong-color">{{monster.wrongCount}}</text>
+          <text class="stat-label">答错</text>
+        </view>
+      </view>
+
+      <view class="result-btn retry-btn" bindtap="retry">
+        <text>重新挑战</text>
+      </view>
+      <view class="result-btn back-btn" bindtap="goBack">
+        <text>返回地图</text>
+      </view>
+    </view>
+  </view>
+
+</view>

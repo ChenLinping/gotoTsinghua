@@ -1,39 +1,35 @@
 {
   "pages": [
-    "pages/index/index",
+    "pages/map/map",
     "pages/onboarding/onboarding",
-    "pages/subjects/subjects",
-    "pages/stats/stats",
-    "pages/profile/profile"
+    "pages/battle/battle",
+    "pages/character/character",
+    "pages/shop/shop"
   ],
   "window": {
     "navigationBarBackgroundColor": "#4f46e5",
     "navigationBarTitleText": "走向清华",
     "navigationBarTextStyle": "white",
-    "backgroundColor": "#f1f5f9",
-    "backgroundTextStyle": "dark"
+    "backgroundColor": "#0f0c29",
+    "backgroundTextStyle": "light"
   },
   "tabBar": {
     "color": "#94a3b8",
-    "selectedColor": "#4f46e5",
-    "backgroundColor": "#ffffff",
-    "borderStyle": "black",
+    "selectedColor": "#a78bfa",
+    "backgroundColor": "#1e1b4b",
+    "borderStyle": "white",
     "list": [
       {
-        "pagePath": "pages/index/index",
-        "text": "今日"
+        "pagePath": "pages/map/map",
+        "text": "冒险"
       },
       {
-        "pagePath": "pages/subjects/subjects",
-        "text": "复习"
+        "pagePath": "pages/character/character",
+        "text": "角色"
       },
       {
-        "pagePath": "pages/profile/profile",
-        "text": "我的"
-      },
-      {
-        "pagePath": "pages/stats/stats",
-        "text": "统计"
+        "pagePath": "pages/shop/shop",
+        "text": "商店"
       }
     ]
   },

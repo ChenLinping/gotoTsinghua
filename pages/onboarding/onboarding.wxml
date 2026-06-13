@@ -1,193 +1,205 @@
-<!-- pages/onboarding/onboarding.wxml -->
-<view class="page">
-  <!-- Status bar spacer -->
-  <view class="status-bar" style="height: {{statusBarHeight}}px;"></view>
+<view class="page-bg" style="padding-top: {{statusBarHeight + 44}}px;">
 
-  <!-- Step indicator -->
-  <view class="step-indicator">
-    <view class="dot {{step >= 0 ? 'active' : ''}}"></view>
-    <view class="dot-line {{step >= 1 ? 'active' : ''}}"></view>
-    <view class="dot {{step >= 1 ? 'active' : ''}}"></view>
-    <view class="dot-line {{step >= 2 ? 'active' : ''}}"></view>
-    <view class="dot {{step >= 2 ? 'active' : ''}}"></view>
-    <view class="dot-line {{step >= 3 ? 'active' : ''}}"></view>
-    <view class="dot {{step >= 3 ? 'active' : ''}}"></view>
+  <!-- 自定义导航栏 -->
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-bar">
+      <view wx:if="{{step > 0 && step < 3}}" class="nav-back" bindtap="goBack">
+        <text>← 返回</text>
+      </view>
+      <text class="nav-title">{{step === 0 ? '开始冒险' : step === 1 ? '创建角色' : step === 2 ? '属性鉴定' : '准备就绪'}}</text>
+      <view class="nav-spacer" wx:if="{{step > 0 && step < 3}}"></view>
+    </view>
   </view>
 
-  <!-- Step 0: Welcome -->
-  <view class="step-container" wx:if="{{step === 0}}">
-    <view class="card welcome-card">
-      <view class="welcome-emoji">🏆</view>
-      <view class="app-name">走向清华</view>
-      <view class="tagline">你的高考备战智能助手</view>
-      <view class="divider"></view>
-      <view class="feature-list">
-        <view class="feature-item">
-          <text class="feature-icon">📅</text>
-          <text class="feature-text">智能排课 — AI为你量身安排每日学习计划</text>
+  <!-- 步骤指示器 -->
+  <view class="step-indicator" wx:if="{{step > 0 && step < 3}}">
+    <view class="step-dot {{step >= 1 ? 'step-active' : ''}}"></view>
+    <view class="step-line {{step >= 2 ? 'line-active' : ''}}"></view>
+    <view class="step-dot {{step >= 2 ? 'step-active' : ''}}"></view>
+    <view class="step-line {{step >= 3 ? 'line-active' : ''}}"></view>
+    <view class="step-dot {{step >= 3 ? 'step-active' : ''}}"></view>
+  </view>
+
+  <!-- ========== Step 0: 欢迎页 ========== -->
+  <view class="step-content" wx:if="{{step === 0}}">
+    <view class="welcome-hero">
+      <view class="welcome-trophy">
+        <text class="trophy-emoji">🏆</text>
+      </view>
+      <view class="welcome-glow"></view>
+    </view>
+
+    <view class="welcome-text">
+      <text class="welcome-title">走向清华</text>
+      <text class="welcome-subtitle">冒险之旅</text>
+    </view>
+
+    <view class="welcome-desc">
+      <text class="desc-text">将高考备考变成一场RPG冒险</text>
+    </view>
+
+    <view class="feature-list">
+      <view class="feature-item">
+        <text class="feature-icon">⚔️</text>
+        <view class="feature-info">
+          <text class="feature-name">打怪升级</text>
+          <text class="feature-desc">答对题目，击败知识怪物</text>
         </view>
-        <view class="feature-item">
-          <text class="feature-icon">📝</text>
-          <text class="feature-text">题库练习 — 历年真题 + 模拟专项训练</text>
+      </view>
+      <view class="feature-item">
+        <text class="feature-icon">🧠</text>
+        <view class="feature-info">
+          <text class="feature-name">智能出题</text>
+          <text class="feature-desc">2026新高考风格题库</text>
         </view>
-        <view class="feature-item">
-          <text class="feature-icon">🎯</text>
-          <text class="feature-text">段位升级 — 从青铜到王者，见证你的成长</text>
+      </view>
+      <view class="feature-item">
+        <text class="feature-icon">🎒</text>
+        <view class="feature-info">
+          <text class="feature-name">装备收集</text>
+          <text class="feature-desc">学习文具变身神兵利器</text>
+        </view>
+      </view>
+      <view class="feature-item">
+        <text class="feature-icon">🗺️</text>
+        <view class="feature-info">
+          <text class="feature-name">五大地图</text>
+          <text class="feature-desc">从启程之谷到清华之巅</text>
         </view>
       </view>
     </view>
 
-    <view class="btn-group">
-      <button class="btn-primary btn-lg" bindtap="nextStep">开始</button>
+    <view class="welcome-btn" bindtap="startAdventure">
+      <text class="btn-text">开始冒险</text>
+      <text class="btn-arrow">→</text>
     </view>
   </view>
 
-  <!-- Step 1: Name -->
-  <view class="step-container" wx:if="{{step === 1}}">
-    <view class="card name-card">
-      <view class="card-emoji">👋</view>
-      <view class="card-title">你叫什么名字？</view>
-      <view class="card-subtitle">让我们认识你吧</view>
-      <view class="input-wrapper">
+  <!-- ========== Step 1: 名字输入 ========== -->
+  <view class="step-content" wx:if="{{step === 1}}">
+    <view class="name-hero">
+      <text class="name-hero-emoji">🧙</text>
+    </view>
+
+    <view class="name-prompt">
+      <text class="prompt-title">你叫什么名字，勇士？</text>
+      <text class="prompt-desc">这个名字将伴随你的冒险之旅</text>
+    </view>
+
+    <view class="name-input-wrap">
+      <view class="name-input-border {{nameError ? 'input-error' : ''}}">
+        <text class="input-icon">✏️</text>
         <input
-          class="text-input"
-          type="text"
-          placeholder="请输入你的名字"
-          placeholder-class="placeholder"
+          class="name-input"
+          placeholder="输入你的名字..."
+          placeholder-class="name-placeholder"
+          maxlength="8"
           value="{{name}}"
           bindinput="onNameInput"
-          maxlength="20"
+          bindconfirm="confirmName"
+          focus="{{step === 1}}"
         />
       </view>
+      <text wx:if="{{nameError}}" class="error-text">{{nameError}}</text>
     </view>
 
-    <view class="btn-group">
-      <button class="btn-ghost" bindtap="prevStep">上一步</button>
-      <button class="btn-primary" bindtap="nextStep" disabled="{{!canNext}}">下一步</button>
+    <view class="name-btn" bindtap="confirmName">
+      <text class="btn-text">确认名字</text>
     </view>
   </view>
 
-  <!-- Step 2: Scores -->
-  <view class="step-container" wx:if="{{step === 2}}">
-    <view class="card score-card">
-      <view class="card-emoji">📊</view>
-      <view class="card-title">输入最近一次考试各科成绩</view>
-      <view class="card-subtitle">帮助我们为你定制学习计划</view>
+  <!-- ========== Step 2: 成绩输入 ========== -->
+  <view class="step-content" wx:if="{{step === 2}}">
+    <view class="score-header">
+      <text class="score-header-emoji">🔮</text>
+      <text class="score-header-title">初始属性鉴定</text>
+      <text class="score-header-desc">输入你最近一次考试各科成绩，系统将评估你的初始属性</text>
+    </view>
 
-      <view class="score-list">
-        <view class="score-row" wx:for="{{subjects}}" wx:key="key">
-          <view class="score-left">
-            <text class="score-icon">{{item.icon}}</text>
+    <view class="score-list">
+      <view
+        class="score-item"
+        wx:for="{{subjects}}"
+        wx:key="key"
+        style="border-left: 6rpx solid {{item.color}};"
+      >
+        <view class="score-left">
+          <text class="score-icon">{{item.icon}}</text>
+          <view class="score-info">
             <text class="score-name">{{item.name}}</text>
+            <text class="score-desc">{{item.desc}}</text>
           </view>
-          <view class="score-right">
-            <input
-              class="score-input"
-              type="digit"
-              placeholder="0"
-              placeholder-class="placeholder"
-              value="{{item.score}}"
-              bindinput="onScoreInput"
-              data-index="{{index}}"
-              data-key="{{item.key}}"
-              maxlength="3"
-            />
-            <text class="score-max">/ {{item.max}}</text>
-          </view>
+        </view>
+        <view class="score-input-wrap">
+          <input
+            class="score-input"
+            type="number"
+            placeholder="{{item.placeholder}}"
+            placeholder-class="score-placeholder"
+            value="{{item.score}}"
+            data-idx="{{index}}"
+            bindinput="onScoreInput"
+          />
+          <text class="score-unit">分</text>
         </view>
       </view>
     </view>
 
-    <view class="btn-group">
-      <button class="btn-ghost" bindtap="prevStep">上一步</button>
-      <button class="btn-primary" bindtap="nextStep" disabled="{{!canNext}}">生成分析报告</button>
+    <!-- 总分和等级预览 -->
+    <view wx:if="{{totalScore > 0}}" class="score-summary">
+      <view class="summary-row">
+        <text class="summary-label">总分</text>
+        <text class="summary-value">{{totalScore}}</text>
+      </view>
+      <view class="summary-row">
+        <text class="summary-label">初始等级</text>
+        <text class="summary-level">Lv.{{startLevel}}</text>
+      </view>
+      <text class="summary-analysis">{{scoreAnalysis}}</text>
+    </view>
+
+    <view class="score-btn" bindtap="confirmScores">
+      <text class="btn-text">完成鉴定</text>
     </view>
   </view>
 
-  <!-- Step 3: Analysis -->
-  <view class="step-container" wx:if="{{step === 3 && analysis}}">
-    <!-- Total Score Card -->
-    <view class="card total-card">
-      <view class="total-label">总分</view>
-      <view class="total-score">{{analysis.total}}</view>
-      <view class="total-max">/ {{totalMax}} 分</view>
-      <view class="total-pct">
-        <text class="pct-num">{{analysis.totalPct}}%</text>
-        <text class="pct-label">综合得分率</text>
+  <!-- ========== Step 3: 完成 ========== -->
+  <view class="step-content" wx:if="{{step === 3}}">
+    <view class="complete-hero">
+      <view class="complete-portal">
+        <text class="portal-emoji">🌀</text>
+      </view>
+      <view class="complete-glow"></view>
+    </view>
+
+    <view class="complete-text">
+      <text class="complete-title">鉴定完成！</text>
+      <text class="complete-name">勇士 {{name}}</text>
+    </view>
+
+    <view class="complete-stats">
+      <view class="cs-item">
+        <text class="cs-label">初始等级</text>
+        <text class="cs-value">Lv.{{startLevel}}</text>
+      </view>
+      <view class="cs-item">
+        <text class="cs-label">总分</text>
+        <text class="cs-value">{{totalScore}}</text>
+      </view>
+      <view class="cs-item">
+        <text class="cs-label">起始装备</text>
+        <text class="cs-value">✏️🧥</text>
       </view>
     </view>
 
-    <!-- Weak subjects -->
-    <view class="card section-card weak-card" wx:if="{{analysis.weak.length > 0}}">
-      <view class="section-header weak-header">
-        <text class="section-icon">⚠️</text>
-        <text class="section-title">薄弱科目 — 重点突破</text>
-      </view>
-      <view class="subject-list">
-        <view class="subject-item" wx:for="{{analysis.weak}}" wx:key="key">
-          <view class="subject-top">
-            <text class="subject-icon">{{item.icon}}</text>
-            <text class="subject-name">{{item.name}}</text>
-            <text class="subject-score weak-text">{{item.score}} / {{item.max}}</text>
-            <text class="subject-pct weak-bg">{{item.pct}}%</text>
-          </view>
-          <view class="subject-suggestion">{{item.suggestion}}</view>
-        </view>
-      </view>
+    <view class="complete-msg">
+      <text>冒险之门已经打开，清华之巅在等待着你！</text>
     </view>
 
-    <!-- Strong subjects -->
-    <view class="card section-card strong-card" wx:if="{{analysis.strong.length > 0}}">
-      <view class="section-header strong-header">
-        <text class="section-icon">✅</text>
-        <text class="section-title">优势科目 — 继续保持</text>
-      </view>
-      <view class="subject-list">
-        <view class="subject-item" wx:for="{{analysis.strong}}" wx:key="key">
-          <view class="subject-top">
-            <text class="subject-icon">{{item.icon}}</text>
-            <text class="subject-name">{{item.name}}</text>
-            <text class="subject-score strong-text">{{item.score}} / {{item.max}}</text>
-            <text class="subject-pct strong-bg">{{item.pct}}%</text>
-          </view>
-          <view class="subject-suggestion">{{item.suggestion}}</view>
-        </view>
-      </view>
-    </view>
-
-    <!-- Stable subjects -->
-    <view class="card section-card stable-card" wx:if="{{analysis.stable.length > 0}}">
-      <view class="section-header stable-header">
-        <text class="section-icon">📈</text>
-        <text class="section-title">稳定科目 — 稳步提升</text>
-      </view>
-      <view class="subject-list">
-        <view class="subject-item" wx:for="{{analysis.stable}}" wx:key="key">
-          <view class="subject-top">
-            <text class="subject-icon">{{item.icon}}</text>
-            <text class="subject-name">{{item.name}}</text>
-            <text class="subject-score">{{item.score}} / {{item.max}}</text>
-            <text class="subject-pct stable-bg">{{item.pct}}%</text>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <!-- Summary plan -->
-    <view class="card plan-card">
-      <view class="plan-icon">🎓</view>
-      <view class="plan-title">你的专属学习计划</view>
-      <view class="plan-desc">
-        根据你的成绩，我们将在 {{analysis.weakCount}} 个薄弱科目上投入更多时间，
-        同时巩固 {{analysis.strongCount}} 个优势科目，
-        并稳步提升 {{analysis.stableCount}} 个稳定科目。
-      </view>
-      <view class="plan-highlight">系统将为你自动生成每日学习计划和阶段性目标。</view>
-    </view>
-
-    <view class="btn-group">
-      <button class="btn-ghost" bindtap="prevStep">返回修改</button>
-      <button class="btn-primary btn-lg btn-cta" bindtap="finishOnboarding">开始我的清华之路</button>
+    <view class="complete-btn" bindtap="enterWorld">
+      <text class="btn-text">踏入冒险世界</text>
+      <text class="btn-arrow">⚔️</text>
     </view>
   </view>
+
 </view>
