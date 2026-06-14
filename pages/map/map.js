@@ -1,6 +1,14 @@
 var game = require('../../utils/game');
 var cult = require('../../utils/cultivation');
 
+// Emoji Unicode strings (WXML不支持HTML实体)
+var EM_FIRE = '\uD83D\uDD25';       // 🔥
+var EM_CHECK = '\u2705';             // ✅
+var EM_TROPHY = '\uD83C\uDFC6';      // 🏆
+var EM_STAR = '\u2B50';              // ⭐
+var EM_FLEX = '\uD83D\uDCAA';        // 💪
+var EM_ARROW = '\u27A1\uFE0F';       // ➡️
+
 var SUBJECTS = [
   { id: 'math', name: '\u6570\u5B66', icon: '\uD83D\uDCD0' },
   { id: 'english', name: '\u82F1\u8BED', icon: '\uD83D\uDD24' },
@@ -39,7 +47,12 @@ Page({
     breakthroughInfo: null,
     showBreakthrough: false,
     // 日期
-    dateStr: ''
+    dateStr: '',
+    // Emoji (WXML不支持HTML实体)
+    emFire: EM_FIRE,
+    emCheck: EM_CHECK,
+    emArrow: EM_ARROW,
+    resultIcon: EM_TROPHY
   },
 
   onLoad: function() {
@@ -203,6 +216,11 @@ Page({
 
     var realmInfo = cult.getCurrentRealm(newXP);
 
+    var resultIcon = EM_TROPHY;
+    if (correct < total * 0.8) {
+      resultIcon = correct >= total * 0.5 ? EM_STAR : EM_FLEX;
+    }
+
     this.setData({
       state: 'result',
       todayDone: true,
@@ -211,7 +229,8 @@ Page({
       todayTotal: total,
       totalCultivation: newXP,
       realmInfo: realmInfo,
-      char: char
+      char: char,
+      resultIcon: resultIcon
     });
 
     if (breakthrough) {

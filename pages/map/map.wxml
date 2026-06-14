@@ -40,7 +40,7 @@
 
     <!-- 连续打卡 -->
     <view class="streak-row" wx:if="{{char.streakDays > 0}}">
-      <text class="streak-fire">&#128293;</text>
+      <text class="streak-fire">{{emFire}}</text>
       <text class="streak-text">连续修行 {{char.streakDays}} 天</text>
     </view>
 
@@ -68,7 +68,7 @@
     <!-- 今日已完成 -->
     <view class="done-section" wx:if="{{todayDone}}">
       <view class="done-card">
-        <text class="done-icon">&#9989;</text>
+        <text class="done-icon">{{emCheck}}</text>
         <text class="done-title">今日修行完成</text>
         <text class="done-detail">明天继续，道心坚定</text>
       </view>
@@ -120,7 +120,7 @@
   <!-- ===== 结果界面 (result) ===== -->
   <view class="result-view" wx:if="{{state === 'result'}}">
     <view class="result-card">
-      <text class="result-icon">{{todayCorrect >= todayTotal * 0.8 ? '&#127942;' : todayCorrect >= todayTotal * 0.5 ? '&#11088;' : '&#128170;'}}</text>
+      <text class="result-icon">{{resultIcon}}</text>
       <text class="result-title">修行完成</text>
 
       <view class="result-stats">
@@ -157,7 +157,7 @@
       <text class="bk-title">境界突破!</text>
       <text class="bk-icon">{{breakthroughInfo.newRealm.icon}}</text>
       <text class="bk-from">{{breakthroughInfo.from}}</text>
-      <text class="bk-arrow">&#10140;</text>
+      <text class="bk-arrow">{{emArrow}}</text>
       <text class="bk-to">{{breakthroughInfo.to}}</text>
       <text class="bk-desc">{{breakthroughInfo.newRealm.desc}}</text>
       <view class="bk-btn" bindtap="closeBreakthrough">
