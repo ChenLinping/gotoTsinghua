@@ -1,201 +1,117 @@
-<view class="page-bg">
-  <!-- 顶部角色卡片 -->
+<view class="page">
+
+  <!-- 角色卡片 -->
   <view class="hero-card">
-    <view class="hero-glow"></view>
+    <view class="hero-glow" style="background:radial-gradient(circle, {{realmInfo.realm.color}}44 0%, transparent 70%);"></view>
     <view class="hero-content">
-      <view class="avatar-wrap">
-        <text class="avatar-emoji">🧙</text>
-        <view class="rank-badge" style="background: {{rank.color}};">
-          <text class="rank-emoji">{{rank.emoji}}</text>
-        </view>
-      </view>
+      <text class="hero-icon">{{realmInfo.realm.icon}}</text>
       <view class="hero-info">
-        <text class="hero-name">{{char.name || '无名勇士'}}</text>
-        <view class="rank-title" style="color: {{rank.color}};">
-          <text>{{rank.name}}</text>
-          <text wx:if="{{nextRank}}" class="next-rank"> → {{nextRank.name}}</text>
+        <text class="hero-name">{{char.name || '修仙者'}}</text>
+        <text class="hero-realm" style="color:{{realmInfo.realm.color}};">{{realmInfo.realm.name}} {{realmInfo.stage.name}}</text>
+        <text class="hero-lv">Lv.{{realmInfo.realmIdx * 4 + realmInfo.stageIdx + 1}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 修行概览 -->
+  <view class="panel">
+    <view class="panel-title">
+      <text class="panel-icon">&#9968;</text>
+      <text>修行概览</text>
+    </view>
+    <view class="overview-grid">
+      <view class="overview-item">
+        <text class="ov-num">{{totalCultivation}}</text>
+        <text class="ov-label">总修为</text>
+      </view>
+      <view class="overview-item">
+        <text class="ov-num">{{cultDays}}</text>
+        <text class="ov-label">修行天数</text>
+      </view>
+      <view class="overview-item">
+        <text class="ov-num">{{daysLeft}}</text>
+        <text class="ov-label">距高考(天)</text>
+      </view>
+      <view class="overview-item highlight">
+        <text class="ov-num fire-color">{{streakDays}}</text>
+        <text class="ov-label">连续打卡</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 答题统计 -->
+  <view class="panel">
+    <view class="panel-title">
+      <text class="panel-icon">&#128202;</text>
+      <text>答题统计</text>
+    </view>
+
+    <view class="answer-summary">
+      <view class="answer-big">
+        <text class="answer-rate">{{correctRate}}%</text>
+        <text class="answer-rate-label">正确率</text>
+      </view>
+      <view class="answer-detail">
+        <view class="ad-row">
+          <text class="ad-dot correct-dot"></text>
+          <text class="ad-text">答对</text>
+          <text class="ad-num">{{correctCount}}</text>
         </view>
-        <view class="level-row">
-          <text class="level-label">Lv.{{char.level}}</text>
-          <view class="xp-bar-wrap">
-            <view class="xp-bar" style="width: {{xpPercent}}%;"></view>
-          </view>
-          <text class="xp-text">{{xpCurrent}}/{{xpNeeded}}</text>
+        <view class="ad-row">
+          <text class="ad-dot wrong-dot"></text>
+          <text class="ad-text">答错</text>
+          <text class="ad-num">{{wrongCount}}</text>
+        </view>
+        <view class="ad-row">
+          <text class="ad-dot total-dot"></text>
+          <text class="ad-text">总计</text>
+          <text class="ad-num">{{totalAnswers}}</text>
         </view>
       </view>
     </view>
   </view>
 
-  <!-- 属性面板 -->
-  <view class="panel stat-panel">
+  <!-- 科目分布 -->
+  <view class="panel">
     <view class="panel-title">
-      <text class="panel-icon">⚔️</text>
-      <text>战斗属性</text>
+      <text class="panel-icon">&#128218;</text>
+      <text>科目分布</text>
     </view>
-
-    <!-- HP 条 -->
-    <view class="stat-row hp-row">
-      <text class="stat-label">❤️ HP</text>
-      <view class="hp-bar-outer">
-        <view class="hp-bar-inner {{hpPercent < 30 ? 'hp-low' : hpPercent < 60 ? 'hp-mid' : 'hp-high'}}" style="width: {{hpPercent}}%;"></view>
-      </view>
-      <text class="stat-value">{{char.hp}} / {{stats.maxHP}}</text>
-    </view>
-
-    <!-- ATK / DEF / Crit -->
-    <view class="stat-grid">
-      <view class="stat-box">
-        <text class="stat-icon">🗡️</text>
-        <text class="stat-num">{{stats.atk}}</text>
-        <text class="stat-name">攻击力</text>
-      </view>
-      <view class="stat-box">
-        <text class="stat-icon">🛡️</text>
-        <text class="stat-num">{{stats.def}}</text>
-        <text class="stat-name">防御力</text>
-      </view>
-      <view class="stat-box">
-        <text class="stat-icon">💥</text>
-        <text class="stat-num">{{stats.critRate * 100}}%</text>
-        <text class="stat-name">暴击率</text>
-      </view>
-      <view class="stat-box">
-        <text class="stat-icon">💎</text>
-        <text class="stat-num">x{{stats.critDmg}}</text>
-        <text class="stat-name">暴击伤害</text>
-      </view>
-    </view>
-
-    <!-- XP 加成 -->
-    <view wx:if="{{stats.xpBoost > 1}}" class="bonus-row">
-      <text class="bonus-icon">✨</text>
-      <text class="bonus-text">经验加成: +{{(stats.xpBoost - 1) * 100}}%</text>
-    </view>
-  </view>
-
-  <!-- 装备面板 -->
-  <view class="panel equip-panel">
-    <view class="panel-title">
-      <text class="panel-icon">🎒</text>
-      <text>装备栏</text>
-    </view>
-
-    <view class="equip-slots">
-      <!-- 武器 -->
-      <view class="equip-slot" style="border-color: {{weapon ? weapon.rarityColor : '#475569'}};">
-        <text class="slot-type">武器</text>
-        <block wx:if="{{weapon}}">
-          <text class="slot-emoji">{{weapon.emoji}}</text>
-          <text class="slot-name">{{weapon.name}}</text>
-          <text class="slot-stat" style="color: {{weapon.rarityColor}};">+{{weapon.atk}} ATK</text>
-          <text class="slot-rarity" style="background: {{weapon.rarityColor}};">{{weapon.rarityName}}</text>
-        </block>
-        <block wx:else>
-          <text class="slot-empty">空</text>
-        </block>
-      </view>
-
-      <!-- 防具 -->
-      <view class="equip-slot" style="border-color: {{armor ? armor.rarityColor : '#475569'}};">
-        <text class="slot-type">防具</text>
-        <block wx:if="{{armor}}">
-          <text class="slot-emoji">{{armor.emoji}}</text>
-          <text class="slot-name">{{armor.name}}</text>
-          <text class="slot-stat" style="color: {{armor.rarityColor}};">+{{armor.def}} DEF</text>
-          <text class="slot-rarity" style="background: {{armor.rarityColor}};">{{armor.rarityName}}</text>
-        </block>
-        <block wx:else>
-          <text class="slot-empty">空</text>
-        </block>
-      </view>
-
-      <!-- 饰品 -->
-      <view class="equip-slot" style="border-color: {{accessory ? accessory.rarityColor : '#475569'}};">
-        <text class="slot-type">饰品</text>
-        <block wx:if="{{accessory}}">
-          <text class="slot-emoji">{{accessory.emoji}}</text>
-          <text class="slot-name">{{accessory.name}}</text>
-          <text class="slot-stat" style="color: {{accessory.rarityColor}};">{{accessory.desc}}</text>
-          <text class="slot-rarity" style="background: {{accessory.rarityColor}};">{{accessory.rarityName}}</text>
-        </block>
-        <block wx:else>
-          <text class="slot-empty">空</text>
-        </block>
-      </view>
-    </view>
-  </view>
-
-  <!-- 成就面板 -->
-  <view class="panel achieve-panel">
-    <view class="panel-title">
-      <text class="panel-icon">🏅</text>
-      <text>成就 ({{unlockedCount}}/{{totalCount}})</text>
-    </view>
-
-    <view class="achieve-grid">
-      <view class="achieve-item {{item.unlocked ? 'unlocked' : 'locked'}}" wx:for="{{achievements}}" wx:key="id">
-        <text class="achieve-emoji">{{item.emoji}}</text>
-        <text class="achieve-name">{{item.name}}</text>
-        <text class="achieve-desc">{{item.desc}}</text>
-        <view wx:if="{{!item.unlocked}}" class="achieve-lock">🔒</view>
-      </view>
-    </view>
-  </view>
-
-  <!-- 战绩统计 -->
-  <view class="panel record-panel">
-    <view class="panel-title">
-      <text class="panel-icon">📊</text>
-      <text>战绩统计</text>
-    </view>
-
-    <view class="record-grid">
-      <view class="record-box">
-        <text class="record-num">{{totalKills}}</text>
-        <text class="record-label">击杀总数</text>
-      </view>
-      <view class="record-box boss">
-        <text class="record-num">{{bossKills}}</text>
-        <text class="record-label">Boss击杀</text>
-      </view>
-      <view class="record-box">
-        <text class="record-num">{{correctRate}}%</text>
-        <text class="record-label">正确率</text>
-      </view>
-      <view class="record-box">
-        <text class="record-num">{{streakDays}}</text>
-        <text class="record-label">连续天数 🔥</text>
-      </view>
-    </view>
-
-    <!-- 答题详情 -->
-    <view class="answer-row">
-      <view class="answer-correct">
-        <text class="answer-num">{{totalCorrect}}</text>
-        <text class="answer-label">答对</text>
-      </view>
-      <view class="answer-divider"></view>
-      <view class="answer-wrong">
-        <text class="answer-num">{{totalWrong}}</text>
-        <text class="answer-label">答错</text>
-      </view>
-    </view>
-
-    <!-- 各科目击杀 -->
-    <view class="subject-kills">
-      <text class="subject-title">各科目击杀数</text>
-      <view class="subject-list">
-        <view class="subject-item" wx:for="{{killStats}}" wx:key="subject">
-          <text class="subject-name">{{item.name}}</text>
-          <view class="subject-bar-wrap">
-            <view class="subject-bar" style="width: {{item.count > 0 ? (item.count / 50 * 100) : 0}}%; min-width: {{item.count > 0 ? '8rpx' : '0'}};"></view>
-          </view>
-          <text class="subject-count">{{item.count}}</text>
+    <view class="subject-list">
+      <view class="subject-row" wx:for="{{subjectStats}}" wx:key="key">
+        <text class="subj-name">{{item.name}}</text>
+        <view class="subj-bar-wrap">
+          <view class="subj-bar" style="width:{{item.count > 0 ? (item.count / maxSubjectCount * 100) : 0}}%; min-width:{{item.count > 0 ? '6px' : '0'}};"></view>
         </view>
+        <text class="subj-count">{{item.count}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 境界历程 -->
+  <view class="panel">
+    <view class="panel-title">
+      <text class="panel-icon">&#127793;</text>
+      <text>境界历程</text>
+    </view>
+    <view class="realm-timeline">
+      <view class="tl-track">
+        <view class="tl-line-bg">
+          <view class="tl-line-fill" style="width:{{realmIdx / 4 * 100}}%;"></view>
+        </view>
+        <view wx:for="{{realms}}" wx:key="name"
+          class="tl-node {{index < realmIdx ? 'tl-done' : index === realmIdx ? 'tl-cur' : 'tl-lock'}}"
+          style="{{index === realmIdx ? 'border-color:' + item.color : index < realmIdx ? 'border-color:#4ade80; background:#4ade80;' : ''}}">
+          <text class="tl-icon">{{item.icon}}</text>
+        </view>
+      </view>
+      <view class="tl-labels">
+        <text wx:for="{{realms}}" wx:key="name" class="tl-label {{index === realmIdx ? 'tl-label-cur' : index < realmIdx ? 'tl-label-done' : ''}}">{{item.name}}</text>
       </view>
     </view>
   </view>
 
   <!-- 底部留白 -->
-  <view style="height: 60rpx;"></view>
+  <view style="height:80px;"></view>
+
 </view>

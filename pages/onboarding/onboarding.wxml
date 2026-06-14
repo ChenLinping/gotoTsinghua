@@ -6,7 +6,7 @@
       <view wx:if="{{step > 0 && step < 3}}" class="nav-back" bindtap="goBack">
         <text>← 返回</text>
       </view>
-      <text class="nav-title">{{step === 0 ? '开始冒险' : step === 1 ? '创建角色' : step === 2 ? '属性鉴定' : '准备就绪'}}</text>
+      <text class="nav-title">{{step === 0 ? '开始修行' : step === 1 ? '创建角色' : step === 2 ? '灵根鉴定' : '准备就绪'}}</text>
       <view class="nav-spacer" wx:if="{{step > 0 && step < 3}}"></view>
     </view>
   </view>
@@ -31,46 +31,46 @@
 
     <view class="welcome-text">
       <text class="welcome-title">走向清华</text>
-      <text class="welcome-subtitle">冒险之旅</text>
+      <text class="welcome-subtitle">修仙之路</text>
     </view>
 
     <view class="welcome-desc">
-      <text class="desc-text">将高考备考变成一场RPG冒险</text>
+      <text class="desc-text">将高考备考变成一段修仙修行的旅程</text>
     </view>
 
     <view class="feature-list">
       <view class="feature-item">
-        <text class="feature-icon">⚔️</text>
+        <text class="feature-icon">&#127793;</text>
         <view class="feature-info">
-          <text class="feature-name">打怪升级</text>
-          <text class="feature-desc">答对题目，击败知识怪物</text>
+          <text class="feature-name">修仙境界</text>
+          <text class="feature-desc">从练气期到化神境大圆满</text>
         </view>
       </view>
       <view class="feature-item">
-        <text class="feature-icon">🧠</text>
+        <text class="feature-icon">&#129504;</text>
         <view class="feature-info">
-          <text class="feature-name">智能出题</text>
-          <text class="feature-desc">2026新高考风格题库</text>
+          <text class="feature-name">每日修行</text>
+          <text class="feature-desc">答题积累修为，突破境界</text>
         </view>
       </view>
       <view class="feature-item">
-        <text class="feature-icon">🎒</text>
+        <text class="feature-icon">&#128218;</text>
         <view class="feature-info">
-          <text class="feature-name">装备收集</text>
-          <text class="feature-desc">学习文具变身神兵利器</text>
+          <text class="feature-name">六科修炼</text>
+          <text class="feature-desc">数英物化生语全面提升</text>
         </view>
       </view>
       <view class="feature-item">
-        <text class="feature-icon">🗺️</text>
+        <text class="feature-icon">&#127942;</text>
         <view class="feature-info">
-          <text class="feature-name">五大地图</text>
-          <text class="feature-desc">从启程之谷到清华之巅</text>
+          <text class="feature-name">圆梦清华</text>
+          <text class="feature-desc">高考前一天达成化神大圆满</text>
         </view>
       </view>
     </view>
 
     <view class="welcome-btn" bindtap="startAdventure">
-      <text class="btn-text">开始冒险</text>
+      <text class="btn-text">开始修行</text>
       <text class="btn-arrow">→</text>
     </view>
   </view>
@@ -82,8 +82,8 @@
     </view>
 
     <view class="name-prompt">
-      <text class="prompt-title">你叫什么名字，勇士？</text>
-      <text class="prompt-desc">这个名字将伴随你的冒险之旅</text>
+      <text class="prompt-title">你叫什么名字，修仙者？</text>
+      <text class="prompt-desc">这个名字将伴随你的修行之路</text>
     </view>
 
     <view class="name-input-wrap">
@@ -112,8 +112,8 @@
   <view class="step-content" wx:if="{{step === 2}}">
     <view class="score-header">
       <text class="score-header-emoji">🔮</text>
-      <text class="score-header-title">初始属性鉴定</text>
-      <text class="score-header-desc">输入你最近一次考试各科成绩，系统将评估你的初始属性</text>
+      <text class="score-header-title">灵根鉴定</text>
+      <text class="score-header-desc">输入你最近一次考试各科成绩，系统将评估你的初始灵根</text>
     </view>
 
     <view class="score-list">
@@ -152,8 +152,8 @@
         <text class="summary-value">{{totalScore}}</text>
       </view>
       <view class="summary-row">
-        <text class="summary-label">初始等级</text>
-        <text class="summary-level">Lv.{{startLevel}}</text>
+        <text class="summary-label">初始境界</text>
+        <text class="summary-level">练气初期</text>
       </view>
       <text class="summary-analysis">{{scoreAnalysis}}</text>
     </view>
@@ -174,31 +174,31 @@
 
     <view class="complete-text">
       <text class="complete-title">鉴定完成！</text>
-      <text class="complete-name">勇士 {{name}}</text>
+      <text class="complete-name">修仙者 {{name}}</text>
     </view>
 
     <view class="complete-stats">
       <view class="cs-item">
-        <text class="cs-label">初始等级</text>
-        <text class="cs-value">Lv.{{startLevel}}</text>
+        <text class="cs-label">初始境界</text>
+        <text class="cs-value">练气初期</text>
       </view>
       <view class="cs-item">
         <text class="cs-label">总分</text>
         <text class="cs-value">{{totalScore}}</text>
       </view>
       <view class="cs-item">
-        <text class="cs-label">起始装备</text>
-        <text class="cs-value">✏️🧥</text>
+        <text class="cs-label">目标</text>
+        <text class="cs-value">化神大圆满</text>
       </view>
     </view>
 
     <view class="complete-msg">
-      <text>冒险之门已经打开，清华之巅在等待着你！</text>
+      <text>修仙之路已经开启，清华之巅在等待着你！</text>
     </view>
 
     <view class="complete-btn" bindtap="enterWorld">
-      <text class="btn-text">踏入冒险世界</text>
-      <text class="btn-arrow">⚔️</text>
+      <text class="btn-text">踏入修行之路</text>
+      <text class="btn-arrow">&#127793;</text>
     </view>
   </view>
 

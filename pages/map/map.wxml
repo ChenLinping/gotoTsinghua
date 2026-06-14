@@ -1,248 +1,167 @@
-<view class="page">
+<view class="page" style="background:{{realmInfo.realm.bg}};">
 
-  <!-- ===== 游戏世界（相机跟随） ===== -->
-  <view class="world {{forgeTransition ? 'world-slowmo' : ''}}" style="transform:translate({{-camX}}px,{{-camY}}px);">
-    <!-- 地图背景 -->
-    <view class="world-bg mc-bg-{{selectedRegionId}}"></view>
+  <!-- ===== 境界主页 (idle) ===== -->
+  <view class="main-view" wx:if="{{state === 'idle'}}">
 
-    <!-- 地面网格 -->
-    <view class="world-grid">
-      <view wx:for="{{gridRows}}" wx:key="index" class="grid-row">
-        <view wx:for="{{item}}" wx:key="index" class="grid-cell gc-{{item}}"></view>
+    <!-- 顶栏 -->
+    <view class="top-bar">
+      <text class="top-date">{{dateStr}}</text>
+      <view class="top-countdown">
+        <text class="cd-num">{{daysLeft}}</text>
+        <text class="cd-label">天后高考</text>
       </view>
     </view>
 
-    <!-- 装饰物 -->
-    <view class="deco deco-cloud" style="left:200px;top:80px;">{{emCloud}}</view>
-    <view class="deco deco-cloud" style="left:1200px;top:60px;">{{emCloud}}</view>
-    <view class="deco deco-cloud" style="left:2200px;top:100px;">{{emCloud}}</view>
-    <view class="deco deco-tree" style="left:100px;top:400px;">{{emTree1}}</view>
-    <view class="deco deco-tree" style="left:2800px;top:800px;">{{emTree1}}</view>
-    <view class="deco deco-tree" style="left:150px;top:1500px;">{{emTree2}}</view>
-    <view class="deco deco-tree" style="left:2700px;top:2000px;">{{emTree1}}</view>
-    <view class="deco deco-tree" style="left:500px;top:2800px;">{{emDiamond}}</view>
-    <view class="deco deco-tree" style="left:2500px;top:2700px;">{{emDiamond}}</view>
-
-    <!-- 伤害飘字 -->
-    <view wx:for="{{dmgNumbers}}" wx:key="id"
-      class="dmg-float {{item.isPlayer ? 'dmg-player' : 'dmg-monster'}}"
-      style="left:{{item.x}}px;top:{{item.y}}px;">
-      <text>-{{item.value}}</text>
+    <!-- 修行天数 -->
+    <view class="cult-days">
+      <text>修行第 {{cultDays}} 天</text>
+      <text class="cult-lv">Lv.{{level}}</text>
     </view>
 
-    <!-- 怪物 -->
-    <view wx:for="{{monsters}}" wx:key="id"
-      class="mob {{item.alive ? 'mob-alive' : 'mob-dead'}} {{!item.unlocked ? 'mob-locked' : ''}} {{item.isBoss ? 'mob-boss' : ''}} {{item.isElite ? 'mob-elite' : ''}} {{item.aiState === 'chase' ? 'mob-chase' : ''}}"
-      style="left:{{item.px}}px;top:{{item.py}}px;">
-      <!-- 怪物飞刀环绕 -->
-      <view class="mob-knife-orbit" wx:if="{{item.alive && item.knives > 0}}">
-        <view wx:for="{{8}}" wx:for-item="k" wx:for-index="ki" wx:key="ki"
-          class="mob-knife-item"
-          wx:if="{{ki < (item.knives > 8 ? 8 : item.knives)}}"
-          style="transform:rotate({{item.knifeAngle + (ki * (360 / (item.knives > 8 ? 8 : item.knives)))}}deg) translateX({{item.isBoss ? 50 : item.isElite ? 42 : 35}}px) rotate({{-(item.knifeAngle + (ki * (360 / (item.knives > 8 ? 8 : item.knives))))}}deg);">
-          <text class="mob-knife-emoji">{{emKnife}}</text>
-        </view>
+    <!-- 境界面板 -->
+    <view class="realm-panel">
+      <view class="realm-glow" style="background:radial-gradient(circle, {{realmInfo.realm.color}}33 0%, transparent 70%);"></view>
+      <text class="realm-icon">{{realmInfo.realm.icon}}</text>
+      <text class="realm-name">{{realmInfo.realm.name}}</text>
+      <text class="realm-stage">{{realmInfo.stage.name}}</text>
+      <text class="realm-desc">{{realmInfo.realm.desc}}</text>
+    </view>
+
+    <!-- 进度条 -->
+    <view class="progress-section">
+      <view class="progress-bar">
+        <view class="progress-fill" style="width:{{realmInfo.progress * 100}}%; background:{{realmInfo.realm.color}};"></view>
       </view>
-      <view class="mob-body">
-        <view class="mob-head">
-          <text wx:if="{{!item.alive}}" class="mob-face">+</text>
-          <text wx:elif="{{item.isBoss}}" class="mob-face">B</text>
-          <text wx:elif="{{item.isElite}}" class="mob-face">E</text>
-          <text wx:elif="{{!item.unlocked}}" class="mob-face">?</text>
-          <text wx:else class="mob-face">{{item.emoji}}</text>
-        </view>
-        <view class="mob-legs">
-          <view class="mob-leg"></view>
-          <view class="mob-leg"></view>
-        </view>
-        <!-- 飞刀数量 + HP条 -->
-        <view class="mob-info" wx:if="{{item.alive && item.unlocked}}">
-          <text class="mob-name">{{item.name}}</text>
-          <view class="mob-knife-bar">
-            <view class="mob-knife-fill" style="width:{{(item.knives/item.maxKnives)*100}}%"></view>
-          </view>
-          <text class="mob-knife-count">{{emKnife}}{{item.knives}}</text>
-        </view>
+      <view class="progress-info">
+        <text class="prog-current">{{totalCultivation}} 修为</text>
+        <text class="prog-next">{{realmInfo.isMax ? '大圆满' : realmInfo.nextThreshold + ' 突破'}}</text>
       </view>
     </view>
 
-    <!-- 玩家角色 + 法宝环绕 + Buff光环 -->
-    <view class="player" style="left:{{playerX}}px;top:{{playerY}}px;">
-      <!-- 护盾光环 -->
-      <view class="shield-aura" wx:if="{{forgeShieldFrames > 0}}"></view>
+    <!-- 连续打卡 -->
+    <view class="streak-row" wx:if="{{char.streakDays > 0}}">
+      <text class="streak-fire">&#128293;</text>
+      <text class="streak-text">连续修行 {{char.streakDays}} 天</text>
+    </view>
 
-      <!-- Buff光环 (火焰/金甲/吸血等) -->
-      <view wx:for="{{buffList}}" wx:key="id"
-        class="buff-aura buff-aura-{{item.id}}">
-      </view>
+    <!-- 每日修行入口 -->
+    <view class="practice-section" wx:if="{{!todayDone}}">
+      <text class="section-title">每日修行</text>
+      <text class="section-sub">选择科目，答题获得修为</text>
 
-      <!-- 法宝环绕圈 -->
-      <view class="treasure-orbit" wx:if="{{treasures.length > 0}}">
-        <view wx:for="{{treasures}}" wx:key="index"
-          class="treasure-item {{buffs[0] === 'fire' ? 'treasure-fire' : ''}}"
-          style="transform:rotate({{treasureAngle + (index * (360 / treasures.length))}}deg) translateX(55px) rotate({{-(treasureAngle + (index * (360 / treasures.length)))}}deg);">
-          <text class="treasure-emoji">{{item.emoji}}</text>
+      <!-- 科目选择 -->
+      <view class="subject-grid">
+        <view wx:for="{{subjects}}" wx:key="id"
+          class="subject-btn {{selectedSubject === item.id ? 'subject-active' : ''}}"
+          data-id="{{item.id}}" bindtap="selectSubject"
+          style="{{selectedSubject === item.id ? 'border-color:' + realmInfo.realm.color : ''}}">
+          <text class="subj-icon">{{item.icon}}</text>
+          <text class="subj-name">{{item.name}}</text>
         </view>
       </view>
 
-      <!-- 玩家身体 -->
-      <view class="steve {{playerMoving ? 'steve-walk' : ''}}">
-        <view class="steve-head-box">
-          <text class="steve-face">A</text>
-        </view>
-        <view class="steve-body-box">
-          <view class="steve-arm-l"></view>
-          <view class="steve-torso"></view>
-          <view class="steve-arm-r"></view>
-        </view>
-        <view class="steve-legs-box">
-          <view class="steve-leg-l"></view>
-          <view class="steve-leg-r"></view>
-        </view>
+      <view class="start-btn {{selectedSubject ? 'start-ready' : ''}}" bindtap="startPractice">
+        <text>开始修行</text>
       </view>
-      <view class="player-shadow"></view>
     </view>
-  </view>
 
-  <!-- ===== 慢动作过渡层 ===== -->
-  <view class="slowmo-overlay" wx:if="{{forgeTransition}}">
-    <view class="slowmo-vignette"></view>
-    <view class="slowmo-text {{showForgeText ? 'slowmo-text-show' : ''}}">
-      <text>飞刀耗尽!</text>
-    </view>
-  </view>
-
-  <!-- ===== 红屏闪烁 ===== -->
-  <view class="hit-flash" wx:if="{{hitFlash}}"></view>
-
-  <!-- ===== 菜单按钮 ===== -->
-  <view class="menu-btn" bindtap="toggleMenu">
-    <text>{{showMenu ? 'X' : '='}}</text>
-  </view>
-  <view class="menu-dropdown" wx:if="{{showMenu}}">
-    <view class="menu-item" bindtap="goCharacter">
-      <text>{{emCloud}} 角色</text>
-    </view>
-    <view class="menu-item" bindtap="goTreasury">
-      <text>{{emDiamond}} 宝库</text>
-    </view>
-  </view>
-
-  <!-- ===== HUD（屏幕固定） ===== -->
-  <view class="hud-bar">
-    <text class="hud-lv">Lv.{{char.level}}</text>
-    <text class="hud-rank">{{rank.current.emoji}}</text>
-    <view class="hud-hp-wrap">
-      <view class="hud-hp-fill {{char.hp < char.maxHP * 0.3 ? 'hp-low' : ''}}" style="width:{{(char.hp/char.maxHP)*100}}%"></view>
-    </view>
-    <text class="hud-hp-text">{{char.hp}}/{{char.maxHP}}</text>
-    <text class="hud-coin">$ {{char.coins}}</text>
-  </view>
-
-  <!-- 飞刀弹药显示 -->
-  <view class="knife-hud">
-    <text class="knife-icon">{{emKnife}}</text>
-    <text class="knife-count">{{treasures.length}}</text>
-  </view>
-
-  <!-- Buff图标栏 -->
-  <view class="buff-hud" wx:if="{{buffList.length > 0}}">
-    <view wx:for="{{buffList}}" wx:key="id" class="buff-icon buff-icon-{{item.id}}">
-      <text class="buff-emoji">{{item.emoji}}</text>
-    </view>
-  </view>
-
-  <!-- 区域选择 -->
-  <view class="region-pill" bindtap="toggleRegionMenu" wx:if="{{selectedRegion}}">
-    <text>{{selectedRegion.icon}} {{selectedRegion.name}}</text>
-    <text class="pill-arrow">{{showRegionMenu ? '^' : 'v'}}</text>
-  </view>
-  <view class="region-dropdown" wx:if="{{showRegionMenu}}">
-    <view wx:for="{{regions}}" wx:key="id"
-      class="dd-item {{selectedRegionId === item.id ? 'dd-active' : ''}} {{!item.unlocked ? 'dd-locked' : ''}}"
-      data-id="{{item.id}}" bindtap="selectRegion">
-      <text>{{item.icon}} {{item.name}}</text>
-      <text wx:if="{{!item.unlocked}}" class="dd-lock">Lv.{{item.unlockLevel}}</text>
-    </view>
-  </view>
-
-  <!-- 每日宝箱 -->
-  <view class="chest-float" bindtap="openChest" wx:if="{{showChest}}">
-    <text class="chest-emoji">+</text>
-  </view>
-
-  <!-- 虚拟摇杆 -->
-  <view class="joystick-zone"
-    catchtouchstart="onJoyTouchStart"
-    catchtouchmove="onJoyTouchMove"
-    catchtouchend="onJoyTouchEnd">
-    <view class="joystick-base">
-      <view class="joystick-knob" style="transform:translate({{joyKnobX}}px,{{joyKnobY}}px);"></view>
-    </view>
-  </view>
-
-  <!-- 提示文字 -->
-  <view class="hint-bar" wx:if="{{showHint && state === 'exploring'}}">
-    <text>靠近怪物战斗！飞刀用完自动炼宝补充</text>
-  </view>
-
-  <!-- ===== 炼宝面板 (5道题) ===== -->
-  <view class="forge-overlay" wx:if="{{state === 'forging'}}">
-    <view class="forge-bg"></view>
-    <view class="forge-panel">
-      <!-- 标题 -->
-      <view class="forge-header">
-        <text class="forge-title">* 炼宝炉 *</text>
-        <text class="forge-sub">飞刀耗尽！答题铸造新飞刀 + 永久强化</text>
+    <!-- 今日已完成 -->
+    <view class="done-section" wx:if="{{todayDone}}">
+      <view class="done-card">
+        <text class="done-icon">&#9989;</text>
+        <text class="done-title">今日修行完成</text>
+        <text class="done-detail">明天继续，道心坚定</text>
       </view>
+    </view>
 
-      <!-- 进度 -->
-      <view class="forge-progress">
-        <text class="forge-counter">第 {{forgeIdx + 1}} / {{forgeQuestions.length}} 题</text>
-        <view class="forge-dots">
-          <view wx:for="{{forgeResults}}" wx:key="index"
-            class="forge-dot {{item === 'correct' ? 'dot-ok' : item === 'wrong' ? 'dot-no' : forgeIdx === index ? 'dot-cur' : ''}}"></view>
+    <!-- 境界总览(底部) -->
+    <view class="realm-timeline">
+      <view wx:for="{{5}}" wx:for-item="r" wx:for-index="ri" wx:key="ri"
+        class="tl-dot {{ri < realmInfo.realmIdx ? 'tl-done' : ri === realmInfo.realmIdx ? 'tl-cur' : 'tl-lock'}}">
+      </view>
+      <view class="tl-line">
+        <view class="tl-line-fill" style="width:{{(realmInfo.realmIdx / 4) * 100}}%;"></view>
+      </view>
+    </view>
+
+  </view>
+
+  <!-- ===== 答题界面 (practice) ===== -->
+  <view class="practice-view" wx:if="{{state === 'practice'}}">
+    <view class="practice-header">
+      <text class="prac-counter">第 {{qIdx + 1}} / {{questions.length}} 题</text>
+      <view class="prac-dots">
+        <view wx:for="{{results}}" wx:key="index"
+          class="prac-dot {{item === 'correct' ? 'dot-ok' : item === 'wrong' ? 'dot-no' : qIdx === index ? 'dot-cur' : ''}}"></view>
+      </view>
+    </view>
+
+    <view class="practice-body" wx:if="{{questions[qIdx]}}">
+      <text class="prac-q">{{questions[qIdx].q}}</text>
+
+      <view class="prac-options">
+        <view wx:for="{{questions[qIdx].options}}" wx:key="index"
+          class="prac-opt {{showResult && results[qIdx] === 'correct' && index === questions[qIdx].answer ? 'opt-correct' : ''}} {{showResult && selectedOption === index && results[qIdx] === 'wrong' ? 'opt-wrong' : ''}}"
+          data-index="{{index}}" bindtap="selectOption">
+          <text class="prac-opt-label">{{index === 0 ? 'A' : index === 1 ? 'B' : index === 2 ? 'C' : 'D'}}</text>
+          <text class="prac-opt-text">{{item}}</text>
         </view>
       </view>
 
-      <!-- 当前题目 -->
-      <view class="forge-question" wx:if="{{forgeQuestions[forgeIdx]}}">
-        <text class="forge-q-text">{{forgeQuestions[forgeIdx].q}}</text>
-      </view>
-
-      <!-- 选项 -->
-      <view class="forge-options">
-        <view wx:for="{{forgeQuestions[forgeIdx].options}}" wx:key="index"
-          class="forge-opt {{forgeShowResult && forgeResults[forgeIdx] === 'correct' && index === forgeQuestions[forgeIdx].answer ? 'opt-correct' : ''}} {{forgeShowResult && forgeSelectedOption === index && forgeResults[forgeIdx] === 'wrong' ? 'opt-wrong' : ''}}"
-          data-index="{{index}}" bindtap="selectForgeOption">
-          <text class="opt-label">{{index === 0 ? 'A' : index === 1 ? 'B' : index === 2 ? 'C' : 'D'}}</text>
-          <text class="opt-text">{{item}}</text>
-        </view>
-      </view>
-
-      <!-- 解析 -->
-      <view class="forge-explain" wx:if="{{forgeShowResult}}">
-        <text class="{{forgeResults[forgeIdx] === 'correct' ? 'explain-ok' : 'explain-fail'}}">{{forgeResults[forgeIdx] === 'correct' ? '正确！飞刀+1' : '错误，继续加油！'}}</text>
-        <text class="explain-detail">{{forgeQuestions[forgeIdx].explain}}</text>
-      </view>
-
-      <!-- 护盾倒计时 -->
-      <view class="forge-shield-bar">
-        <view class="forge-shield-fill" style="width:{{(forgeShieldFrames / 300) * 100}}%"></view>
+      <view class="prac-explain" wx:if="{{showResult}}">
+        <text class="{{results[qIdx] === 'correct' ? 'explain-ok' : 'explain-fail'}}">
+          {{results[qIdx] === 'correct' ? '正确! +3修为' : '答错了，继续加油'}}
+        </text>
+        <text class="explain-detail">{{questions[qIdx].explain}}</text>
       </view>
     </view>
   </view>
 
-  <!-- ===== 武器掉落 ===== -->
-  <view class="drop-overlay" wx:if="{{showWeaponDrop}}">
-    <view class="drop-bg"></view>
-    <view class="drop-panel">
-      <text class="drop-title">* 区域通关! *</text>
-      <text class="drop-weapon-emoji">{{dropWeapon.emoji}}</text>
-      <text class="drop-weapon-name">{{dropWeapon.name}}</text>
-      <text class="drop-weapon-desc">{{dropWeapon.desc}}</text>
-      <view class="drop-btn" bindtap="confirmWeaponDrop">
-        <text>装备!</text>
+  <!-- ===== 结果界面 (result) ===== -->
+  <view class="result-view" wx:if="{{state === 'result'}}">
+    <view class="result-card">
+      <text class="result-icon">{{todayCorrect >= todayTotal * 0.8 ? '&#127942;' : todayCorrect >= todayTotal * 0.5 ? '&#11088;' : '&#128170;'}}</text>
+      <text class="result-title">修行完成</text>
+
+      <view class="result-stats">
+        <view class="stat-row">
+          <text class="stat-label">答对</text>
+          <text class="stat-value">{{todayCorrect}} / {{todayTotal}}</text>
+        </view>
+        <view class="stat-row">
+          <text class="stat-label">获得修为</text>
+          <text class="stat-value stat-xp">+{{todayXP}}</text>
+        </view>
+        <view class="stat-row" wx:if="{{todayCorrect === todayTotal}}">
+          <text class="stat-label">全对奖励</text>
+          <text class="stat-value stat-perfect">+10 修为</text>
+        </view>
+      </view>
+
+      <!-- 更新后境界 -->
+      <view class="result-realm">
+        <text class="rr-icon">{{realmInfo.realm.icon}}</text>
+        <text class="rr-name">{{realmInfo.realm.name}} {{realmInfo.stage.name}}</text>
+      </view>
+
+      <view class="result-btn" bindtap="backToIdle">
+        <text>继续修行</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 突破弹窗 ===== -->
+  <view class="bk-overlay" wx:if="{{showBreakthrough}}">
+    <view class="bk-bg" bindtap="closeBreakthrough"></view>
+    <view class="bk-panel">
+      <text class="bk-title">境界突破!</text>
+      <text class="bk-icon">{{breakthroughInfo.newRealm.icon}}</text>
+      <text class="bk-from">{{breakthroughInfo.from}}</text>
+      <text class="bk-arrow">&#10140;</text>
+      <text class="bk-to">{{breakthroughInfo.to}}</text>
+      <text class="bk-desc">{{breakthroughInfo.newRealm.desc}}</text>
+      <view class="bk-btn" bindtap="closeBreakthrough">
+        <text>太好了!</text>
       </view>
     </view>
   </view>

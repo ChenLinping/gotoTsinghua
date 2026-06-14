@@ -1,525 +1,207 @@
-/* ========== 页面背景 ========== */
-.page-bg {
+/* ========================================== */
+/* 走向清华 V5 - 修行统计页 */
+/* ========================================== */
+
+.page {
   min-height: 100vh;
-  background: linear-gradient(180deg, #1e1b4b 0%, #312e81 30%, #1e1b4b 100%);
-  padding: 24rpx 24rpx 0;
+  background: linear-gradient(180deg, #0f0c29 0%, #1a1340 40%, #0f0c29 100%);
+  padding: 16px 16px 0;
 }
 
-/* ========== 顶部角色卡片 ========== */
+/* ===== 角色卡片 ===== */
 .hero-card {
   position: relative;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.4) 0%, rgba(139, 92, 246, 0.3) 100%);
-  border-radius: 28rpx;
-  padding: 48rpx 32rpx 40rpx;
-  margin-bottom: 28rpx;
+  background: rgba(0,0,0,0.3);
+  border-radius: 18px;
+  padding: 24px 20px;
+  margin-bottom: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
   overflow: hidden;
-  border: 2rpx solid rgba(139, 92, 246, 0.4);
 }
-
 .hero-glow {
-  position: absolute;
-  top: -60rpx;
-  right: -40rpx;
-  width: 200rpx;
-  height: 200rpx;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, transparent 70%);
-  border-radius: 50%;
+  position: absolute; top: -40px; right: -30px;
+  width: 140px; height: 140px; border-radius: 50%;
+  pointer-events: none;
 }
-
 .hero-content {
-  display: flex;
-  align-items: center;
-  position: relative;
-  z-index: 1;
+  display: flex; align-items: center;
+  position: relative; z-index: 1;
 }
-
-.avatar-wrap {
-  position: relative;
-  margin-right: 28rpx;
-  flex-shrink: 0;
-}
-
-.avatar-emoji {
-  font-size: 100rpx;
-  display: block;
-  width: 130rpx;
-  height: 130rpx;
-  line-height: 130rpx;
+.hero-icon {
+  font-size: 52px; margin-right: 16px;
+  width: 70px; height: 70px; line-height: 70px;
   text-align: center;
-  background: rgba(30, 27, 75, 0.5);
+  background: rgba(255,255,255,0.05);
   border-radius: 50%;
-  border: 3rpx solid rgba(168, 85, 247, 0.6);
+  border: 2px solid rgba(255,255,255,0.1);
 }
-
-.rank-badge {
-  position: absolute;
-  bottom: -6rpx;
-  right: -6rpx;
-  width: 44rpx;
-  height: 44rpx;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 3rpx solid rgba(30, 27, 75, 0.8);
-}
-
-.rank-emoji {
-  font-size: 22rpx;
-}
-
-.hero-info {
-  flex: 1;
-  min-width: 0;
-}
-
+.hero-info { flex: 1; }
 .hero-name {
-  font-size: 38rpx;
-  font-weight: 800;
-  color: #fff;
-  display: block;
-  margin-bottom: 6rpx;
-  text-shadow: 0 2rpx 8rpx rgba(0,0,0,0.3);
+  font-size: 20px; font-weight: 900; color: #fff;
+  display: block; margin-bottom: 4px;
+}
+.hero-realm {
+  font-size: 14px; font-weight: 700;
+  display: block; margin-bottom: 2px;
+}
+.hero-lv {
+  font-size: 11px; color: rgba(255,255,255,0.4);
 }
 
-.rank-title {
-  font-size: 24rpx;
-  font-weight: 600;
-  margin-bottom: 12rpx;
-  display: flex;
-  align-items: center;
-}
-
-.next-rank {
-  font-size: 20rpx;
-  opacity: 0.6;
-  margin-left: 4rpx;
-}
-
-.level-row {
-  display: flex;
-  align-items: center;
-}
-
-.level-label {
-  font-size: 26rpx;
-  font-weight: 700;
-  color: #c4b5fd;
-  margin-right: 12rpx;
-  flex-shrink: 0;
-}
-
-.xp-bar-wrap {
-  flex: 1;
-  height: 14rpx;
-  background: rgba(30, 27, 75, 0.6);
-  border-radius: 7rpx;
-  overflow: hidden;
-  margin-right: 12rpx;
-}
-
-.xp-bar {
-  height: 100%;
-  background: linear-gradient(90deg, #a78bfa, #c084fc);
-  border-radius: 7rpx;
-  transition: width 0.5s ease;
-  box-shadow: 0 0 8rpx rgba(167, 139, 250, 0.5);
-}
-
-.xp-text {
-  font-size: 20rpx;
-  color: #a5b4fc;
-  flex-shrink: 0;
-}
-
-/* ========== 通用面板 ========== */
+/* ===== 通用面板 ===== */
 .panel {
-  background: rgba(30, 27, 75, 0.6);
-  border-radius: 24rpx;
-  padding: 28rpx;
-  margin-bottom: 24rpx;
-  border: 2rpx solid rgba(99, 102, 241, 0.25);
-  backdrop-filter: blur(10px);
+  background: rgba(0,0,0,0.25);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255,255,255,0.06);
 }
-
 .panel-title {
-  display: flex;
-  align-items: center;
-  font-size: 30rpx;
-  font-weight: 700;
-  color: #e0e7ff;
-  margin-bottom: 24rpx;
-  padding-bottom: 16rpx;
-  border-bottom: 2rpx solid rgba(99, 102, 241, 0.2);
+  display: flex; align-items: center;
+  font-size: 14px; font-weight: 800; color: rgba(255,255,255,0.8);
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
 }
-
 .panel-icon {
-  font-size: 32rpx;
-  margin-right: 10rpx;
+  font-size: 16px; margin-right: 6px;
 }
 
-/* ========== 属性面板 ========== */
-.stat-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20rpx;
+/* ===== 修行概览 ===== */
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.overview-item {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 12px 4px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 12px;
+}
+.overview-item.highlight {
+  background: rgba(251,191,36,0.08);
+  border: 1px solid rgba(251,191,36,0.15);
+}
+.ov-num {
+  font-size: 22px; font-weight: 900; color: #fff;
+  margin-bottom: 2px;
+}
+.fire-color { color: #fbbf24; }
+.ov-label {
+  font-size: 10px; color: rgba(255,255,255,0.4);
 }
 
-.stat-label {
-  font-size: 26rpx;
-  color: #c4b5fd;
-  width: 90rpx;
-  flex-shrink: 0;
+/* ===== 答题统计 ===== */
+.answer-summary {
+  display: flex; align-items: center;
+}
+.answer-big {
+  display: flex; flex-direction: column; align-items: center;
+  width: 110px; flex-shrink: 0;
+  padding-right: 16px;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.answer-rate {
+  font-size: 36px; font-weight: 900; color: #4ade80;
+}
+.answer-rate-label {
+  font-size: 11px; color: rgba(255,255,255,0.4);
+}
+.answer-detail {
+  flex: 1; padding-left: 16px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.ad-row {
+  display: flex; align-items: center;
+}
+.ad-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  margin-right: 8px; flex-shrink: 0;
+}
+.correct-dot { background: #4ade80; }
+.wrong-dot { background: #f87171; }
+.total-dot { background: #a78bfa; }
+.ad-text {
+  font-size: 12px; color: rgba(255,255,255,0.5);
+  width: 36px;
+}
+.ad-num {
+  font-size: 16px; font-weight: 800; color: #fff;
+  margin-left: auto;
 }
 
-.hp-bar-outer {
-  flex: 1;
-  height: 20rpx;
-  background: rgba(15, 12, 50, 0.6);
-  border-radius: 10rpx;
-  overflow: hidden;
-  margin: 0 16rpx;
-}
-
-.hp-bar-inner {
-  height: 100%;
-  border-radius: 10rpx;
-  transition: width 0.5s ease;
-}
-
-.hp-high {
-  background: linear-gradient(90deg, #22c55e, #4ade80);
-  box-shadow: 0 0 10rpx rgba(34, 197, 94, 0.4);
-}
-
-.hp-mid {
-  background: linear-gradient(90deg, #f59e0b, #fbbf24);
-  box-shadow: 0 0 10rpx rgba(245, 158, 11, 0.4);
-}
-
-.hp-low {
-  background: linear-gradient(90deg, #ef4444, #f87171);
-  box-shadow: 0 0 10rpx rgba(239, 68, 68, 0.4);
-}
-
-.stat-value {
-  font-size: 22rpx;
-  color: #a5b4fc;
-  flex-shrink: 0;
-  min-width: 100rpx;
-  text-align: right;
-}
-
-.stat-grid {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8rpx;
-}
-
-.stat-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;
-  padding: 16rpx 0;
-  background: rgba(15, 12, 50, 0.4);
-  border-radius: 16rpx;
-  margin: 0 6rpx;
-}
-
-.stat-icon {
-  font-size: 36rpx;
-  margin-bottom: 6rpx;
-}
-
-.stat-num {
-  font-size: 32rpx;
-  font-weight: 800;
-  color: #fff;
-  margin-bottom: 2rpx;
-}
-
-.stat-name {
-  font-size: 20rpx;
-  color: #94a3b8;
-}
-
-.bonus-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 16rpx;
-  padding: 10rpx;
-  background: rgba(168, 85, 247, 0.15);
-  border-radius: 12rpx;
-}
-
-.bonus-icon {
-  font-size: 24rpx;
-  margin-right: 8rpx;
-}
-
-.bonus-text {
-  font-size: 24rpx;
-  color: #c084fc;
-  font-weight: 600;
-}
-
-/* ========== 装备面板 ========== */
-.equip-slots {
-  display: flex;
-  justify-content: space-between;
-}
-
-.equip-slot {
-  flex: 1;
-  margin: 0 8rpx;
-  background: rgba(15, 12, 50, 0.5);
-  border-radius: 20rpx;
-  padding: 20rpx 12rpx;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border: 3rpx solid #475569;
-  min-height: 200rpx;
-  position: relative;
-}
-
-.slot-type {
-  font-size: 20rpx;
-  color: #64748b;
-  margin-bottom: 12rpx;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 2rpx;
-}
-
-.slot-emoji {
-  font-size: 52rpx;
-  margin-bottom: 10rpx;
-}
-
-.slot-name {
-  font-size: 24rpx;
-  font-weight: 700;
-  color: #e2e8f0;
-  text-align: center;
-  margin-bottom: 6rpx;
-}
-
-.slot-stat {
-  font-size: 22rpx;
-  font-weight: 600;
-  margin-bottom: 8rpx;
-}
-
-.slot-rarity {
-  font-size: 18rpx;
-  color: #fff;
-  padding: 2rpx 14rpx;
-  border-radius: 6rpx;
-  font-weight: 500;
-}
-
-.slot-empty {
-  font-size: 28rpx;
-  color: #475569;
-  margin-top: 30rpx;
-}
-
-/* ========== 成就面板 ========== */
-.achieve-grid {
-  display: flex;
-  flex-wrap: wrap;
-  margin: -6rpx;
-}
-
-.achieve-item {
-  width: calc(33.33% - 12rpx);
-  margin: 6rpx;
-  background: rgba(15, 12, 50, 0.4);
-  border-radius: 16rpx;
-  padding: 20rpx 10rpx;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.achieve-item.unlocked {
-  background: rgba(99, 102, 241, 0.2);
-  border: 2rpx solid rgba(139, 92, 246, 0.4);
-}
-
-.achieve-item.locked {
-  opacity: 0.45;
-}
-
-.achieve-emoji {
-  font-size: 44rpx;
-  margin-bottom: 8rpx;
-}
-
-.achieve-item.locked .achieve-emoji {
-  filter: grayscale(100%);
-}
-
-.achieve-name {
-  font-size: 22rpx;
-  font-weight: 700;
-  color: #e2e8f0;
-  margin-bottom: 4rpx;
-}
-
-.achieve-desc {
-  font-size: 18rpx;
-  color: #94a3b8;
-  line-height: 1.3;
-}
-
-.achieve-lock {
-  position: absolute;
-  top: 8rpx;
-  right: 8rpx;
-  font-size: 20rpx;
-  opacity: 0.6;
-}
-
-/* ========== 战绩面板 ========== */
-.record-grid {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20rpx;
-}
-
-.record-box {
-  flex: 1;
-  margin: 0 6rpx;
-  background: rgba(15, 12, 50, 0.4);
-  border-radius: 16rpx;
-  padding: 18rpx 8rpx;
-  text-align: center;
-}
-
-.record-box.boss {
-  background: rgba(239, 68, 68, 0.15);
-  border: 2rpx solid rgba(239, 68, 68, 0.3);
-}
-
-.record-num {
-  display: block;
-  font-size: 36rpx;
-  font-weight: 800;
-  color: #fff;
-  margin-bottom: 4rpx;
-}
-
-.record-box.boss .record-num {
-  color: #f87171;
-}
-
-.record-label {
-  font-size: 20rpx;
-  color: #94a3b8;
-}
-
-/* 答题详情 */
-.answer-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(15, 12, 50, 0.3);
-  border-radius: 16rpx;
-  padding: 18rpx;
-  margin-bottom: 24rpx;
-}
-
-.answer-correct,
-.answer-wrong {
-  flex: 1;
-  text-align: center;
-}
-
-.answer-num {
-  display: block;
-  font-size: 34rpx;
-  font-weight: 800;
-}
-
-.answer-correct .answer-num {
-  color: #4ade80;
-}
-
-.answer-wrong .answer-num {
-  color: #f87171;
-}
-
-.answer-label {
-  font-size: 22rpx;
-  color: #94a3b8;
-}
-
-.answer-divider {
-  width: 2rpx;
-  height: 50rpx;
-  background: rgba(99, 102, 241, 0.3);
-  margin: 0 20rpx;
-}
-
-/* 各科目击杀 */
-.subject-kills {
-  margin-top: 8rpx;
-}
-
-.subject-title {
-  font-size: 24rpx;
-  color: #a5b4fc;
-  font-weight: 600;
-  margin-bottom: 16rpx;
-  display: block;
-}
-
+/* ===== 科目分布 ===== */
 .subject-list {
-  display: flex;
-  flex-direction: column;
+  display: flex; flex-direction: column; gap: 8px;
 }
-
-.subject-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12rpx;
+.subject-row {
+  display: flex; align-items: center;
 }
-
-.subject-name {
-  font-size: 24rpx;
-  color: #c4b5fd;
-  width: 70rpx;
-  flex-shrink: 0;
+.subj-name {
+  font-size: 12px; color: rgba(255,255,255,0.6);
+  width: 36px; flex-shrink: 0;
 }
-
-.subject-bar-wrap {
-  flex: 1;
-  height: 14rpx;
-  background: rgba(15, 12, 50, 0.5);
-  border-radius: 7rpx;
-  overflow: hidden;
-  margin: 0 14rpx;
+.subj-bar-wrap {
+  flex: 1; height: 8px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 4px; overflow: hidden;
+  margin: 0 8px;
 }
-
-.subject-bar {
-  height: 100%;
+.subj-bar {
+  height: 100%; border-radius: 4px;
   background: linear-gradient(90deg, #6366f1, #a78bfa);
-  border-radius: 7rpx;
   transition: width 0.5s ease;
 }
-
-.subject-count {
-  font-size: 24rpx;
-  color: #e2e8f0;
-  font-weight: 700;
-  width: 50rpx;
-  text-align: right;
-  flex-shrink: 0;
+.subj-count {
+  font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.8);
+  width: 28px; text-align: right; flex-shrink: 0;
 }
+
+/* ===== 境界时间线 ===== */
+.realm-timeline { padding: 4px 0; }
+.tl-track {
+  position: relative;
+  display: flex; justify-content: space-between;
+  align-items: center;
+  padding: 0 4px;
+  margin-bottom: 10px;
+}
+.tl-line-bg {
+  position: absolute; top: 50%; left: 16px; right: 16px;
+  height: 3px; background: rgba(255,255,255,0.08);
+  transform: translateY(-50%); z-index: 0;
+  border-radius: 2px;
+}
+.tl-line-fill {
+  height: 100%; border-radius: 2px;
+  background: #4ade80;
+  transition: width 0.5s ease;
+}
+.tl-node {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1; position: relative;
+  border: 2px solid rgba(255,255,255,0.15);
+  background: rgba(0,0,0,0.4);
+}
+.tl-done {
+  background: #4ade80;
+  border-color: #22c55e;
+}
+.tl-cur {
+  border-width: 3px;
+  box-shadow: 0 0 10px rgba(167,139,250,0.4);
+}
+.tl-icon { font-size: 14px; }
+.tl-labels {
+  display: flex; justify-content: space-between;
+  padding: 0 0;
+}
+.tl-label {
+  font-size: 9px; color: rgba(255,255,255,0.25);
+  width: 36px; text-align: center;
+}
+.tl-label-done { color: #4ade80; }
+.tl-label-cur { color: #a78bfa; font-weight: 700; }

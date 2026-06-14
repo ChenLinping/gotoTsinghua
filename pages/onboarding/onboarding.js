@@ -90,13 +90,13 @@ Page({
     // Generate analysis text
     var analysis = '';
     if (total >= 600) {
-      analysis = '卓越的天赋！你将以高等级开始冒险！';
+      analysis = '卓越的天赋！你将以高起点开始修行！';
     } else if (total >= 500) {
-      analysis = '出色的基础！你拥有不错的起始优势。';
+      analysis = '出色的基础！你拥有不错的修行资质。';
     } else if (total >= 400) {
-      analysis = '良好的基础。努力提升，前途无量！';
+      analysis = '良好的基础。努力修行，前途无量！';
     } else if (total > 0) {
-      analysis = '冒险才刚刚开始，每一步都是成长！';
+      analysis = '修行之路才刚开始，每一步都是积累！';
     }
 
     this.setData({
@@ -116,17 +116,6 @@ Page({
     var char = game.createCharacter();
     char.name = (this.data.name || '').trim();
 
-    // Set starting level based on scores
-    if (this.data.startLevel > 1) {
-      char.level = this.data.startLevel;
-      char.baseAtk = 10 + (char.level - 1) * 2;
-      char.baseDef = 5 + (char.level - 1) * 1;
-      char.xp = game.getXpForLevel(char.level);
-      var stats = game.getCharStats(char);
-      char.maxHP = stats.maxHP;
-      char.hp = stats.maxHP;
-    }
-
     // Save initial scores
     var scores = {};
     this.data.subjects.forEach(function (s) {
@@ -139,17 +128,14 @@ Page({
     char.lastPlayDate = new Date().toISOString().slice(0, 10);
     char.streakDays = 1;
 
-    // Give starter equipment
-    char.equipment.weapon = 'w1';
-    char.equipment.armor = 'a1';
-    if (!char.inventory) char.inventory = [];
-    char.inventory.push('w1');
-    char.inventory.push('a1');
+    // Cultivation fields
+    char.totalCultivation = 0;
+    char.cultivationStartDate = new Date().toISOString();
 
     game.saveGame(char);
 
     wx.showToast({
-      title: '欢迎来到冒险世界！',
+      title: '\u6B22\u8FCE\u6765\u5230\u4FEE\u4ED9\u4E4B\u8DEF\uFF01',
       icon: 'success',
       duration: 1500
     });

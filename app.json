@@ -2,7 +2,6 @@
   "pages": [
     "pages/map/map",
     "pages/onboarding/onboarding",
-    "pages/battle/battle",
     "pages/character/character",
     "pages/shop/shop"
   ],
@@ -11,8 +10,7 @@
     "navigationBarTitleText": "走向清华",
     "navigationBarTextStyle": "white",
     "backgroundColor": "#0f0c29",
-    "backgroundTextStyle": "light",
-    "pageOrientation": "landscape"
+    "backgroundTextStyle": "light"
   },
   "tabBar": {
     "color": "#94a3b8",
@@ -22,7 +20,7 @@
     "list": [
       {
         "pagePath": "pages/map/map",
-        "text": "冒险"
+        "text": "修行"
       },
       {
         "pagePath": "pages/character/character",

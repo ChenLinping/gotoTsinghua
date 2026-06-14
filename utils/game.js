@@ -237,7 +237,9 @@ function createCharacter() {
     perfectBattles: 0,
     subjectKills: { math: 0, english: 0, chinese: 0, physics: 0, chemistry: 0, biology: 0 },
     treasureCount: 1,
-    buffs: []
+    buffs: [],
+    totalCultivation: 0,
+    cultivationStartDate: ''
   };
 }
 
