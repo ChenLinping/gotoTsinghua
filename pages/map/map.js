@@ -82,10 +82,6 @@ Page({
     var cultDays = cult.getCultivationDays(char.cultivationStartDate);
     var level = cult.getCultivationLevel(char.totalCultivation);
 
-    var today = new Date().toDateString();
-    var todayRecord = wx.getStorageSync('lastPracticeDate');
-    var todayDone = todayRecord === today;
-
     var now = new Date();
     var dateStr = (now.getMonth() + 1) + '\u6708' + now.getDate() + '\u65E5';
 
@@ -96,7 +92,7 @@ Page({
       daysLeft: daysLeft,
       cultDays: cultDays,
       level: level,
-      todayDone: todayDone,
+      todayDone: false,
       state: 'idle',
       selectedSubject: null,
       dateStr: dateStr
@@ -212,7 +208,6 @@ Page({
       history = history.slice(history.length - 200);
     }
     wx.setStorageSync('answerHistory', history);
-    wx.setStorageSync('lastPracticeDate', new Date().toDateString());
 
     var realmInfo = cult.getCurrentRealm(newXP);
 
@@ -223,7 +218,6 @@ Page({
 
     this.setData({
       state: 'result',
-      todayDone: true,
       todayXP: reward.xp,
       todayCorrect: correct,
       todayTotal: total,
