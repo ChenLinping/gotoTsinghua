@@ -21,7 +21,15 @@
     <!-- 境界面板 -->
     <view class="realm-panel">
       <view class="realm-glow" style="background:radial-gradient(circle, {{realmInfo.realm.color}}33 0%, transparent 70%);"></view>
-      <text class="realm-icon">{{realmInfo.realm.icon}}</text>
+      <!-- 灵气粒子 -->
+      <view class="sp-particle p1" style="background:{{realmInfo.realm.color}};"></view>
+      <view class="sp-particle p2" style="background:{{realmInfo.realm.color}};"></view>
+      <view class="sp-particle p3" style="background:{{realmInfo.realm.color}};"></view>
+      <view class="sp-particle p4" style="background:{{realmInfo.realm.color}};"></view>
+      <view class="sp-particle p5" style="background:{{realmInfo.realm.color}};"></view>
+      <view class="sp-particle p6" style="background:{{realmInfo.realm.color}};"></view>
+      <text class="realm-icon realm-breathe">{{realmInfo.realm.icon}}</text>
+      <view class="realm-ring" style="border-color:{{realmInfo.realm.color}}44;"></view>
       <text class="realm-name">{{realmInfo.realm.name}}</text>
       <text class="realm-stage">{{realmInfo.stage.name}}</text>
       <text class="realm-desc">{{realmInfo.realm.desc}}</text>
@@ -150,12 +158,25 @@
     </view>
   </view>
 
-  <!-- ===== 突破弹窗 ===== -->
-  <view class="bk-overlay" wx:if="{{showBreakthrough}}">
+  <!-- ===== 突破弹窗 (升级版) ===== -->
+  <view class="bk-overlay {{breakthroughInfo.type === 'realm' ? 'bk-realm-break' : ''}}" wx:if="{{showBreakthrough}}">
     <view class="bk-bg" bindtap="closeBreakthrough"></view>
+    <!-- 灵气漩涡 -->
+    <view class="bk-vortex" style="border-color:{{breakthroughInfo.newRealm.color}};"></view>
+    <view class="bk-vortex bk-vortex2" style="border-color:{{breakthroughInfo.newRealm.color}}88;"></view>
+    <!-- 爆发粒子 -->
+    <view class="bk-burst b1" style="background:{{breakthroughInfo.newRealm.color}};"></view>
+    <view class="bk-burst b2" style="background:{{breakthroughInfo.newRealm.color}};"></view>
+    <view class="bk-burst b3" style="background:{{breakthroughInfo.newRealm.color}};"></view>
+    <view class="bk-burst b4" style="background:{{breakthroughInfo.newRealm.color}};"></view>
+    <view class="bk-burst b5" style="background:{{breakthroughInfo.newRealm.color}};"></view>
+    <view class="bk-burst b6" style="background:{{breakthroughInfo.newRealm.color}};"></view>
+    <view class="bk-burst b7" style="background:{{breakthroughInfo.newRealm.color}};"></view>
+    <view class="bk-burst b8" style="background:{{breakthroughInfo.newRealm.color}};"></view>
+    <!-- 内容 -->
     <view class="bk-panel">
       <text class="bk-title">境界突破!</text>
-      <text class="bk-icon">{{breakthroughInfo.newRealm.icon}}</text>
+      <text class="bk-icon bk-icon-emerge">{{breakthroughInfo.newRealm.icon}}</text>
       <text class="bk-from">{{breakthroughInfo.from}}</text>
       <text class="bk-arrow">{{emArrow}}</text>
       <text class="bk-to">{{breakthroughInfo.to}}</text>

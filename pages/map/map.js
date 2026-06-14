@@ -1,5 +1,6 @@
 var game = require('../../utils/game');
 var cult = require('../../utils/cultivation');
+var smartQuiz = require('../../utils/smart-quiz');
 
 // Emoji Unicode strings (WXML不支持HTML实体)
 var EM_FIRE = '\uD83D\uDD25';       // 🔥
@@ -111,11 +112,8 @@ Page({
       return;
     }
 
-    var questions = [];
-    for (var i = 0; i < cult.DAILY_QUESTIONS; i++) {
-      var q = game.getQuestion(subject, 'easy');
-      if (q) questions.push(q);
-    }
+    var history = wx.getStorageSync('answerHistory') || [];
+    var questions = smartQuiz.selectQuestions(subject, cult.DAILY_QUESTIONS, game.QUESTION_BANK, history);
 
     if (questions.length === 0) {
       wx.showToast({ title: '\u9898\u5E93\u6682\u65E0\u9898\u76EE', icon: 'none' });
@@ -200,7 +198,8 @@ Page({
           correct: results[h] === 'correct',
           subject: subject,
           date: dateStr,
-          explain: questions[h].explain || ''
+          explain: questions[h].explain || '',
+          tags: questions[h].tags || []
         });
       }
     }
@@ -208,6 +207,18 @@ Page({
       history = history.slice(history.length - 200);
     }
     wx.setStorageSync('answerHistory', history);
+
+    // 更新间隔复习计划
+    var reviewResults = [];
+    for (var r = 0; r < questions.length; r++) {
+      if (results[r]) {
+        reviewResults.push({
+          qKey: smartQuiz.questionKey(questions[r]),
+          correct: results[r] === 'correct'
+        });
+      }
+    }
+    smartQuiz.batchUpdateReview(reviewResults);
 
     var realmInfo = cult.getCurrentRealm(newXP);
 

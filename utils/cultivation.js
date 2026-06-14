@@ -156,6 +156,7 @@ function checkBreakthrough(oldXP, newXP) {
       type: 'stage',
       from: oldRealm.displayName,
       to: newRealm.displayName,
+      newRealm: newRealm.realm,
       realm: newRealm.realm,
       stage: newRealm.stage
     };
