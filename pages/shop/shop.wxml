@@ -13,6 +13,10 @@
         <text class="stat-label">答对</text>
       </view>
       <view class="stat-item">
+        <text class="stat-num stat-no">{{wrongCount}}</text>
+        <text class="stat-label">错题</text>
+      </view>
+      <view class="stat-item">
         <text class="stat-num">{{stats.rate}}%</text>
         <text class="stat-label">正确率</text>
       </view>
@@ -29,6 +33,16 @@
     </view>
   </view>
 
+  <!-- 筛选栏: 全部 / 错题 -->
+  <view class="filter-bar" wx:if="{{!empty}}">
+    <view class="filter-item {{showMode === 0 ? 'filter-active' : ''}}" data-mode="0" bindtap="switchShowMode">
+      <text>全部</text>
+    </view>
+    <view class="filter-item {{showMode === 1 ? 'filter-active' : ''}}" data-mode="1" bindtap="switchShowMode">
+      <text>错题 ({{wrongCount}})</text>
+    </view>
+  </view>
+
   <!-- 空状态 -->
   <view class="empty-state" wx:if="{{empty}}">
     <text class="empty-icon">?</text>
@@ -36,8 +50,15 @@
     <text class="empty-hint">去地图上炼宝答题吧！</text>
   </view>
 
+  <!-- 筛选后无结果 -->
+  <view class="empty-state" wx:if="{{!empty && groups.length === 0}}">
+    <text class="empty-icon">!</text>
+    <text class="empty-text">没有错题记录</text>
+    <text class="empty-hint">继续保持，答题全对！</text>
+  </view>
+
   <!-- 题目列表 -->
-  <scroll-view scroll-y class="history-list" wx:if="{{!empty}}">
+  <scroll-view scroll-y class="history-list" wx:if="{{!empty && groups.length > 0}}">
     <view wx:for="{{groups}}" wx:key="title" class="group">
       <view class="group-header">
         <text class="group-title">{{item.title}}</text>

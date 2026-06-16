@@ -19,6 +19,7 @@
 .stat-item { display: flex; flex-direction: column; align-items: center; }
 .stat-num { font-size: 22px; font-weight: 800; color: #e2e8f0; }
 .stat-ok { color: #4ade80; }
+.stat-no { color: #f87171; }
 .stat-label { font-size: 10px; color: #64748b; margin-top: 2px; }
 
 /* Tab */
@@ -38,6 +39,24 @@
   background: rgba(139,92,246,0.2);
   color: #c4b5fd;
   border: 1px solid rgba(139,92,246,0.3);
+}
+
+/* 筛选栏: 全部 / 错题 */
+.filter-bar {
+  display: flex; padding: 6px 16px;
+  background: rgba(0,0,0,0.15);
+  gap: 12px;
+}
+.filter-item {
+  padding: 5px 16px; border-radius: 14px;
+  font-size: 12px; font-weight: 600;
+  color: #64748b; background: rgba(255,255,255,0.04);
+  transition: all 0.2s;
+}
+.filter-active {
+  background: rgba(239,68,68,0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239,68,68,0.25);
 }
 
 /* 空状态 */
