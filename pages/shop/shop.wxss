@@ -1,8 +1,15 @@
 /* ========== 宝库 - 答题历史 ========== */
+page {
+  overflow-x: hidden;
+}
+
 .page-bg {
   min-height: 100vh;
   background: linear-gradient(180deg, #0f0c29 0%, #1a1145 40%, #0f0c29 100%);
   display: flex; flex-direction: column;
+  overflow-x: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* 统计栏 */
@@ -15,7 +22,7 @@
   display: block; font-size: 20px; font-weight: 900;
   color: #c4b5fd; margin-bottom: 10px;
 }
-.stat-items { display: flex; gap: 20px; }
+.stat-items { display: flex; gap: 16px; flex-wrap: wrap; overflow: hidden; }
 .stat-item { display: flex; flex-direction: column; align-items: center; }
 .stat-num { font-size: 22px; font-weight: 800; color: #e2e8f0; }
 .stat-ok { color: #4ade80; }

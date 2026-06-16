@@ -147,7 +147,7 @@
       <view class="prac-btn btn-prev" wx:if="{{qIdx > 0}}" bindtap="prevQuestion">
         <text>{{'上一题'}}</text>
       </view>
-      <view class="prac-btn btn-finish" wx:if="{{correct === totalQ || totalAnswered === totalQ}}" bindtap="_finishPractice">
+      <view class="prac-btn btn-finish" wx:if="{{correct === totalQ || totalAnswered === totalQ}}" bindtap="finishPractice">
         <text>{{'完成修行'}}</text>
       </view>
     </view>

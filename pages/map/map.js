@@ -247,7 +247,7 @@ Page({
     }
   },
 
-  _finishPractice: function() {
+  finishPractice: function() {
     var char = this.data.char;
     var correct = this.data.correct;
     var total = this.data.questions.length;
