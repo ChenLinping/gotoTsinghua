@@ -1,112 +1,89 @@
 <view class="page">
 
-  <!-- 角色卡片 -->
-  <view class="hero-card">
-    <view class="hero-glow" style="background:radial-gradient(circle, {{realmInfo.realm.color}}44 0%, transparent 70%);"></view>
-    <view class="hero-content">
-      <text class="hero-icon">{{realmInfo.realm.icon}}</text>
-      <view class="hero-info">
-        <text class="hero-name">{{char.name || '修仙者'}}</text>
-        <text class="hero-realm" style="color:{{realmInfo.realm.color}};">{{realmInfo.realm.name}} {{realmInfo.stage.name}}</text>
-        <text class="hero-lv">Lv.{{realmInfo.realmIdx * 4 + realmInfo.stageIdx + 1}}</text>
+  <!-- 角色信息卡 -->
+  <view class="bag-header">
+    <view class="bag-glow" style="background:radial-gradient(circle, {{realmColor}}33 0%, transparent 70%);"></view>
+    <view class="bag-avatar">
+      <text class="bag-icon">{{realmIcon}}</text>
+    </view>
+    <view class="bag-info">
+      <text class="bag-name">{{char.name || '修仙者'}}</text>
+      <text class="bag-realm" style="color:{{realmColor}};">{{realmName}} {{stageName}}</text>
+      <text class="bag-xp">{{totalCultivation}} 修为 · 答对 {{totalCorrect}} 题</text>
+    </view>
+  </view>
+
+  <!-- 境界突破奖状 -->
+  <view class="bag-section">
+    <view class="sec-title">
+      <text class="sec-icon">📜</text>
+      <text>境界突破奖状</text>
+      <text class="sec-count">{{earnedRealm}}/{{realmCerts.length}}</text>
+    </view>
+    <view class="reward-grid">
+      <view wx:for="{{realmCerts}}" wx:key="id"
+        class="reward-card {{item.earned ? 'reward-earned' : 'reward-locked'}} rarity-{{item.rarity}}">
+        <text class="rw-icon">{{item.earned ? item.icon : '🔒'}}</text>
+        <text class="rw-name">{{item.name}}</text>
+        <text class="rw-desc">{{item.desc}}</text>
+        <text wx:if="{{item.earned}}" class="rw-rarity rarity-tag-{{item.rarity}}">{{item.rarity === 'common' ? '普通' : item.rarity === 'rare' ? '稀有' : item.rarity === 'epic' ? '史诗' : '传说'}}</text>
       </view>
     </view>
   </view>
 
-  <!-- 修行概览 -->
-  <view class="panel">
-    <view class="panel-title">
-      <text class="panel-icon">&#9968;</text>
-      <text>修行概览</text>
+  <!-- 修行成就 -->
+  <view class="bag-section">
+    <view class="sec-title">
+      <text class="sec-icon">🏆</text>
+      <text>修行成就</text>
+      <text class="sec-count">{{earnedCult}}/{{cultAchievements.length}}</text>
     </view>
-    <view class="overview-grid">
-      <view class="overview-item">
-        <text class="ov-num">{{totalCultivation}}</text>
-        <text class="ov-label">总修为</text>
-      </view>
-      <view class="overview-item">
-        <text class="ov-num">{{cultDays}}</text>
-        <text class="ov-label">修行天数</text>
-      </view>
-      <view class="overview-item">
-        <text class="ov-num">{{daysLeft}}</text>
-        <text class="ov-label">距高考(天)</text>
-      </view>
-      <view class="overview-item highlight">
-        <text class="ov-num fire-color">{{streakDays}}</text>
-        <text class="ov-label">连续打卡</text>
+    <view class="reward-grid">
+      <view wx:for="{{cultAchievements}}" wx:key="id"
+        class="reward-card {{item.earned ? 'reward-earned' : 'reward-locked'}} rarity-{{item.rarity}}">
+        <text class="rw-icon">{{item.earned ? item.icon : '🔒'}}</text>
+        <text class="rw-name">{{item.name}}</text>
+        <text class="rw-desc">{{item.desc}}</text>
+        <text wx:if="{{item.earned}}" class="rw-rarity rarity-tag-{{item.rarity}}">{{item.rarity === 'common' ? '普通' : item.rarity === 'rare' ? '稀有' : item.rarity === 'epic' ? '史诗' : '传说'}}</text>
       </view>
     </view>
   </view>
 
-  <!-- 答题统计 -->
-  <view class="panel">
-    <view class="panel-title">
-      <text class="panel-icon">&#128202;</text>
-      <text>答题统计</text>
+  <!-- 答题勋章 -->
+  <view class="bag-section">
+    <view class="sec-title">
+      <text class="sec-icon">🎖️</text>
+      <text>答题勋章</text>
+      <text class="sec-count">{{earnedAnswer}}/{{answerRecords.length}}</text>
     </view>
-
-    <view class="answer-summary">
-      <view class="answer-big">
-        <text class="answer-rate">{{correctRate}}%</text>
-        <text class="answer-rate-label">正确率</text>
-      </view>
-      <view class="answer-detail">
-        <view class="ad-row">
-          <text class="ad-dot correct-dot"></text>
-          <text class="ad-text">答对</text>
-          <text class="ad-num">{{correctCount}}</text>
-        </view>
-        <view class="ad-row">
-          <text class="ad-dot wrong-dot"></text>
-          <text class="ad-text">答错</text>
-          <text class="ad-num">{{wrongCount}}</text>
-        </view>
-        <view class="ad-row">
-          <text class="ad-dot total-dot"></text>
-          <text class="ad-text">总计</text>
-          <text class="ad-num">{{totalAnswers}}</text>
-        </view>
+    <view class="reward-grid">
+      <view wx:for="{{answerRecords}}" wx:key="id"
+        class="reward-card {{item.earned ? 'reward-earned' : 'reward-locked'}} rarity-{{item.rarity}}">
+        <text class="rw-icon">{{item.earned ? item.icon : '🔒'}}</text>
+        <text class="rw-name">{{item.name}}</text>
+        <text class="rw-desc">{{item.desc}}</text>
+        <text wx:if="{{item.earned}}" class="rw-rarity rarity-tag-{{item.rarity}}">{{item.rarity === 'common' ? '普通' : item.rarity === 'rare' ? '稀有' : item.rarity === 'epic' ? '史诗' : '传说'}}</text>
       </view>
     </view>
   </view>
 
-  <!-- 科目分布 -->
-  <view class="panel">
-    <view class="panel-title">
-      <text class="panel-icon">&#128218;</text>
-      <text>科目分布</text>
+  <!-- 科目奖牌 -->
+  <view class="bag-section">
+    <view class="sec-title">
+      <text class="sec-icon">🥇</text>
+      <text>科目奖牌</text>
+      <text class="sec-count">{{earnedSubject}}/{{subjectMedals.length}}</text>
     </view>
-    <view class="subject-list">
-      <view class="subject-row" wx:for="{{subjectStats}}" wx:key="key">
-        <text class="subj-name">{{item.name}}</text>
-        <view class="subj-bar-wrap">
-          <view class="subj-bar" style="width:{{item.count > 0 ? (item.count / maxSubjectCount * 100) : 0}}%; min-width:{{item.count > 0 ? '6px' : '0'}};"></view>
+    <view class="reward-grid">
+      <view wx:for="{{subjectMedals}}" wx:key="id"
+        class="reward-card {{item.earned ? 'reward-earned' : 'reward-locked'}} rarity-{{item.rarity}}">
+        <text class="rw-icon">{{item.earned ? item.icon : '🔒'}}</text>
+        <text class="rw-name">{{item.name}}</text>
+        <text class="rw-desc">{{item.desc}}</text>
+        <view wx:if="{{!item.earned}}" class="rw-progress">
+          <view class="rw-progress-fill" style="width:{{item.progress * 100}}%;"></view>
         </view>
-        <text class="subj-count">{{item.count}}</text>
-      </view>
-    </view>
-  </view>
-
-  <!-- 境界历程 -->
-  <view class="panel">
-    <view class="panel-title">
-      <text class="panel-icon">&#127793;</text>
-      <text>境界历程</text>
-    </view>
-    <view class="realm-timeline">
-      <view class="tl-track">
-        <view class="tl-line-bg">
-          <view class="tl-line-fill" style="width:{{realmIdx / 8 * 100}}%;"></view>
-        </view>
-        <view wx:for="{{realms}}" wx:key="name"
-          class="tl-node {{index < realmIdx ? 'tl-done' : index === realmIdx ? 'tl-cur' : 'tl-lock'}}"
-          style="{{index === realmIdx ? 'border-color:' + item.color : index < realmIdx ? 'border-color:#4ade80; background:#4ade80;' : ''}}">
-          <text class="tl-icon">{{item.icon}}</text>
-        </view>
-      </view>
-      <view class="tl-labels">
-        <text wx:for="{{realms}}" wx:key="name" class="tl-label {{index === realmIdx ? 'tl-label-cur' : index < realmIdx ? 'tl-label-done' : ''}}">{{item.name}}</text>
+        <text wx:if="{{item.earned}}" class="rw-rarity rarity-tag-{{item.rarity}}">稀有</text>
       </view>
     </view>
   </view>

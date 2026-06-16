@@ -20,11 +20,11 @@
     "list": [
       {
         "pagePath": "pages/map/map",
-        "text": "\u4ED9\u9014"
+        "text": "\u4FEE\u884C"
       },
       {
         "pagePath": "pages/character/character",
-        "text": "\u89D2\u8272"
+        "text": "\u50A8\u7269\u888B"
       },
       {
         "pagePath": "pages/shop/shop",
