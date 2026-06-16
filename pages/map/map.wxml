@@ -95,31 +95,60 @@
 
   <!-- ===== 答题界面 (practice) ===== -->
   <view class="practice-view" wx:if="{{state === 'practice'}}">
-    <view class="practice-header">
-      <text class="prac-counter">第 {{qIdx + 1}} / {{questions.length}} 题</text>
-      <view class="prac-dots">
-        <view wx:for="{{results}}" wx:key="index"
-          class="prac-dot {{item === 'correct' ? 'dot-ok' : item === 'wrong' ? 'dot-no' : qIdx === index ? 'dot-cur' : ''}}"></view>
+    <!-- 题目导航器 -->
+    <view class="q-navigator">
+      <view wx:for="{{results}}" wx:key="index"
+        class="q-dot {{correctSet[index] ? 'qdot-ok' : item === 'wrong' ? 'qdot-no' : qIdx === index ? 'qdot-cur' : 'qdot-empty'}}"
+        data-idx="{{index}}" bindtap="goToQuestion">
+        <text class="qdot-num">{{index + 1}}</text>
       </view>
     </view>
 
-    <view class="practice-body" wx:if="{{questions[qIdx]}}">
+    <!-- 计数 -->
+    <view class="prac-info">
+      <text class="prac-counter">{{qIdx + 1}} / {{totalQ}}</text>
+      <text class="prac-correct">{{emCheck}} {{correct}}</text>
+    </view>
+
+    <!-- 答题区 (支持左右滑动) -->
+    <view class="practice-body" wx:if="{{questions[qIdx]}}"
+      bindtouchstart="onTouchStart" bindtouchend="onTouchEnd">
+
       <text class="prac-q">{{questions[qIdx].q}}</text>
 
       <view class="prac-options">
         <view wx:for="{{questions[qIdx].options}}" wx:key="index"
-          class="prac-opt {{showResult && results[qIdx] === 'correct' && index === questions[qIdx].answer ? 'opt-correct' : ''}} {{showResult && selectedOption === index && results[qIdx] === 'wrong' ? 'opt-wrong' : ''}}"
-          data-index="{{index}}" bindtap="selectOption">
+          class="prac-opt {{showResult && index === questions[qIdx].answer ? 'opt-correct' : ''}} {{showResult && selectedOption === index && results[qIdx] === 'wrong' ? 'opt-wrong' : ''}}"
+          data-index="{{index}}" catchtap="selectOption">
           <text class="prac-opt-label">{{index === 0 ? 'A' : index === 1 ? 'B' : index === 2 ? 'C' : 'D'}}</text>
           <text class="prac-opt-text">{{item}}</text>
         </view>
       </view>
 
-      <view class="prac-explain" wx:if="{{showResult}}">
-        <text class="{{results[qIdx] === 'correct' ? 'explain-ok' : 'explain-fail'}}">
-          {{results[qIdx] === 'correct' ? '正确! +3修为' : '答错了，继续加油'}}
-        </text>
+      <!-- 解析 -->
+      <view class="prac-explain" wx:if="{{showResult && results[qIdx] === 'correct'}}">
+        <text class="explain-ok">{{'正确! +3修为'}}</text>
         <text class="explain-detail">{{questions[qIdx].explain}}</text>
+      </view>
+      <view class="prac-explain" wx:if="{{showResult && results[qIdx] === 'wrong'}}">
+        <text class="explain-fail">{{'答错了，看正确答案'}}</text>
+        <text class="explain-detail">{{questions[qIdx].explain}}</text>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="prac-actions">
+      <view class="prac-btn btn-retry" wx:if="{{showResult && results[qIdx] === 'wrong'}}" bindtap="retryQuestion">
+        <text>{{'重做'}}</text>
+      </view>
+      <view class="prac-btn btn-next" wx:if="{{showResult && qIdx < totalQ - 1}}" bindtap="nextQuestion">
+        <text>{{'下一题'}}</text>
+      </view>
+      <view class="prac-btn btn-prev" wx:if="{{qIdx > 0}}" bindtap="prevQuestion">
+        <text>{{'上一题'}}</text>
+      </view>
+      <view class="prac-btn btn-finish" wx:if="{{correct === totalQ || totalAnswered === totalQ}}" bindtap="_finishPractice">
+        <text>{{'完成修行'}}</text>
       </view>
     </view>
   </view>

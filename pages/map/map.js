@@ -40,6 +40,9 @@ Page({
     results: [],
     selectedOption: -1,
     showResult: false,
+    totalQ: 0,
+    totalAnswered: 0,
+    correctSet: {},
     // 今日记录
     todayDone: false,
     todayXP: 0,
@@ -126,8 +129,11 @@ Page({
     this.setData({
       state: 'practice',
       questions: questions,
+      totalQ: questions.length,
+      totalAnswered: 0,
       qIdx: 0,
       correct: 0,
+      correctSet: {},
       results: new Array(questions.length).fill(''),
       selectedOption: -1,
       showResult: false
@@ -138,37 +144,107 @@ Page({
     if (this.data.showResult) return;
 
     var idx = parseInt(e.currentTarget.dataset.index);
-    var q = this.data.questions[this.data.qIdx];
+    var qIdx = this.data.qIdx;
+    var q = this.data.questions[qIdx];
     var isCorrect = idx === q.answer;
 
     var results = this.data.results.slice();
-    results[this.data.qIdx] = isCorrect ? 'correct' : 'wrong';
-    var correct = this.data.correct + (isCorrect ? 1 : 0);
+    var firstAnswer = !results[qIdx];
+    results[qIdx] = isCorrect ? 'correct' : 'wrong';
+    var correct = this.data.correct;
+    var correctSet = this.data.correctSet;
+    var totalAnswered = this.data.totalAnswered + (firstAnswer ? 1 : 0);
+
+    if (isCorrect && !correctSet[qIdx]) {
+      correct++;
+      var cs = {};
+      for (var k in correctSet) {
+        if (correctSet.hasOwnProperty(k)) cs[k] = correctSet[k];
+      }
+      cs[qIdx] = true;
+      correctSet = cs;
+    }
 
     this.setData({
       selectedOption: idx,
       showResult: true,
       results: results,
-      correct: correct
+      correct: correct,
+      correctSet: correctSet,
+      totalAnswered: totalAnswered
     });
-
-    var self = this;
-    setTimeout(function() {
-      self._nextQuestion();
-    }, 1200);
   },
 
-  _nextQuestion: function() {
+  // ========== Swipe Navigation ==========
+  nextQuestion: function() {
     var next = this.data.qIdx + 1;
-    if (next >= this.data.questions.length) {
-      this._finishPractice();
-      return;
-    }
+    if (next >= this.data.questions.length) return;
+    this._loadQuestionState(next);
+  },
+
+  prevQuestion: function() {
+    var prev = this.data.qIdx - 1;
+    if (prev < 0) return;
+    this._loadQuestionState(prev);
+  },
+
+  goToQuestion: function(e) {
+    var idx = parseInt(e.currentTarget.dataset.idx);
+    if (idx === this.data.qIdx) return;
+    // Block: can't navigate to unanswered questions beyond the furthest reached
+    this._loadQuestionState(idx);
+  },
+
+  retryQuestion: function() {
+    var qIdx = this.data.qIdx;
+    var results = this.data.results.slice();
+    results[qIdx] = '';
     this.setData({
-      qIdx: next,
+      results: results,
       selectedOption: -1,
       showResult: false
     });
+  },
+
+  onTouchStart: function(e) {
+    this._touchStartX = e.touches[0].clientX;
+    this._touchStartY = e.touches[0].clientY;
+  },
+
+  onTouchEnd: function(e) {
+    var dx = e.changedTouches[0].clientX - this._touchStartX;
+    var dy = e.changedTouches[0].clientY - this._touchStartY;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx > 0) this.prevQuestion();
+      else this.nextQuestion();
+    }
+  },
+
+  _loadQuestionState: function(idx) {
+    var results = this.data.results;
+    var correctSet = this.data.correctSet;
+    if (results[idx] === 'correct' || correctSet[idx]) {
+      // Correctly answered - show locked state
+      this.setData({
+        qIdx: idx,
+        selectedOption: this.data.questions[idx].answer,
+        showResult: true
+      });
+    } else if (results[idx] === 'wrong') {
+      // Wrong - allow retry, clear selection
+      this.setData({
+        qIdx: idx,
+        selectedOption: -1,
+        showResult: false
+      });
+    } else {
+      // Unanswered
+      this.setData({
+        qIdx: idx,
+        selectedOption: -1,
+        showResult: false
+      });
+    }
   },
 
   _finishPractice: function() {
@@ -184,27 +260,25 @@ Page({
 
     var breakthrough = cult.checkBreakthrough(oldXP, newXP);
 
-    // 保存答题记录
+    // 保存答题记录 (只保存最终答对的)
     var history = wx.getStorageSync('answerHistory') || [];
     var questions = this.data.questions;
-    var results = this.data.results;
+    var correctSet = this.data.correctSet;
     var subject = this.data.selectedSubject;
     var now = new Date();
     var dateStr = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
 
     for (var h = 0; h < questions.length; h++) {
-      if (results[h]) {
-        history.push({
-          q: questions[h].q,
-          options: questions[h].options,
-          answer: questions[h].answer,
-          correct: results[h] === 'correct',
-          subject: subject,
-          date: dateStr,
-          explain: questions[h].explain || '',
-          tags: questions[h].tags || []
-        });
-      }
+      history.push({
+        q: questions[h].q,
+        options: questions[h].options,
+        answer: questions[h].answer,
+        correct: !!correctSet[h],
+        subject: subject,
+        date: dateStr,
+        explain: questions[h].explain || '',
+        tags: questions[h].tags || []
+      });
     }
     if (history.length > 200) {
       history = history.slice(history.length - 200);
@@ -214,12 +288,10 @@ Page({
     // 更新间隔复习计划
     var reviewResults = [];
     for (var r = 0; r < questions.length; r++) {
-      if (results[r]) {
-        reviewResults.push({
-          qKey: smartQuiz.questionKey(questions[r]),
-          correct: results[r] === 'correct'
-        });
-      }
+      reviewResults.push({
+        qKey: smartQuiz.questionKey(questions[r]),
+        correct: !!correctSet[r]
+      });
     }
     smartQuiz.batchUpdateReview(reviewResults);
 
