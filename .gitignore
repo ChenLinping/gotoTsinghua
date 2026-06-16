@@ -4,3 +4,7 @@ project.private.config.json
 # OS files
 .DS_Store
 Thumbs.db
+
+# Build artifacts
+temp/
+node_modules/

@@ -32,7 +32,6 @@
       <view class="realm-ring" style="border-color:{{realmInfo.realm.color}}44;"></view>
       <text class="realm-name">{{realmInfo.realm.name}}</text>
       <text class="realm-stage">{{realmInfo.stage.name}}</text>
-      <text class="realm-desc">{{realmInfo.realm.desc}}</text>
     </view>
 
     <!-- 进度条 -->

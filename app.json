@@ -5,9 +5,15 @@
     "pages/character/character",
     "pages/shop/shop"
   ],
+  "subpackages": [
+    {
+      "root": "questionBank",
+      "pages": []
+    }
+  ],
   "window": {
     "navigationBarBackgroundColor": "#4f46e5",
-    "navigationBarTitleText": "走向清华",
+    "navigationBarTitleText": "\u6E05\u5317\u4FEE\u4ED9\u4F20",
     "navigationBarTextStyle": "white",
     "backgroundColor": "#0f0c29",
     "backgroundTextStyle": "light"
@@ -20,15 +26,15 @@
     "list": [
       {
         "pagePath": "pages/map/map",
-        "text": "修行"
+        "text": "\u4ED9\u9014"
       },
       {
         "pagePath": "pages/character/character",
-        "text": "角色"
+        "text": "\u89D2\u8272"
       },
       {
         "pagePath": "pages/shop/shop",
-        "text": "宝库"
+        "text": "\u5B9D\u5E93"
       }
     ]
   },

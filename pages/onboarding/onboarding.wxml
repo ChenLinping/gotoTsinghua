@@ -1,18 +1,18 @@
-<view class="page-bg" style="padding-top: {{statusBarHeight + 44}}px;">
+<view class="page-bg">
 
   <!-- 自定义导航栏 -->
-  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;" wx:if="{{step >= 1 && step <= 3}}">
     <view class="nav-bar">
-      <view wx:if="{{step > 0 && step < 3}}" class="nav-back" bindtap="goBack">
-        <text>← 返回</text>
+      <view wx:if="{{step >= 1 && step <= 2}}" class="nav-back" bindtap="goBack">
+        <text class="nav-back-text">{{'< '}} 返回</text>
       </view>
-      <text class="nav-title">{{step === 0 ? '开始修行' : step === 1 ? '创建角色' : step === 2 ? '灵根鉴定' : '准备就绪'}}</text>
-      <view class="nav-spacer" wx:if="{{step > 0 && step < 3}}"></view>
+      <text class="nav-title">{{step === 1 ? '报名修仙' : step === 2 ? '灵根鉴定' : '仙缘已至'}}</text>
+      <view class="nav-spacer" wx:if="{{step >= 1 && step <= 2}}"></view>
     </view>
   </view>
 
   <!-- 步骤指示器 -->
-  <view class="step-indicator" wx:if="{{step > 0 && step < 3}}">
+  <view class="step-indicator" wx:if="{{step >= 1 && step <= 3}}">
     <view class="step-dot {{step >= 1 ? 'step-active' : ''}}"></view>
     <view class="step-line {{step >= 2 ? 'line-active' : ''}}"></view>
     <view class="step-dot {{step >= 2 ? 'step-active' : ''}}"></view>
@@ -20,75 +20,58 @@
     <view class="step-dot {{step >= 3 ? 'step-active' : ''}}"></view>
   </view>
 
-  <!-- ========== Step 0: 欢迎页 ========== -->
-  <view class="step-content" wx:if="{{step === 0}}">
-    <view class="welcome-hero">
-      <view class="welcome-trophy">
-        <text class="trophy-emoji">🏆</text>
-      </view>
-      <view class="welcome-glow"></view>
+  <!-- ========== Step 0: 品牌首页 ========== -->
+  <view class="step-content splash-view" wx:if="{{step === 0}}">
+
+    <!-- 灵气粒子 -->
+    <view class="splash-particles">
+      <view wx:for="{{particles}}" wx:key="*this" class="sp-dot {{item}}" style="background:#a78bfa;"></view>
     </view>
 
-    <view class="welcome-text">
-      <text class="welcome-title">走向清华</text>
-      <text class="welcome-subtitle">修仙之路</text>
+    <view class="splash-glow"></view>
+
+    <view class="splash-brand">
+      <text class="brand-icon">{{'🏆'}}</text>
+      <text class="brand-title">清北修仙传</text>
+      <text class="brand-sub">修仙之路，从此刻开始</text>
     </view>
 
-    <view class="welcome-desc">
-      <text class="desc-text">将高考备考变成一段修仙修行的旅程</text>
-    </view>
-
-    <view class="feature-list">
-      <view class="feature-item">
-        <text class="feature-icon">&#127793;</text>
-        <view class="feature-info">
-          <text class="feature-name">修仙境界</text>
-          <text class="feature-desc">从练气期到化神境大圆满</text>
-        </view>
+    <view class="splash-features">
+      <view class="sf-item">
+        <text class="sf-icon">{{'⚡'}}</text>
+        <text class="sf-text">五大境界 · 二十重突破</text>
       </view>
-      <view class="feature-item">
-        <text class="feature-icon">&#129504;</text>
-        <view class="feature-info">
-          <text class="feature-name">每日修行</text>
-          <text class="feature-desc">答题积累修为，突破境界</text>
-        </view>
+      <view class="sf-item">
+        <text class="sf-icon">{{'📚'}}</text>
+        <text class="sf-text">六科修炼 · 答题即修行</text>
       </view>
-      <view class="feature-item">
-        <text class="feature-icon">&#128218;</text>
-        <view class="feature-info">
-          <text class="feature-name">六科修炼</text>
-          <text class="feature-desc">数英物化生语全面提升</text>
-        </view>
-      </view>
-      <view class="feature-item">
-        <text class="feature-icon">&#127942;</text>
-        <view class="feature-info">
-          <text class="feature-name">圆梦清华</text>
-          <text class="feature-desc">高考前一天达成化神大圆满</text>
-        </view>
+      <view class="sf-item">
+        <text class="sf-icon">{{'🔥'}}</text>
+        <text class="sf-text">每日打卡 · 道心坚定</text>
       </view>
     </view>
 
-    <view class="welcome-btn" bindtap="startAdventure">
-      <text class="btn-text">开始修行</text>
-      <text class="btn-arrow">→</text>
+    <view class="splash-btn" bindtap="enterGame">
+      <text class="btn-text">踏入仙途</text>
     </view>
   </view>
 
-  <!-- ========== Step 1: 名字输入 ========== -->
-  <view class="step-content" wx:if="{{step === 1}}">
+  <!-- ========== Step 1: 输入名字 ========== -->
+  <view class="step-content" wx:if="{{step === 1}}" style="padding-top: {{statusBarHeight + 44 + 20}}px;">
+
     <view class="name-hero">
-      <text class="name-hero-emoji">🧙</text>
+      <view class="name-circle">
+        <text class="name-emoji">{{'🧙'}}</text>
+      </view>
     </view>
 
     <view class="name-prompt">
-      <text class="prompt-title">你叫什么名字，修仙者？</text>
-      <text class="prompt-desc">这个名字将伴随你的修行之路</text>
+      <text class="prompt-title">报上名来，修仙者！</text>
+      <text class="prompt-desc">此名将伴随你的修仙之路（最多8字）</text>
     </view>
 
     <view class="name-input-wrap">
       <view class="name-input-border {{nameError ? 'input-error' : ''}}">
-        <text class="input-icon">✏️</text>
         <input
           class="name-input"
           placeholder="输入你的名字..."
@@ -103,38 +86,35 @@
       <text wx:if="{{nameError}}" class="error-text">{{nameError}}</text>
     </view>
 
-    <view class="name-btn" bindtap="confirmName">
+    <view class="action-btn" bindtap="confirmName">
       <text class="btn-text">确认名字</text>
     </view>
   </view>
 
   <!-- ========== Step 2: 成绩输入 ========== -->
-  <view class="step-content" wx:if="{{step === 2}}">
+  <view class="step-content score-view" wx:if="{{step === 2}}" style="padding-top: {{statusBarHeight + 44 + 10}}px;">
+
     <view class="score-header">
-      <text class="score-header-emoji">🔮</text>
+      <text class="score-header-icon">{{'🔮'}}</text>
       <text class="score-header-title">灵根鉴定</text>
-      <text class="score-header-desc">输入你最近一次考试各科成绩，系统将评估你的初始灵根</text>
+      <text class="score-header-desc">输入最近一次考试各科成绩</text>
     </view>
 
     <view class="score-list">
-      <view
-        class="score-item"
-        wx:for="{{subjects}}"
-        wx:key="key"
-        style="border-left: 6rpx solid {{item.color}};"
-      >
+      <view class="score-item" wx:for="{{subjects}}" wx:key="key"
+        style="border-left: 6rpx solid {{item.color}};">
         <view class="score-left">
           <text class="score-icon">{{item.icon}}</text>
           <view class="score-info">
             <text class="score-name">{{item.name}}</text>
-            <text class="score-desc">{{item.desc}}</text>
+            <text class="score-max">满分 {{item.max}}</text>
           </view>
         </view>
         <view class="score-input-wrap">
           <input
             class="score-input"
             type="number"
-            placeholder="{{item.placeholder}}"
+            placeholder="0"
             placeholder-class="score-placeholder"
             value="{{item.score}}"
             data-idx="{{index}}"
@@ -145,60 +125,74 @@
       </view>
     </view>
 
-    <!-- 总分和等级预览 -->
-    <view wx:if="{{totalScore > 0}}" class="score-summary">
+    <!-- 总分 -->
+    <view class="score-summary" wx:if="{{totalScore > 0}}">
       <view class="summary-row">
         <text class="summary-label">总分</text>
-        <text class="summary-value">{{totalScore}}</text>
+        <text class="summary-value {{scoreWarning ? 'warn' : ''}}">{{totalScore}} / {{maxTotal}}</text>
       </view>
-      <view class="summary-row">
-        <text class="summary-label">初始境界</text>
-        <text class="summary-level">练气初期</text>
-      </view>
-      <text class="summary-analysis">{{scoreAnalysis}}</text>
+      <text wx:if="{{scoreWarning}}" class="warn-text">{{scoreWarning}}</text>
     </view>
 
-    <view class="score-btn" bindtap="confirmScores">
+    <view class="action-btn {{scoreWarning ? 'btn-disabled' : ''}}" bindtap="confirmScores">
       <text class="btn-text">完成鉴定</text>
     </view>
   </view>
 
-  <!-- ========== Step 3: 完成 ========== -->
-  <view class="step-content" wx:if="{{step === 3}}">
-    <view class="complete-hero">
-      <view class="complete-portal">
-        <text class="portal-emoji">🌀</text>
-      </view>
-      <view class="complete-glow"></view>
+  <!-- ========== Step 3: 仪式感欢迎 ========== -->
+  <view class="step-content welcome-view" wx:if="{{step === 3}}" style="padding-top: {{statusBarHeight + 44 + 10}}px;">
+
+    <view class="welcome-portal">
+      <view class="portal-ring"></view>
+      <view class="portal-ring2"></view>
+      <text class="portal-icon">{{'✨'}}</text>
     </view>
 
-    <view class="complete-text">
-      <text class="complete-title">鉴定完成！</text>
-      <text class="complete-name">修仙者 {{name}}</text>
+    <text class="welcome-big-title">{{welcomeTitle}}</text>
+
+    <view class="welcome-msg-box">
+      <text class="welcome-msg-text">{{welcomeMsg}}</text>
     </view>
 
-    <view class="complete-stats">
-      <view class="cs-item">
-        <text class="cs-label">初始境界</text>
-        <text class="cs-value">练气初期</text>
+    <view class="welcome-score-row">
+      <view class="wsr-item">
+        <text class="wsr-val">{{totalScore}}</text>
+        <text class="wsr-label">总分</text>
       </view>
-      <view class="cs-item">
-        <text class="cs-label">总分</text>
-        <text class="cs-value">{{totalScore}}</text>
+      <view class="wsr-item">
+        <text class="wsr-val">练气初期</text>
+        <text class="wsr-label">初始境界</text>
       </view>
-      <view class="cs-item">
-        <text class="cs-label">目标</text>
-        <text class="cs-value">化神大圆满</text>
+      <view class="wsr-item">
+        <text class="wsr-val">化神大圆满</text>
+        <text class="wsr-label">终极目标</text>
       </view>
     </view>
 
-    <view class="complete-msg">
-      <text>修仙之路已经开启，清华之巅在等待着你！</text>
+    <view class="action-btn cinematic-btn" bindtap="startCinematic">
+      <text class="btn-text">让我们开始修仙之路吧</text>
+    </view>
+  </view>
+
+  <!-- ========== Step 4: 开场动画 ========== -->
+  <view class="cinematic-overlay" wx:if="{{step === 4}}">
+    <view class="cin-bg" bindtap="skipCinematic"></view>
+
+    <!-- 灵气粒子 -->
+    <view class="cin-particles">
+      <view wx:for="{{particles}}" wx:key="*this" class="cin-dot {{item}}" style="background:#a78bfa;"></view>
     </view>
 
-    <view class="complete-btn" bindtap="enterWorld">
-      <text class="btn-text">踏入修行之路</text>
-      <text class="btn-arrow">&#127793;</text>
+    <!-- 依次浮现文字 -->
+    <view class="cin-texts">
+      <text class="cin-line {{cinematicIdx >= 0 ? 'cin-show' : ''}}">{{cinematicTexts[0]}}</text>
+      <text class="cin-line {{cinematicIdx >= 1 ? 'cin-show' : ''}}">{{cinematicTexts[1]}}</text>
+      <text class="cin-line {{cinematicIdx >= 2 ? 'cin-show' : ''}}">{{cinematicTexts[2]}}</text>
+    </view>
+
+    <!-- 跳过 -->
+    <view class="cin-skip" bindtap="skipCinematic">
+      <text class="cin-skip-text">点击跳过</text>
     </view>
   </view>
 

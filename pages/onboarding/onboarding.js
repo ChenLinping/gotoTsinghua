@@ -1,154 +1,196 @@
 var game = require('../../utils/game');
 
+// Unicode emojis for WXML
+var EM_SWORD = '\u2694\uFE0F';
+var EM_CRYSTAL = '\uD83D\uDD2E';
+var EM_SCROLL = '\uD83D\uDCDC';
+var EM_STAR = '\u2B50';
+var EM_FIRE = '\uD83D\uDD25';
+var EM_SPARKLE = '\u2728';
+
+var SUBJECTS = [
+  { key: 'chinese', name: '\u8BED\u6587', icon: '\uD83D\uDCDC', max: 150, color: '#f59e0b' },
+  { key: 'math', name: '\u6570\u5B66', icon: '\uD83D\uDCD0', max: 150, color: '#6366f1' },
+  { key: 'english', name: '\u82F1\u8BED', icon: '\uD83D\uDD24', max: 150, color: '#ec4899' },
+  { key: 'physics', name: '\u7269\u7406', icon: '\u26A1', max: 100, color: '#0891b2' },
+  { key: 'chemistry', name: '\u5316\u5B66', icon: '\uD83E\uDDEA', max: 100, color: '#10b981' },
+  { key: 'biology', name: '\u751F\u7269', icon: '\uD83E\uDDEC', max: 100, color: '#8b5cf6' }
+];
+
 Page({
   data: {
     step: 0,
     name: '',
     nameError: '',
-
-    // 6 subjects for score input
-    subjects: [
-      { key: 'math', name: '数学', icon: '📐', color: '#6366f1', desc: '逻辑之力', score: '', placeholder: '如: 120' },
-      { key: 'english', name: '英语', icon: '🌍', color: '#ec4899', desc: '语言之力', score: '', placeholder: '如: 130' },
-      { key: 'chinese', name: '语文', icon: '📜', color: '#f59e0b', desc: '文字之力', score: '', placeholder: '如: 115' },
-      { key: 'physics', name: '物理', icon: '⚡', color: '#0891b2', desc: '自然之力', score: '', placeholder: '如: 85' },
-      { key: 'chemistry', name: '化学', icon: '🧪', color: '#10b981', desc: '变化之力', score: '', placeholder: '如: 80' },
-      { key: 'biology', name: '生物', icon: '🧬', color: '#8b5cf6', desc: '生命之力', score: '', placeholder: '如: 78' }
-    ],
-
+    subjects: SUBJECTS,
     totalScore: 0,
-    startLevel: 1,
-    scoreAnalysis: '',
-    statusBarHeight: 20
+    maxTotal: 750,
+    scoreWarning: '',
+    welcomeMsg: '',
+    welcomeTitle: '',
+    // Cinematic
+    cinematicTexts: [
+      '\u7075\u6839\u9274\u5B9A\u5B8C\u6210...',
+      '\u53D1\u73B0\u4FEE\u4ED9\u5929\u8D4B...',
+      '\u8E0F\u5165\u4FEE\u884C\u4E4B\u8DEF...'
+    ],
+    cinematicIdx: 0,
+    cinematicDone: false,
+    // System
+    statusBarHeight: 20,
+    // Particles
+    particles: ['p1','p2','p3','p4','p5','p6']
   },
 
-  onLoad: function () {
+  onLoad: function() {
     var sysInfo = wx.getSystemInfoSync();
-    this.setData({
-      statusBarHeight: sysInfo.statusBarHeight || 20
-    });
+    this.setData({ statusBarHeight: sysInfo.statusBarHeight || 20 });
 
-    // Check if already has a character
     var char = game.loadGame();
     if (char && char.name) {
       wx.switchTab({ url: '/pages/map/map' });
     }
   },
 
-  // ========== Step 0: 欢迎 ==========
-  startAdventure: function () {
+  // ========== Step 0: Brand Splash ==========
+  enterGame: function() {
     this.setData({ step: 1 });
   },
 
-  // ========== Step 1: 名字输入 ==========
-  onNameInput: function (e) {
-    var val = e.detail.value;
-    this.setData({
-      name: val,
-      nameError: ''
-    });
+  // ========== Step 1: Name Input ==========
+  onNameInput: function(e) {
+    this.setData({ name: e.detail.value, nameError: '' });
   },
 
-  confirmName: function () {
+  confirmName: function() {
     var name = (this.data.name || '').trim();
     if (!name) {
-      this.setData({ nameError: '请输入你的名字' });
+      this.setData({ nameError: '\u8BF7\u8F93\u5165\u4F60\u7684\u540D\u5B57' });
       return;
     }
     if (name.length > 8) {
-      this.setData({ nameError: '名字不能超过8个字' });
+      this.setData({ nameError: '\u540D\u5B57\u4E0D\u80FD\u8D85\u8FC78\u4E2A\u5B57' });
       return;
     }
     this.setData({ step: 2 });
   },
 
-  // ========== Step 2: 成绩输入 ==========
-  onScoreInput: function (e) {
+  // ========== Step 2: Score Input ==========
+  onScoreInput: function(e) {
     var idx = e.currentTarget.dataset.idx;
     var val = e.detail.value;
     var subjects = this.data.subjects.slice();
     subjects[idx].score = val;
 
-    // Calculate total
     var total = 0;
-    subjects.forEach(function (s) {
-      var num = parseInt(s.score, 10);
+    var warning = '';
+    for (var i = 0; i < subjects.length; i++) {
+      var num = parseInt(subjects[i].score, 10);
       if (!isNaN(num) && num > 0) {
+        if (num > subjects[i].max) {
+          warning = subjects[i].name + '\u4E0D\u80FD\u8D85\u8FC7' + subjects[i].max + '\u5206';
+        }
         total += num;
       }
-    });
-
-    // Calculate start level
-    var startLevel = 1;
-    if (total >= 600) startLevel = 8;
-    else if (total >= 550) startLevel = 6;
-    else if (total >= 500) startLevel = 5;
-    else if (total >= 450) startLevel = 4;
-    else if (total >= 400) startLevel = 3;
-    else if (total >= 300) startLevel = 2;
-
-    // Generate analysis text
-    var analysis = '';
-    if (total >= 600) {
-      analysis = '卓越的天赋！你将以高起点开始修行！';
-    } else if (total >= 500) {
-      analysis = '出色的基础！你拥有不错的修行资质。';
-    } else if (total >= 400) {
-      analysis = '良好的基础。努力修行，前途无量！';
-    } else if (total > 0) {
-      analysis = '修行之路才刚开始，每一步都是积累！';
+    }
+    if (total > 750) {
+      warning = '\u603B\u5206\u4E0D\u80FD\u8D85\u8FC7750\u5206';
     }
 
     this.setData({
       subjects: subjects,
       totalScore: total,
-      startLevel: startLevel,
-      scoreAnalysis: analysis
+      scoreWarning: warning
     });
   },
 
-  confirmScores: function () {
-    this.setData({ step: 3 });
+  confirmScores: function() {
+    if (this.data.scoreWarning) return;
+
+    // Generate personalized welcome
+    var total = this.data.totalScore;
+    var name = (this.data.name || '').trim();
+    var msg, title;
+
+    if (total >= 650) {
+      title = '\u5929\u7EB5\u5947\u624D\uFF01';
+      msg = name + '\uFF0C\u9AA8\u9ABC\u6E05\u5947\uFF0C\u5FC5\u6210\u5927\u5668\uFF01\u4FEE\u4ED9\u4E4B\u8DEF\u5DF2\u4E3A\u4F60\u5F00\u542F\uFF01';
+    } else if (total >= 550) {
+      title = '\u9AA8\u9ABC\u6E05\u5947\uFF01';
+      msg = '\u5C11\u5E74\u770B\u4F60\u9AA8\u9ABC\u6E05\u5947\uFF0C\u4E00\u5B9A\u662F\u4FEE\u4ED9\u7684\u597D\u6750\u6599\uFF01' + name + '\uFF0C\u8BA9\u6211\u4EEC\u5F00\u59CB\u4FEE\u4ED9\u4E4B\u8DEF\u5427\uFF01';
+    } else if (total >= 450) {
+      title = '\u52E4\u80FD\u8865\u62D9\uFF01';
+      msg = name + '\uFF0C\u6839\u9AA8\u5C1A\u53EF\uFF0C\u52E4\u80FD\u8865\u62D9\uFF0C\u4FEE\u4ED9\u4E4B\u8DEF\u91CD\u5728\u575A\u6301\uFF01';
+    } else {
+      title = '\u6F5C\u529B\u65E0\u9650\uFF01';
+      msg = name + '\uFF0C\u4E07\u4E2D\u65E0\u4E00\u7684...\u6F5C\u529B\u80A1\uFF01\u4FEE\u4ED9\u4E4B\u8DEF\u4ECE\u811A\u4E0B\u5F00\u59CB\uFF01';
+    }
+
+    this.setData({
+      welcomeMsg: msg,
+      welcomeTitle: title,
+      step: 3
+    });
   },
 
-  // ========== Step 3: 完成 ==========
-  enterWorld: function () {
+  // ========== Step 3: Ceremonial Welcome ==========
+  startCinematic: function() {
+    this._saveCharacter();
+    this.setData({ step: 4, cinematicIdx: 0, cinematicDone: false });
+    this._runCinematic();
+  },
+
+  _runCinematic: function() {
+    var self = this;
+    var texts = this.data.cinematicTexts;
+    var idx = 0;
+
+    function showNext() {
+      if (idx >= texts.length) {
+        // All done, transition to main page
+        setTimeout(function() {
+          wx.switchTab({ url: '/pages/map/map' });
+        }, 1500);
+        self.setData({ cinematicDone: true });
+        return;
+      }
+      self.setData({ cinematicIdx: idx });
+      idx++;
+      setTimeout(showNext, 2200);
+    }
+
+    showNext();
+  },
+
+  skipCinematic: function() {
+    wx.switchTab({ url: '/pages/map/map' });
+  },
+
+  // ========== Save Character ==========
+  _saveCharacter: function() {
     var char = game.createCharacter();
     char.name = (this.data.name || '').trim();
 
-    // Save initial scores
     var scores = {};
-    this.data.subjects.forEach(function (s) {
-      var num = parseInt(s.score, 10);
-      scores[s.key] = isNaN(num) ? 0 : num;
-    });
+    var subjects = this.data.subjects;
+    for (var i = 0; i < subjects.length; i++) {
+      var num = parseInt(subjects[i].score, 10);
+      scores[subjects[i].key] = isNaN(num) ? 0 : num;
+    }
     char.initialScores = scores;
-
-    // Set play date
     char.lastPlayDate = new Date().toISOString().slice(0, 10);
     char.streakDays = 1;
-
-    // Cultivation fields
     char.totalCultivation = 0;
     char.cultivationStartDate = new Date().toISOString();
 
     game.saveGame(char);
-
-    wx.showToast({
-      title: '\u6B22\u8FCE\u6765\u5230\u4FEE\u4ED9\u4E4B\u8DEF\uFF01',
-      icon: 'success',
-      duration: 1500
-    });
-
-    setTimeout(function () {
-      wx.switchTab({ url: '/pages/map/map' });
-    }, 1500);
   },
 
-  // ========== 导航 ==========
-  goBack: function () {
-    if (this.data.step > 0) {
-      this.setData({ step: this.data.step - 1 });
+  // ========== Navigation ==========
+  goBack: function() {
+    var s = this.data.step;
+    if (s > 0 && s < 4) {
+      this.setData({ step: s - 1 });
     }
   }
 });

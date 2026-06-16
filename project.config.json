@@ -1,5 +1,5 @@
 {
-  "description": "走向清华 - 高考备战学习规划",
+  "description": "清北修仙传 - 修仙备考小程序",
   "packOptions": {
     "ignore": [],
     "include": []
@@ -45,7 +45,7 @@
   "compileType": "miniprogram",
   "libVersion": "3.16.1",
   "appid": "wxc2db4261985fffa7",
-  "projectname": "走向清华",
+  "projectname": "清北修仙传",
   "condition": {},
   "editorSetting": {
     "tabIndent": "insertSpaces",

@@ -1,6 +1,7 @@
 var game = require('../../utils/game');
 var cult = require('../../utils/cultivation');
 var smartQuiz = require('../../utils/smart-quiz');
+var questionLoader = require('../../utils/question-loader');
 
 // Emoji Unicode strings (WXML不支持HTML实体)
 var EM_FIRE = '\uD83D\uDD25';       // 🔥
@@ -113,7 +114,9 @@ Page({
     }
 
     var history = wx.getStorageSync('answerHistory') || [];
-    var questions = smartQuiz.selectQuestions(subject, cult.DAILY_QUESTIONS, game.QUESTION_BANK, history);
+    var subjectBank = {};
+    subjectBank[subject] = questionLoader.loadSubject(subject);
+    var questions = smartQuiz.selectQuestions(subject, cult.DAILY_QUESTIONS, subjectBank, history);
 
     if (questions.length === 0) {
       wx.showToast({ title: '\u9898\u5E93\u6682\u65E0\u9898\u76EE', icon: 'none' });
