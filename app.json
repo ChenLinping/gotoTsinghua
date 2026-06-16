@@ -5,12 +5,6 @@
     "pages/character/character",
     "pages/shop/shop"
   ],
-  "subpackages": [
-    {
-      "root": "questionBank",
-      "pages": []
-    }
-  ],
   "window": {
     "navigationBarBackgroundColor": "#4f46e5",
     "navigationBarTitleText": "\u6E05\u5317\u4FEE\u4ED9\u4F20",
