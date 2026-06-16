@@ -179,11 +179,11 @@
   transition: width 0.5s ease;
 }
 .tl-node {
-  width: 32px; height: 32px;
+  width: 26px; height: 26px;
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   z-index: 1; position: relative;
-  border: 2px solid rgba(255,255,255,0.15);
+  border: 1.5px solid rgba(255,255,255,0.15);
   background: rgba(0,0,0,0.4);
 }
 .tl-done {
@@ -194,7 +194,7 @@
   border-width: 3px;
   box-shadow: 0 0 10px rgba(167,139,250,0.4);
 }
-.tl-icon { font-size: 14px; }
+.tl-icon { font-size: 12px; }
 .tl-labels {
   display: flex; justify-content: space-between;
   padding: 0 0;

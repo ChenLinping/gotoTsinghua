@@ -212,9 +212,9 @@
   flex-shrink: 0;
 }
 .tl-dot {
-  width: 10px; height: 10px; border-radius: 50%;
+  width: 7px; height: 7px; border-radius: 50%;
   z-index: 2; position: relative;
-  border: 2px solid rgba(255,255,255,0.2);
+  border: 1.5px solid rgba(255,255,255,0.2);
 }
 .tl-done { background: #4ade80; border-color: #22c55e; }
 .tl-cur { background: #a78bfa; border-color: #8b5cf6; box-shadow: 0 0 6px rgba(167,139,250,0.5); }

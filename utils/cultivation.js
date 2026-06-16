@@ -1,21 +1,23 @@
 // ==========================================
-// 清北修仙传 - 修仙境界体系
+// 清北修仙传 - 修仙境界体系 (九大境界)
+// 高考 = 渡劫，高考完 = 飞仙
 // ==========================================
 
 // 高考日期
 var EXAM_DATE = new Date('2027-06-07T09:00:00+08:00');
 
-// ========== 五大境界 ==========
+// ========== 九大境界 (凡人修仙传体系) ==========
+// 每境界4小阶，每小阶500XP，线性递增
 var REALMS = [
   {
     id: 0, name: '\u7EC3\u6C14\u671F', icon: '\uD83C\uDF31',
     color: '#10b981', bg: 'linear-gradient(180deg, #064e3b 0%, #065f46 50%, #047857 100%)',
-    desc: '\u6691\u5047\u9884\u4E60\uFF0C\u5939\u5B9E\u57FA\u7840',
+    desc: '\u6691\u5047\u9884\u4E60\uFF0C\u592F\u5B9E\u57FA\u7840',
     stages: [
       { name: '\u521D\u671F', threshold: 0 },
-      { name: '\u4E2D\u671F', threshold: 300 },
-      { name: '\u540E\u671F', threshold: 600 },
-      { name: '\u5927\u5706\u6EE1', threshold: 900 }
+      { name: '\u4E2D\u671F', threshold: 500 },
+      { name: '\u540E\u671F', threshold: 1000 },
+      { name: '\u5927\u5706\u6EE1', threshold: 1500 }
     ]
   },
   {
@@ -23,10 +25,10 @@ var REALMS = [
     color: '#6366f1', bg: 'linear-gradient(180deg, #1e1b4b 0%, #312e81 50%, #3730a3 100%)',
     desc: '\u4E00\u8F6E\u590D\u4E60\uFF0C\u7CFB\u7EDF\u68B3\u7406',
     stages: [
-      { name: '\u521D\u671F', threshold: 1200 },
-      { name: '\u4E2D\u671F', threshold: 2000 },
-      { name: '\u540E\u671F', threshold: 2800 },
-      { name: '\u5927\u5706\u6EE1', threshold: 3600 }
+      { name: '\u521D\u671F', threshold: 2000 },
+      { name: '\u4E2D\u671F', threshold: 2500 },
+      { name: '\u540E\u671F', threshold: 3000 },
+      { name: '\u5927\u5706\u6EE1', threshold: 3500 }
     ]
   },
   {
@@ -35,9 +37,9 @@ var REALMS = [
     desc: '\u5BD2\u5047\u5F3A\u5316\uFF0C\u91CD\u70B9\u7A81\u7834',
     stages: [
       { name: '\u521D\u671F', threshold: 4000 },
-      { name: '\u4E2D\u671F', threshold: 4800 },
-      { name: '\u540E\u671F', threshold: 5600 },
-      { name: '\u5927\u5706\u6EE1', threshold: 6400 }
+      { name: '\u4E2D\u671F', threshold: 4500 },
+      { name: '\u540E\u671F', threshold: 5000 },
+      { name: '\u5927\u5706\u6EE1', threshold: 5500 }
     ]
   },
   {
@@ -45,27 +47,71 @@ var REALMS = [
     color: '#ef4444', bg: 'linear-gradient(180deg, #7f1d1d 0%, #991b1b 50%, #b91c1c 100%)',
     desc: '\u4E8C\u8F6E\u4E13\u9898\uFF0C\u5F3A\u5316\u9898\u578B',
     stages: [
-      { name: '\u521D\u671F', threshold: 7000 },
-      { name: '\u4E2D\u671F', threshold: 7800 },
-      { name: '\u540E\u671F', threshold: 8600 },
-      { name: '\u5927\u5706\u6EE1', threshold: 9400 }
+      { name: '\u521D\u671F', threshold: 6000 },
+      { name: '\u4E2D\u671F', threshold: 6500 },
+      { name: '\u540E\u671F', threshold: 7000 },
+      { name: '\u5927\u5706\u6EE1', threshold: 7500 }
     ]
   },
   {
-    id: 4, name: '\u5316\u795E\u5883', icon: '\uD83C\uDFC6',
+    id: 4, name: '\u5316\u795E\u671F', icon: '\u26A1',
     color: '#a855f7', bg: 'linear-gradient(180deg, #4a1d96 0%, #5b21b6 50%, #6d28d9 100%)',
-    desc: '\u4E09\u8F6E\u51B2\u523A\uFF0C\u5706\u68A6\u6E05\u534E',
+    desc: '\u4E09\u8F6E\u51B2\u523A\uFF0C\u67E5\u7F3A\u8865\u6F0F',
+    stages: [
+      { name: '\u521D\u671F', threshold: 8000 },
+      { name: '\u4E2D\u671F', threshold: 8500 },
+      { name: '\u540E\u671F', threshold: 9000 },
+      { name: '\u5927\u5706\u6EE1', threshold: 9500 }
+    ]
+  },
+  {
+    id: 5, name: '\u70BC\u865A\u671F', icon: '\uD83C\uDF00',
+    color: '#0891b2', bg: 'linear-gradient(180deg, #083344 0%, #164e63 50%, #155e75 100%)',
+    desc: '\u6A21\u62DF\u5B9E\u6218\uFF0C\u63D0\u5347\u901F\u5EA6',
     stages: [
       { name: '\u521D\u671F', threshold: 10000 },
-      { name: '\u4E2D\u671F', threshold: 11000 },
-      { name: '\u540E\u671F', threshold: 12000 },
-      { name: '\u5927\u5706\u6EE1', threshold: 13000 }
+      { name: '\u4E2D\u671F', threshold: 10500 },
+      { name: '\u540E\u671F', threshold: 11000 },
+      { name: '\u5927\u5706\u6EE1', threshold: 11500 }
+    ]
+  },
+  {
+    id: 6, name: '\u5408\u4F53\u671F', icon: '\uD83D\uDCAB',
+    color: '#d946ef', bg: 'linear-gradient(180deg, #4a044e 0%, #701a75 50%, #86198f 100%)',
+    desc: '\u771F\u9898\u7CBE\u7EC3\uFF0C\u878D\u4F1A\u8D2F\u901A',
+    stages: [
+      { name: '\u521D\u671F', threshold: 12000 },
+      { name: '\u4E2D\u671F', threshold: 12500 },
+      { name: '\u540E\u671F', threshold: 13000 },
+      { name: '\u5927\u5706\u6EE1', threshold: 13500 }
+    ]
+  },
+  {
+    id: 7, name: '\u5927\u4E58\u671F', icon: '\uD83C\uDF1F',
+    color: '#eab308', bg: 'linear-gradient(180deg, #713f12 0%, #854d0e 50%, #a16207 100%)',
+    desc: '\u8003\u524D\u8C03\u6574\uFF0C\u7A33\u5B9A\u5FC3\u6001',
+    stages: [
+      { name: '\u521D\u671F', threshold: 14000 },
+      { name: '\u4E2D\u671F', threshold: 14500 },
+      { name: '\u540E\u671F', threshold: 15000 },
+      { name: '\u5927\u5706\u6EE1', threshold: 15500 }
+    ]
+  },
+  {
+    id: 8, name: '\u6E21\u52AB\u671F', icon: '\u2694\uFE0F',
+    color: '#dc2626', bg: 'linear-gradient(180deg, #450a0a 0%, #7f1d1d 50%, #991b1b 100%)',
+    desc: '\u9AD8\u8003\u51B3\u6218\uFF0C\u6E21\u52AB\u98DE\u4ED9',
+    stages: [
+      { name: '\u521D\u671F', threshold: 16000 },
+      { name: '\u4E2D\u671F', threshold: 16500 },
+      { name: '\u540E\u671F', threshold: 17000 },
+      { name: '\u5927\u5706\u6EE1', threshold: 17500 }
     ]
   }
 ];
 
 // 最高境界总修为
-var MAX_CULTIVATION = 13000;
+var MAX_CULTIVATION = 18000;
 
 // 每日答题数量
 var DAILY_QUESTIONS = 10;

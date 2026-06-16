@@ -97,7 +97,7 @@
     <view class="realm-timeline">
       <view class="tl-track">
         <view class="tl-line-bg">
-          <view class="tl-line-fill" style="width:{{realmIdx / 4 * 100}}%;"></view>
+          <view class="tl-line-fill" style="width:{{realmIdx / 8 * 100}}%;"></view>
         </view>
         <view wx:for="{{realms}}" wx:key="name"
           class="tl-node {{index < realmIdx ? 'tl-done' : index === realmIdx ? 'tl-cur' : 'tl-lock'}}"

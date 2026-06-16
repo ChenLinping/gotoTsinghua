@@ -39,7 +39,7 @@
     <view class="splash-features">
       <view class="sf-item">
         <text class="sf-icon">{{'⚡'}}</text>
-        <text class="sf-text">五大境界 · 二十重突破</text>
+        <text class="sf-text">九大境界 · 三十六重突破</text>
       </view>
       <view class="sf-item">
         <text class="sf-icon">{{'📚'}}</text>
@@ -164,8 +164,8 @@
         <text class="wsr-label">初始境界</text>
       </view>
       <view class="wsr-item">
-        <text class="wsr-val">化神大圆满</text>
-        <text class="wsr-label">终极目标</text>
+        <text class="wsr-val">渡劫大圆满</text>
+        <text class="wsr-label">飞仙目标</text>
       </view>
     </view>
 

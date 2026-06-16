@@ -83,11 +83,11 @@
 
     <!-- 境界总览(底部) -->
     <view class="realm-timeline">
-      <view wx:for="{{5}}" wx:for-item="r" wx:for-index="ri" wx:key="ri"
+      <view wx:for="{{9}}" wx:for-item="r" wx:for-index="ri" wx:key="ri"
         class="tl-dot {{ri < realmInfo.realmIdx ? 'tl-done' : ri === realmInfo.realmIdx ? 'tl-cur' : 'tl-lock'}}">
       </view>
       <view class="tl-line">
-        <view class="tl-line-fill" style="width:{{(realmInfo.realmIdx / 4) * 100}}%;"></view>
+        <view class="tl-line-fill" style="width:{{(realmInfo.realmIdx / 8) * 100}}%;"></view>
       </view>
     </view>
 
