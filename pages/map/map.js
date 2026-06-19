@@ -87,6 +87,29 @@ Page({
     var cultDays = cult.getCultivationDays(char.cultivationStartDate);
     var level = cult.getCultivationLevel(char.totalCultivation);
 
+    // Character image path based on gender and realm
+    var gender = char.gender || 'male';
+    var charImg = '/images/char/char_' + gender + '_' + realmInfo.realmIdx + '.jpg';
+
+    // Current equipment
+    var equipItems = [];
+    if (realmInfo.realmIdx >= 0) {
+      var allEquip = cult.getEquipForRealm(realmInfo.realmIdx, gender);
+      // Show equipped items (those the player has earned)
+      var owned = char.ownedEquip || [];
+      for (var e = 0; e < allEquip.length; e++) {
+        var isOwned = owned.indexOf(allEquip[e].id) >= 0;
+        equipItems.push({
+          id: allEquip[e].id,
+          name: allEquip[e].name,
+          type: allEquip[e].type,
+          rarity: allEquip[e].rarity,
+          img: allEquip[e].img,
+          owned: isOwned
+        });
+      }
+    }
+
     var now = new Date();
     var dateStr = (now.getMonth() + 1) + '\u6708' + now.getDate() + '\u65E5';
 
@@ -97,6 +120,9 @@ Page({
       daysLeft: daysLeft,
       cultDays: cultDays,
       level: level,
+      charImg: charImg,
+      charGender: gender,
+      equipItems: equipItems,
       todayDone: false,
       state: 'idle',
       selectedSubject: null,
@@ -260,6 +286,26 @@ Page({
 
     var breakthrough = cult.checkBreakthrough(oldXP, newXP);
 
+    // Grant equipment on realm breakthrough
+    var newEquipIds = [];
+    var newEquips = [];
+    if (breakthrough && breakthrough.type === 'realm') {
+      var newRealmIdx = cult.getCurrentRealm(newXP).realmIdx;
+      var gender = char.gender || 'male';
+      var newEquip = cult.getEquipForRealm(newRealmIdx, gender);
+      var ownedEquip = char.ownedEquip || [];
+      for (var eq = 0; eq < newEquip.length; eq++) {
+        if (ownedEquip.indexOf(newEquip[eq].id) < 0) {
+          ownedEquip.push(newEquip[eq].id);
+          newEquipIds.push(newEquip[eq].id);
+          newEquips.push(newEquip[eq]);
+        }
+      }
+      char.ownedEquip = ownedEquip;
+      char.equippedSet = newRealmIdx;
+      game.saveGame(char);
+    }
+
     // 保存答题记录 (只保存最终答对的)
     var history = wx.getStorageSync('answerHistory') || [];
     var questions = this.data.questions;
@@ -310,7 +356,9 @@ Page({
       totalCultivation: newXP,
       realmInfo: realmInfo,
       char: char,
-      resultIcon: resultIcon
+      resultIcon: resultIcon,
+      newEquipIds: newEquipIds,
+      newEquips: newEquips
     });
 
     if (breakthrough) {

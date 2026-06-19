@@ -1,23 +1,25 @@
 <view class="page-bg">
 
   <!-- 自定义导航栏 -->
-  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;" wx:if="{{step >= 1 && step <= 3}}">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;" wx:if="{{step >= 1 && step <= 4}}">
     <view class="nav-bar">
-      <view wx:if="{{step >= 1 && step <= 2}}" class="nav-back" bindtap="goBack">
+      <view wx:if="{{step >= 1 && step <= 3}}" class="nav-back" bindtap="goBack">
         <text class="nav-back-text">{{'< '}} 返回</text>
       </view>
-      <text class="nav-title">{{step === 1 ? '报名修仙' : step === 2 ? '灵根鉴定' : '仙缘已至'}}</text>
-      <view class="nav-spacer" wx:if="{{step >= 1 && step <= 2}}"></view>
+      <text class="nav-title">{{step === 1 ? '报名修仙' : step === 2 ? '选择性别' : step === 3 ? '灵根鉴定' : '仙缘已至'}}</text>
+      <view class="nav-spacer" wx:if="{{step >= 1 && step <= 3}}"></view>
     </view>
   </view>
 
   <!-- 步骤指示器 -->
-  <view class="step-indicator" wx:if="{{step >= 1 && step <= 3}}">
+  <view class="step-indicator" wx:if="{{step >= 1 && step <= 4}}">
     <view class="step-dot {{step >= 1 ? 'step-active' : ''}}"></view>
     <view class="step-line {{step >= 2 ? 'line-active' : ''}}"></view>
     <view class="step-dot {{step >= 2 ? 'step-active' : ''}}"></view>
     <view class="step-line {{step >= 3 ? 'line-active' : ''}}"></view>
     <view class="step-dot {{step >= 3 ? 'step-active' : ''}}"></view>
+    <view class="step-line {{step >= 4 ? 'line-active' : ''}}"></view>
+    <view class="step-dot {{step >= 4 ? 'step-active' : ''}}"></view>
   </view>
 
   <!-- ========== Step 0: 品牌首页 ========== -->
@@ -91,8 +93,30 @@
     </view>
   </view>
 
-  <!-- ========== Step 2: 成绩输入 ========== -->
-  <view class="step-content score-view" wx:if="{{step === 2}}" style="padding-top: {{statusBarHeight + 44 + 10}}px;">
+  <!-- ========== Step 2: 性别选择 ========== -->
+  <view class="step-content" wx:if="{{step === 2}}" style="padding-top: {{statusBarHeight + 44 + 20}}px;">
+    <view class="gender-header">
+      <text class="step-emoji">{{'\u2694\uFE0F'}}</text>
+      <text class="step-title">{{'\u9009\u62E9\u4FEE\u884C\u4E4B\u8EAB'}}</text>
+      <text class="step-desc">{{'\u4F60\u5C06\u4EE5\u4F55\u79CD\u8EAB\u4EFD\u8E0F\u5165\u4ED9\u9014\uFF1F'}}</text>
+    </view>
+
+    <view class="gender-options">
+      <view class="gender-card {{selectedGender === 'male' ? 'gender-active' : ''}}" bindtap="selectGender" data-gender="male">
+        <text class="gender-icon">{{'\u2694\uFE0F'}}</text>
+        <text class="gender-name">{{'\u7537\u4FEE'}}</text>
+        <text class="gender-desc">{{'\u5FA1\u5251\u98DE\u884C\uFF0C\u6218\u5929\u6597\u5730'}}</text>
+      </view>
+      <view class="gender-card {{selectedGender === 'female' ? 'gender-active' : ''}}" bindtap="selectGender" data-gender="female">
+        <text class="gender-icon">{{'\uD83C\uDF38'}}</text>
+        <text class="gender-name">{{'\u5973\u4FEE'}}</text>
+        <text class="gender-desc">{{'\u7075\u88D9\u98D8\u9038\uFF0C\u4ED9\u6C14\u7F20\u7EF5'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ========== Step 3: 成绩输入 ========== -->
+  <view class="step-content score-view" wx:if="{{step === 3}}" style="padding-top: {{statusBarHeight + 44 + 10}}px;">
 
     <view class="score-header">
       <text class="score-header-icon">{{'🔮'}}</text>
@@ -139,8 +163,8 @@
     </view>
   </view>
 
-  <!-- ========== Step 3: 仪式感欢迎 ========== -->
-  <view class="step-content welcome-view" wx:if="{{step === 3}}" style="padding-top: {{statusBarHeight + 44 + 10}}px;">
+  <!-- ========== Step 4: 仪式感欢迎 ========== -->
+  <view class="step-content welcome-view" wx:if="{{step === 4}}" style="padding-top: {{statusBarHeight + 44 + 10}}px;">
 
     <view class="welcome-portal">
       <view class="portal-ring"></view>
@@ -174,8 +198,8 @@
     </view>
   </view>
 
-  <!-- ========== Step 4: 开场动画 ========== -->
-  <view class="cinematic-overlay" wx:if="{{step === 4}}">
+  <!-- ========== Step 5: 开场动画 ========== -->
+  <view class="cinematic-overlay" wx:if="{{step === 5}}">
     <view class="cin-bg" bindtap="skipCinematic"></view>
 
     <!-- 灵气粒子 -->

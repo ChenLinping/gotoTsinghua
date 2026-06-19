@@ -159,6 +159,36 @@ Page({
       });
     }
 
+    // 5. Character image
+    var gender = char.gender || 'male';
+    var charImg = '/images/char/char_' + gender + '_' + realmIdx + '.jpg';
+
+    // 6. Equipment list
+    var equipList = [];
+    var ownedEquip = char.ownedEquip || [];
+    for (var r = 0; r <= realmIdx; r++) {
+      var realmEquip = cult.getEquipForRealm(r, gender);
+      for (var e = 0; e < realmEquip.length; e++) {
+        var eq = realmEquip[e];
+        var isOwned = ownedEquip.indexOf(eq.id) >= 0;
+        var realmName = cult.REALMS[r].name;
+        equipList.push({
+          id: eq.id,
+          name: eq.name,
+          type: eq.type,
+          rarity: eq.rarity,
+          desc: eq.desc,
+          img: eq.img,
+          owned: isOwned,
+          realmName: realmName
+        });
+      }
+    }
+    var equipOwnedCount = 0;
+    for (var i = 0; i < equipList.length; i++) {
+      if (equipList[i].owned) equipOwnedCount++;
+    }
+
     this.setData({
       char: char,
       realmInfo: realmInfo,
@@ -175,7 +205,11 @@ Page({
       earnedRealm: earnedRealm,
       earnedCult: earnedCult,
       earnedAnswer: earnedAnswer,
-      earnedSubject: earnedSubject
+      earnedSubject: earnedSubject,
+      charImg: charImg,
+      charGender: gender,
+      equipList: equipList,
+      equipOwnedCount: equipOwnedCount
     });
   }
 });

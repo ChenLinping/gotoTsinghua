@@ -172,7 +172,33 @@
 .name-placeholder { color: #64748b; font-weight: 400; }
 .error-text { display: block; font-size: 12px; color: #f87171; margin-top: 6px; padding-left: 4px; }
 
-/* ========== Step 2: 成绩输入 ========== */
+/* ========== Step 2: Gender Selection ========== */
+.step-emoji { font-size: 48px; display: block; margin-bottom: 12px; }
+.step-title { display: block; font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 8px; letter-spacing: 2px; }
+.step-desc { display: block; font-size: 13px; color: #a5b4fc; }
+.gender-header {
+  text-align: center; margin-bottom: 24px;
+}
+.gender-options {
+  display: flex; gap: 16px; padding: 0 20px;
+}
+.gender-card {
+  flex: 1; background: rgba(255,255,255,0.06);
+  border-radius: 16px; padding: 24px 16px;
+  display: flex; flex-direction: column; align-items: center;
+  border: 2px solid rgba(255,255,255,0.08);
+  transition: all 0.3s;
+}
+.gender-card:active { transform: scale(0.96); }
+.gender-active {
+  border-color: #a78bfa;
+  background: rgba(139,92,246,0.15);
+}
+.gender-icon { font-size: 48px; margin-bottom: 12px; }
+.gender-name { font-size: 18px; font-weight: 800; color: #e2e8f0; margin-bottom: 8px; }
+.gender-desc { font-size: 12px; color: #94a3b8; text-align: center; line-height: 1.5; }
+
+/* ========== Step 3: 成绩输入 ========== */
 .score-view { padding-top: 0; }
 
 .score-header { text-align: center; margin-bottom: 12px; }
@@ -220,7 +246,7 @@
 .summary-value.warn { color: #f87171; }
 .warn-text { display: block; font-size: 11px; color: #f87171; margin-top: 6px; text-align: center; }
 
-/* ========== Step 3: 仪式感欢迎 ========== */
+/* ========== Step 4: 仪式感欢迎 ========== */
 .welcome-view { justify-content: center; }
 
 .welcome-portal {
@@ -293,7 +319,7 @@
 
 .cinematic-btn { margin-top: 8px; }
 
-/* ========== Step 4: 开场动画 ========== */
+/* ========== Step 5: 开场动画 ========== */
 .cinematic-overlay {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
   z-index: 9999;

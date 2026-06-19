@@ -22,6 +22,7 @@ Page({
     step: 0,
     name: '',
     nameError: '',
+    selectedGender: '',
     subjects: SUBJECTS,
     totalScore: 0,
     maxTotal: 750,
@@ -75,7 +76,13 @@ Page({
     this.setData({ step: 2 });
   },
 
-  // ========== Step 2: Score Input ==========
+  // ========== Step 2: Gender Selection ==========
+  selectGender: function(e) {
+    var gender = e.currentTarget.dataset.gender;
+    this.setData({ selectedGender: gender, step: 3 });
+  },
+
+  // ========== Step 3: Score Input ==========
   onScoreInput: function(e) {
     var idx = e.currentTarget.dataset.idx;
     var val = e.detail.value;
@@ -129,14 +136,14 @@ Page({
     this.setData({
       welcomeMsg: msg,
       welcomeTitle: title,
-      step: 3
+      step: 4
     });
   },
 
-  // ========== Step 3: Ceremonial Welcome ==========
+  // ========== Step 4: Ceremonial Welcome ==========
   startCinematic: function() {
     this._saveCharacter();
-    this.setData({ step: 4, cinematicIdx: 0, cinematicDone: false });
+    this.setData({ step: 5, cinematicIdx: 0, cinematicDone: false });
     this._runCinematic();
   },
 
@@ -170,6 +177,15 @@ Page({
   _saveCharacter: function() {
     var char = game.createCharacter();
     char.name = (this.data.name || '').trim();
+    char.gender = this.data.selectedGender;
+
+    // Grant realm 0 starting equipment
+    if (char.gender === 'female') {
+      char.ownedEquip = ['fw0', 'fm0'];
+    } else {
+      char.ownedEquip = ['mw0', 'mm0'];
+    }
+    char.equippedSet = 0;
 
     var scores = {};
     var subjects = this.data.subjects;
@@ -189,7 +205,7 @@ Page({
   // ========== Navigation ==========
   goBack: function() {
     var s = this.data.step;
-    if (s > 0 && s < 4) {
+    if (s > 0 && s < 5) {
       this.setData({ step: s - 1 });
     }
   }

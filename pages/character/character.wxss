@@ -115,3 +115,54 @@
   background: #6366f1;
   transition: width 0.3s;
 }
+
+/* ===== Character Portrait ===== */
+.char-portrait {
+  width: 60px; height: 90px;
+  border-radius: 8px;
+}
+
+/* ===== Equipment Grid ===== */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.section-title {
+  font-size: 14px; font-weight: 800; color: #fff;
+}
+.section-count {
+  font-size: 11px; font-weight: 600;
+  color: rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.06);
+  padding: 2px 8px; border-radius: 10px;
+}
+.equip-grid {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 0 4px;
+}
+.equip-card {
+  width: calc(50% - 4px);
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px; padding: 10px;
+  display: flex; flex-direction: column; align-items: center;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-sizing: border-box;
+}
+.card-owned { border-color: rgba(139,92,246,0.3); }
+.card-locked { opacity: 0.35; }
+.equip-card-img { width: 48px; height: 48px; border-radius: 6px; margin-bottom: 4px; }
+.equip-card-lock { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 4px; }
+.equip-card-name { font-size: 12px; font-weight: 700; color: #e2e8f0; }
+.equip-card-realm { font-size: 9px; color: #64748b; margin-top: 2px; }
+.equip-card-rarity {
+  font-size: 8px; font-weight: 600; color: #fff;
+  padding: 1px 6px; border-radius: 3px; margin-top: 4px;
+}
+.rarity-common .equip-card-rarity { background: #64748b; }
+.rarity-rare .equip-card-rarity { background: #3b82f6; }
+.rarity-epic .equip-card-rarity { background: #a855f7; }
+.rarity-legendary .equip-card-rarity { background: #f59e0b; }
+.rarity-common { border-left: 3px solid #64748b; }
+.rarity-rare { border-left: 3px solid #3b82f6; }
+.rarity-epic { border-left: 3px solid #a855f7; }
+.rarity-legendary { border-left: 3px solid #f59e0b; }
