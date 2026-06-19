@@ -96,21 +96,21 @@
   <!-- ========== Step 2: 性别选择 ========== -->
   <view class="step-content" wx:if="{{step === 2}}" style="padding-top: {{statusBarHeight + 44 + 20}}px;">
     <view class="gender-header">
-      <text class="step-emoji">{{'\u2694\uFE0F'}}</text>
-      <text class="step-title">{{'\u9009\u62E9\u4FEE\u884C\u4E4B\u8EAB'}}</text>
-      <text class="step-desc">{{'\u4F60\u5C06\u4EE5\u4F55\u79CD\u8EAB\u4EFD\u8E0F\u5165\u4ED9\u9014\uFF1F'}}</text>
+      <text class="step-emoji">⚔️</text>
+      <text class="step-title">选择修行之身</text>
+      <text class="step-desc">你将以何种身份踏入仙途？</text>
     </view>
 
     <view class="gender-options">
       <view class="gender-card {{selectedGender === 'male' ? 'gender-active' : ''}}" bindtap="selectGender" data-gender="male">
-        <text class="gender-icon">{{'\u2694\uFE0F'}}</text>
-        <text class="gender-name">{{'\u7537\u4FEE'}}</text>
-        <text class="gender-desc">{{'\u5FA1\u5251\u98DE\u884C\uFF0C\u6218\u5929\u6597\u5730'}}</text>
+        <text class="gender-icon">⚔️</text>
+        <text class="gender-name">男修</text>
+        <text class="gender-desc">御剑飞行，战天斗地</text>
       </view>
       <view class="gender-card {{selectedGender === 'female' ? 'gender-active' : ''}}" bindtap="selectGender" data-gender="female">
-        <text class="gender-icon">{{'\uD83C\uDF38'}}</text>
-        <text class="gender-name">{{'\u5973\u4FEE'}}</text>
-        <text class="gender-desc">{{'\u7075\u88D9\u98D8\u9038\uFF0C\u4ED9\u6C14\u7F20\u7EF5'}}</text>
+        <text class="gender-icon">🌸</text>
+        <text class="gender-name">女修</text>
+        <text class="gender-desc">灵裙飘逸，仙气缠绵</text>
       </view>
     </view>
   </view>

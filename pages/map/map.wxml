@@ -37,7 +37,7 @@
       <view class="equip-row" wx:if="{{equipItems.length > 0}}">
         <view wx:for="{{equipItems}}" wx:key="id" class="equip-thumb {{item.owned ? 'equip-owned' : 'equip-locked'}}">
           <image wx:if="{{item.owned}}" class="equip-img" src="{{item.img}}" mode="aspectFit" />
-          <text wx:if="{{!item.owned}}" class="equip-lock">{{'\uD83D\uDD12'}}</text>
+          <text wx:if="{{!item.owned}}" class="equip-lock">🔒</text>
           <text class="equip-name">{{item.name}}</text>
         </view>
       </view>
@@ -185,11 +185,11 @@
 
       <!-- New equipment earned -->
       <view class="new-equip-section" wx:if="{{newEquips && newEquips.length > 0}}">
-        <text class="new-equip-title">{{'\u83B7\u5F97\u65B0\u88C5\u5907!'}}</text>
+        <text class="new-equip-title">获得新装备!</text>
         <view wx:for="{{newEquips}}" wx:key="id" class="new-equip-card rarity-{{item.rarity}}">
           <image class="new-equip-img" src="{{item.img}}" mode="aspectFit" />
           <text class="new-equip-name">{{item.name}}</text>
-          <text class="new-equip-rarity">{{item.rarity === 'common' ? '\u666E\u901A' : item.rarity === 'rare' ? '\u7A00\u6709' : item.rarity === 'epic' ? '\u53F2\u8BD7' : '\u4F20\u8BF4'}}</text>
+          <text class="new-equip-rarity">{{item.rarity === 'common' ? '普通' : item.rarity === 'rare' ? '稀有' : item.rarity === 'epic' ? '史诗' : '传说'}}</text>
         </view>
       </view>
 

@@ -16,18 +16,18 @@
   <!-- 装备展示 -->
   <view class="bag-section">
     <view class="section-header">
-      <text class="section-title">{{'\u6CD5\u5B9D\u88C5\u5907'}}</text>
+      <text class="section-title">法宝装备</text>
       <text class="section-count">{{equipOwnedCount}} / {{equipList.length}}</text>
     </view>
     <view class="equip-grid">
       <view wx:for="{{equipList}}" wx:key="id" class="equip-card rarity-{{item.rarity}} {{item.owned ? 'card-owned' : 'card-locked'}}">
         <image wx:if="{{item.owned}}" class="equip-card-img" src="{{item.img}}" mode="aspectFit" />
         <view wx:if="{{!item.owned}}" class="equip-card-lock">
-          <text>{{'\uD83D\uDD12'}}</text>
+          <text>🔒</text>
         </view>
         <text class="equip-card-name">{{item.name}}</text>
         <text class="equip-card-realm">{{item.realmName}}</text>
-        <text class="equip-card-rarity">{{item.rarity === 'common' ? '\u666E\u901A' : item.rarity === 'rare' ? '\u7A00\u6709' : item.rarity === 'epic' ? '\u53F2\u8BD7' : '\u4F20\u8BF4'}}</text>
+        <text class="equip-card-rarity">{{item.rarity === 'common' ? '普通' : item.rarity === 'rare' ? '稀有' : item.rarity === 'epic' ? '史诗' : '传说'}}</text>
       </view>
     </view>
   </view>
